@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="HTP" default="build" basedir=".">
+
+	<property file="build.properties" />
+	<property name="compile.dir" location="war/WEB-INF/classes" />
+	<property name="lib.dir" location="lib" />
+	<property name="dist.dir" location="dist" />
+	<property name="dist.name" value="htp.war" />
+	<property name="dist.lib" location="war/WEB-INF/lib" />
+	<property name="gwt.entry.point" value="edu.mayo.phenoportal.Htp" />
+
+	<!-- Non-server libs referenced at complie time only (such as JUnit) -->
+	<path id="project.class.path">
+		<pathelement location="${compile.dir}" />
+		<pathelement location="${gwt.sdk}/gwt-user.jar" />
+		<fileset dir="${gwt.sdk}" includes="gwt-dev*.jar" />
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+		<fileset dir="${dist.lib}" includes="**/*.jar" />
+	</path>
+
+	<!-- Add any additional server libs that need to be copied -->
+	<target name="libs" description="Copy libs to WEB-INF/lib">
+		<mkdir dir="${dist.lib}" />
+		<copy todir="${dist.lib}" file="${gwt.sdk}/gwt-servlet.jar" />
+		<copy todir="${dist.lib}" file="${gwt.sdk}/gwt-servlet-deps.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/commons-codec-1.6.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/commons-fileupload-1.2.2.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/commons-io-2.4.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/commons-logging-1.1.1.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/guava-12.0.1.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/jaxrs-api-2.3.4.Final.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/log4j-1.2.16.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/mime-util-1.3.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/mysql-connector-java-5.1.19-bin.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/poi-3.8-20120326.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/resteasy-jaxrs-2.3.4.Final.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/xercesImpl-2.6.2.jar" />
+	</target>
+
+	<target name="javac" depends="libs" description="Compile java source to bytecode">
+		<mkdir dir="${compile.dir}" />
+		<javac srcdir="src" includes="**" encoding="utf-8" destdir="${compile.dir}" source="1.5" target="1.5" nowarn="true" debug="true" debuglevel="lines,vars,source" includeantruntime="false">
+			<classpath refid="project.class.path" />
+		</javac>
+		<copy todir="${compile.dir}">
+			<fileset dir="src" excludes="**/*.java" />
+		</copy>
+	</target>
+
+	<target name="gwtc" depends="javac" description="GWT compile to JavaScript (production mode)">
+		<java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+			<classpath>
+				<pathelement location="src" />
+				<path refid="project.class.path" />
+				<pathelement location="${gwt.sdk}/validation-api-1.0.0.GA.jar" />
+				<pathelement location="${gwt.sdk}/validation-api-1.0.0.GA-sources.jar" />
+			</classpath>
+			<!-- add jvmarg -Xss16M or similar if you see a StackOverflowError -->
+			<jvmarg value="-Xmx256M" />
+			<arg line="-war" />
+			<arg value="war" />
+			<arg line="-logLevel WARN" />
+			<arg line="${gwt.args}" />
+			<arg value="${gwt.entry.point}" />
+		</java>
+	</target>
+
+	<target name="devmode" depends="javac" description="Run development mode">
+		<java failonerror="true" fork="true" classname="com.google.gwt.dev.DevMode">
+			<classpath>
+				<pathelement location="src" />
+				<path refid="project.class.path" />
+				<pathelement location="${gwt.sdk}/validation-api-1.0.0.GA.jar" />
+				<pathelement location="${gwt.sdk}/validation-api-1.0.0.GA-sources.jar" />
+			</classpath>
+			<jvmarg value="-Xmx256M" />
+			<arg value="-startupUrl" />
+			<arg value="Htp.html" />
+			<arg line="-war" />
+			<arg value="war" />
+			<arg line="-logLevel DEBUG" />
+			<arg line="${gwt.args}" />
+			<arg value="${gwt.entry.point}" />
+		</java>
+	</target>
+
+	<target name="build" depends="gwtc" description="Build this project" />
+
+	<target name="war" depends="build" description="Create a war file">
+		<mkdir dir="${dist.dir}" />
+		<zip destfile="${dist.dir}/${dist.name}" basedir="war" />
+	</target>
+
+	<target name="clean" description="Cleans this project">
+		<delete dir="${compile.dir}" failonerror="false" />
+		<delete dir="war/htp" failonerror="false" />
+		<delete dir="${dist.dir}" failonerror="false" />
+	</target>
+
+	<target name="deploy-jboss" depends="war" description="Deploys war to jBoss">
+		<copy file="${dist.dir}/${dist.name}" todir="${jboss.application.deploy.dir}" />
+	</target>
+
+	<target name="deploy-tomcat6" depends="war" description="Deploys war to Tomcat 6">
+		<copy file="${dist.dir}/${dist.name}" todir="${tomcat6.application.deploy.dir}" />
+	</target>
+
+	<target name="deploy-tomcat7" depends="war" description="Deploys war to Tomcat">
+		<copy file="${dist.dir}/${dist.name}" todir="${tomcat7.application.deploy.dir}" />
+	</target>
+
+</project>

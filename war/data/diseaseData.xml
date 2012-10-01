@@ -1,0 +1,215 @@
+<Demographics>
+	<DemographicType>
+		<type>Denominator Population</type>
+		<DemographicCategory>
+			<name>gender</name>
+			<DemographicStat>
+				<label>female</label>
+				<value>105</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>male</label>
+				<value>83</value>
+			</DemographicStat>
+		</DemographicCategory>
+		<DemographicCategory>
+			<name>age</name>
+			<DemographicStat>
+				<label>(0,18)</label>
+				<value>14</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(19,30)</label>
+				<value>23</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(30,60)</label>
+				<value>59</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(60,75)</label>
+				<value>31</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(75,above)</label>
+				<value>61</value>
+			</DemographicStat>
+		</DemographicCategory>
+		<DemographicCategory>
+			<name>race</name>
+			<DemographicStat>
+				<label>American Indian</label>
+				<value>38</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Asian</label>
+				<value>33</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Black or African American</label>
+				<value>33</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Native Hawaiian</label>
+				<value>37</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>White</label>
+				<value>47</value>
+			</DemographicStat>
+		</DemographicCategory>
+		<DemographicCategory>
+			<name>ethnicity</name>
+			<DemographicStat>
+				<label>Hispanic or Latino</label>
+				<value>88</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Non Hispanic or Latio</label>
+				<value>100</value>
+			</DemographicStat>
+		</DemographicCategory>
+	</DemographicType>
+	<DemographicType>
+		<type>Initial Patient Population</type>
+		<DemographicCategory>
+			<name>gender</name>
+			<DemographicStat>
+				<label>female</label>
+				<value>918</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>male</label>
+				<value>828</value>
+			</DemographicStat>
+		</DemographicCategory>
+		<DemographicCategory>
+			<name>age</name>
+			<DemographicStat>
+				<label>(0,18)</label>
+				<value>111</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(19,30)</label>
+				<value>186</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(30,60)</label>
+				<value>548</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(60,75)</label>
+				<value>263</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(75,above)</label>
+				<value>638</value>
+			</DemographicStat>
+		</DemographicCategory>
+		<DemographicCategory>
+			<name>race</name>
+			<DemographicStat>
+				<label>American Indian</label>
+				<value>328</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Asian</label>
+				<value>341</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Black or African American</label>
+				<value>359</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Native Hawaiian</label>
+				<value>341</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>White</label>
+				<value>377</value>
+			</DemographicStat>
+		</DemographicCategory>
+		<DemographicCategory>
+			<name>ethnicity</name>
+			<DemographicStat>
+				<label>Hispanic or Latino</label>
+				<value>861</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Non Hispanic or Latio</label>
+				<value>885</value>
+			</DemographicStat>
+		</DemographicCategory>
+	</DemographicType>
+	<DemographicType>
+		<type>Numerator Population</type>
+		<DemographicCategory>
+			<name>gender</name>
+			<DemographicStat>
+				<label>female</label>
+				<value>58</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>male</label>
+				<value>40</value>
+			</DemographicStat>
+		</DemographicCategory>
+		<DemographicCategory>
+			<name>age</name>
+			<DemographicStat>
+				<label>(0,18)</label>
+				<value>8</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(19,30)</label>
+				<value>14</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(30,60)</label>
+				<value>31</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(60,75)</label>
+				<value>17</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>(75,above)</label>
+				<value>28</value>
+			</DemographicStat>
+		</DemographicCategory>
+		<DemographicCategory>
+			<name>race</name>
+			<DemographicStat>
+				<label>American Indian</label>
+				<value>18</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Asian</label>
+				<value>22</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Black or African American</label>
+				<value>16</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Native Hawaiian</label>
+				<value>15</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>White</label>
+				<value>27</value>
+			</DemographicStat>
+		</DemographicCategory>
+		<DemographicCategory>
+			<name>ethnicity</name>
+			<DemographicStat>
+				<label>Hispanic or Latino</label>
+				<value>54</value>
+			</DemographicStat>
+			<DemographicStat>
+				<label>Non Hispanic or Latio</label>
+				<value>44</value>
+			</DemographicStat>
+		</DemographicCategory>
+	</DemographicType>
+</Demographics>

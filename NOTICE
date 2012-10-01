@@ -1,0 +1,33 @@
+The Phenoportal module includes and uses the 
+following software components and resources developed 
+by various people and organizations (further software components 
+may be used by those components):
+
+Google Web Toolkit (GWT)
+Web application framework
+Version: 2.4.0
+URL: http://code.google.com/webtoolkit/
+License: Apache License 2.0
+
+SmartGWT
+Web application framework built on GWT
+Version: 3.0.0
+URL: http://www.smartclient.com/product/smartgwt.jsp
+License: LGPLv3 open source license
+
+GWT Highcharts 
+GWT charting visualizations
+Version: 1.3.0
+URL: http://www.moxiegroup.com/moxieapps/gwt-highcharts/
+License: Apache License 2.0
+
+GWT Logging:
+GWT logging framework to log client and server details
+Version: 3.1.8
+URL:https://developers.google.com/web-toolkit/doc/latest/DevGuideLogging
+
+BCrypt
+OpenBSD-style Blowfish password hashing system
+Version 0.2
+URL: http://www.mindrot.org/projects/jBCrypt/
+License: ISC/BSD

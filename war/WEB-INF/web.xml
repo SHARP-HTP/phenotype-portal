@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
+
+	<!-- Servlets -->
+	<servlet>
+		<servlet-name>authentication</servlet-name>
+		<servlet-class>edu.mayo.phenoportal.server.authentication.AuthenticationServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>authentication</servlet-name>
+		<url-pattern>/htp/authentication</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>RPCCall</servlet-name>
+		<servlet-class>edu.mayo.phenoportal.server.phenotype.PhenotypeServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>RPCCall</servlet-name>
+		<url-pattern>/htp/RPCforPhenotypeCategories</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>RPCFileService</servlet-name>
+		<servlet-class>edu.mayo.phenoportal.server.upload.FileServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>RPCFileService</servlet-name>
+		<url-pattern>/htp/RPCFileService</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>algorithmUpload</servlet-name>
+		<servlet-class>edu.mayo.phenoportal.server.upload.UploadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>algorithmUpload</servlet-name>
+		<url-pattern>/htp/algorithmupload</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>images</servlet-name>
+		<servlet-class>edu.mayo.phenoportal.server.phenotype.ImageServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>images</servlet-name>
+		<url-pattern>/htp/images</url-pattern>
+	</servlet-mapping>
+
+	<!-- Default page to serve -->
+	<welcome-file-list>
+		<welcome-file>Htp.html</welcome-file>
+	</welcome-file-list>
+
+
+</web-app>
