@@ -283,14 +283,14 @@ public class RestExecuter extends BasePhenoportalServlet {
     /* TODO: Use the actual returned .bpmn file. */
     public static String getBpmn(String url, String storeLocation, String fileName)
             throws Exception {
-        File incoming = new File(
-                "/Users/m091355/Dropbox/Mayo/Projects/Sharp/HTP/Drools Response/Disease.bpmn");
+//        File incoming = new File(
+//                "/Users/m091355/Dropbox/Mayo/Projects/Sharp/HTP/Drools Response/Disease.bpmn");
+//
+//        fileName = fileName + ".bpmn";
+//        File tempFile = new File(storeLocation + fileName);
+//        FileUtils.copyFile(incoming, tempFile);
 
-        fileName = fileName + ".bpmn";
-        File tempFile = new File(storeLocation + fileName);
-        FileUtils.copyFile(incoming, tempFile);
-
-        return fileName;
+        return null;
     }
 
     private void setHostNameVerifier() {

@@ -590,12 +590,13 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         executionResults.setImage(getImage(relativePath + imageFileName));
 
         /* Drools workflow bpmn */
-        String returnedBpmn = RestExecuter.getBpmn(locationUrl + "/bpmn", basePath + "bpmn/",
-                getFileName());
-        String bpmnFileName = "workflow.bpmn";
-        File bpmnFile = new File(executionResultsPath + bpmnFileName);
-        FileUtils.copyFile(new File(basePath + "bpmn/" + returnedBpmn), bpmnFile);
-        executionResults.setBpmnPath(relativePath + bpmnFileName);
+	    /* TODO: get/set Drools bpmn file. */
+//        String returnedBpmn = RestExecuter.getBpmn(locationUrl + "/bpmn", basePath + "bpmn/",
+//                getFileName());
+//        String bpmnFileName = "workflow.bpmn";
+//        File bpmnFile = new File(executionResultsPath + bpmnFileName);
+//        FileUtils.copyFile(new File(basePath + "bpmn/" + returnedBpmn), bpmnFile);
+//        executionResults.setBpmnPath(relativePath + bpmnFileName);
 
         /* Drools rules */
         /* TODO: get/set Drools rules. */
