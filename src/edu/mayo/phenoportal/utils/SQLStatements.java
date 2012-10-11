@@ -13,6 +13,7 @@ import edu.mayo.phenoportal.shared.Execution;
 import edu.mayo.phenoportal.shared.News;
 import edu.mayo.phenoportal.shared.SharpNews;
 import edu.mayo.phenoportal.shared.User;
+import edu.mayo.phenoportal.shared.UserRoleRequest;
 import edu.mayo.phenoportal.shared.database.CategoryColumns;
 import edu.mayo.phenoportal.shared.database.DroolsColumns;
 import edu.mayo.phenoportal.shared.database.ExecutionColumns;
@@ -190,25 +191,11 @@ public class SQLStatements {
     }
 
     public static String updateUserStatement(User user) {
-        return "UPDATE User SET " + UserColumns.FNAME.colName() + "='"
-                + user.getFirstName()
-                + "', "
-                + UserColumns.LNAME.colName()
-                + "='"
-                + user.getLastName()
-                + "', "
-                + UserColumns.EMAIL.colName()
-                + "='"
-                + user.getEmail()
-                + "', "
-                + UserColumns.ROLE.colName()
-                + "='"
-                + user.getRole()
-                + "', "
-                + UserColumns.ENABLE.colName()
-                + "='"
-                + user.getEnable()
-                + "', "
+        return "UPDATE User SET " + UserColumns.FNAME.colName() + "='"+ user.getFirstName() + "', "
+                + UserColumns.LNAME.colName() + "='" + user.getLastName() + "', " 
+                + UserColumns.EMAIL.colName()  + "='" + user.getEmail() + "', " 
+                + UserColumns.ROLE.colName() + "='" + user.getRole() + "', " 
+                + UserColumns.ENABLE.colName() + "='"+ user.getEnable() + "', " 
                 // + UserColumns.REGISTRATIONDATE.colName() + "='" +
                 // user.getRegistrationDate()
                 // + "', "
@@ -227,6 +214,11 @@ public class SQLStatements {
                 + " WHERE username='" + userId + "';";
     }
 
+    public static String updateUserRoleStatement(String userId, int role) {
+        return "UPDATE User SET " + UserColumns.ROLE.colName() + "='" + role + "' "
+                + " WHERE username='" + userId + "';";
+    }
+    
     public static String updateCategoryParentCount(int numAlgSibs, String parentId) {
         return "UPDATE Category SET " + CategoryColumns.COUNT.getColName() + "= '" + numAlgSibs
                 + "'" + " WHERE " + CategoryColumns.ID + " = " + parentId + ";";
@@ -289,6 +281,20 @@ public class SQLStatements {
     public static String selectUserRoleRequestStatement(User user) {
         return "SELECT * FROM UserRoleRequest where " + UserRoleRequestColumns.USERNAME.colName()
                 + " = '" + user.getUserName() + "';";
+    }
+
+    public static String selectUserRoleRequestsStatement() {
+        return "SELECT * FROM UserRoleRequest;";
+    }
+
+    public static String updateUserRoleRequestStatement(UserRoleRequest userRoleRequest) {
+
+        int granted = userRoleRequest.isRequestGranted() ? 1 : 0;
+
+        return "UPDATE UserRoleRequest SET " + UserRoleRequestColumns.RESPONSEDATE.colName() + "='"
+                + userRoleRequest.getResponseDate() + "', "
+                + UserRoleRequestColumns.REQUESTGRANTED.colName() + "='" + granted + "'"
+                + " WHERE username='" + userRoleRequest.getUserName() + "';";
     }
 
     public static PreparedStatement insertDroolsStatement(Connection connection, Drools drools)

@@ -12,6 +12,7 @@ public class AdminTabSet extends TabSet {
     private ReportExecutionTab i_executeReportTab;
     private CategoryTab i_categoryTab;
     private UserTab i_userTab;
+    private UserRoleRequestTab i_userRequestTab;
     private NewsTab i_newsTab;
 
     public AdminTabSet() {
@@ -32,6 +33,7 @@ public class AdminTabSet extends TabSet {
         i_executeReportTab = new ReportExecutionTab("Execution Report");
         i_categoryTab = new CategoryTab("Categories");
         i_userTab = new UserTab("Users");
+        i_userRequestTab = new UserRoleRequestTab("User Requests");
         i_newsTab = new NewsTab("News");
 
         // add them to the tabset
@@ -39,6 +41,7 @@ public class AdminTabSet extends TabSet {
 
         // put back in when we implement this tab.
         // addTab(i_categoryTab);
+        addTab(i_userRequestTab);
         addTab(i_uploadReportTab);
         addTab(i_executeReportTab);
         addTab(i_newsTab);

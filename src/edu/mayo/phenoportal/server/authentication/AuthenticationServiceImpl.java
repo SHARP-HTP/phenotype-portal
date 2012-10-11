@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import edu.mayo.phenoportal.client.authentication.AuthenticationService;
 import edu.mayo.phenoportal.server.database.DBConnection;
 import edu.mayo.phenoportal.server.utils.DateConverter;
+import edu.mayo.phenoportal.server.utils.SmtpClient;
 import edu.mayo.phenoportal.shared.User;
 import edu.mayo.phenoportal.shared.database.UserColumns;
 import edu.mayo.phenoportal.utils.SQLStatements;
@@ -105,7 +106,6 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
     @Override
     public Boolean registerUser(User user) throws IllegalArgumentException {
         boolean success = setUser(user);
-
         return Boolean.valueOf(success);
     }
 
@@ -212,6 +212,7 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
                 st = conn.prepareStatement(SQLStatements.insertUserStatement(user, pwHashed));
 
                 st.execute();
+                sendRegistrationEmail(user);
                 isSuccessful = true;
             } catch (Exception ex) {
                 s_logger.log(Level.SEVERE, "Failed to Set users in database" + ex.getStackTrace(),
@@ -223,6 +224,14 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
             }
         }
         return isSuccessful;
+    }
+
+    private void sendRegistrationEmail(User user) {
+        String host = getSmtpHost();
+        String from = getSmtpFromAddress();
+        String messageText = getEmailContentsUserRegistration();
+
+        SmtpClient.sendRegistrationSuccessEmail(host, from, messageText, user);
     }
 
 }

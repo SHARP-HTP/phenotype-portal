@@ -144,7 +144,6 @@ public class UsersXmlDS extends DataSource {
      */
     private void executeFetch(DSRequest request) {
 
-        System.out.print("test");
         String userId = null;
         Criteria criteria = request.getCriteria();
 

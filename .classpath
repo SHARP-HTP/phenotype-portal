@@ -22,5 +22,7 @@
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.19-bin.jar"/>
 	<classpathentry kind="lib" path="lib/poi-3.8-20120326.jar"/>
 	<classpathentry kind="lib" path="lib/resteasy-jaxrs-2.3.4.Final.jar"/>
+	<classpathentry kind="lib" path="lib/mailapi.jar"/>
+	<classpathentry kind="lib" path="lib/smtp.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

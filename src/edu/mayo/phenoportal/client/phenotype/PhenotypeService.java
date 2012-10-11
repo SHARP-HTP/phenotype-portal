@@ -39,6 +39,10 @@ public interface PhenotypeService extends RemoteService {
 
     UserRoleRequest getUserRoleRequest(User user) throws IllegalArgumentException;
 
+    String getUserRoleRequests() throws IllegalArgumentException;
+
+    Boolean updateUserRoleRequest(UserRoleRequest userRoleRequest) throws IllegalArgumentException;
+
     HashMap<String, String> getHelpPages(HashMap<String, String> fileInfo)
             throws IllegalArgumentException;
 

@@ -91,6 +91,7 @@ public class Htp implements EntryPoint {
     // Event Bus to capture global events and act upon them.
     public static EventBus EVENT_BUS = GWT.create(SimpleEventBus.class);
 
+    // This is for development mode
     public static boolean DEBUG_MODE = false;
 
     /**

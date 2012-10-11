@@ -70,6 +70,7 @@ import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
 import edu.mayo.phenoportal.server.database.DBConnection;
 import edu.mayo.phenoportal.server.utils.DOMXmlParser;
 import edu.mayo.phenoportal.server.utils.DateConverter;
+import edu.mayo.phenoportal.server.utils.SmtpClient;
 import edu.mayo.phenoportal.shared.Demographic;
 import edu.mayo.phenoportal.shared.Drools;
 import edu.mayo.phenoportal.shared.Execution;
@@ -590,13 +591,15 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         executionResults.setImage(getImage(relativePath + imageFileName));
 
         /* Drools workflow bpmn */
-	    /* TODO: get/set Drools bpmn file. */
-//        String returnedBpmn = RestExecuter.getBpmn(locationUrl + "/bpmn", basePath + "bpmn/",
-//                getFileName());
-//        String bpmnFileName = "workflow.bpmn";
-//        File bpmnFile = new File(executionResultsPath + bpmnFileName);
-//        FileUtils.copyFile(new File(basePath + "bpmn/" + returnedBpmn), bpmnFile);
-//        executionResults.setBpmnPath(relativePath + bpmnFileName);
+        /* TODO: get/set Drools bpmn file. */
+        // String returnedBpmn = RestExecuter.getBpmn(locationUrl + "/bpmn",
+        // basePath + "bpmn/",
+        // getFileName());
+        // String bpmnFileName = "workflow.bpmn";
+        // File bpmnFile = new File(executionResultsPath + bpmnFileName);
+        // FileUtils.copyFile(new File(basePath + "bpmn/" + returnedBpmn),
+        // bpmnFile);
+        // executionResults.setBpmnPath(relativePath + bpmnFileName);
 
         /* Drools rules */
         /* TODO: get/set Drools rules. */
@@ -608,7 +611,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         Image image = new Image();
         image.setImagePath(imagePath);
         ImageInputStream in = ImageIO.createImageInputStream(imageFile);
-	    try {
+        try {
             final Iterator<?> readers = ImageIO.getImageReaders(in);
             if (readers.hasNext()) {
                 ImageReader reader = (ImageReader) readers.next();
@@ -929,6 +932,12 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                         requestDateStr));
 
                 int result = st.executeUpdate();
+
+                User fullUser = getUser(user.getUserName());
+
+                // send an email to the admin and one to the user
+                sendRequestPersmissionUpgradeEmailAdmin(fullUser);
+                sendRequestPersmissionUpgradeEmailUser(fullUser);
                 success = true;
 
             } catch (Exception ex) {
@@ -983,6 +992,95 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
             }
         }
         return userRoleRequest;
+    }
+
+    @Override
+    public String getUserRoleRequests() throws IllegalArgumentException {
+
+        // Create an instance of class DOMXmlGenerator
+        UserRoleRequestXmlGenerator xmlGenerator = new UserRoleRequestXmlGenerator();
+
+        // Create the root element
+        xmlGenerator.createDocumentAndRootElement(UserRoleRequestXmlGenerator.USER_ROLE_REQUESTS);
+
+        Connection conn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        conn = DBConnection.getDBConnection(getBasePath());
+
+        if (conn != null) {
+            try {
+
+                // get the all user role requests.
+                st = conn.prepareStatement(SQLStatements.selectUserRoleRequestsStatement());
+                rs = st.executeQuery();
+
+                while (rs.next()) {
+                    // create an xml node for this user role request
+                    xmlGenerator.createUserRoleRquestXml(
+                            rs.getString(UserRoleRequestColumns.ID.colNum()),
+                            rs.getString(UserRoleRequestColumns.USERNAME.colNum()),
+                            rs.getString(UserRoleRequestColumns.REQUESTDATE.colNum()),
+                            rs.getString(UserRoleRequestColumns.RESPONSEDATE.colNum()),
+                            rs.getString(UserRoleRequestColumns.REQUESTGRANTED.colNum()));
+                }
+            } catch (Exception ex) {
+
+                s_logger.log(Level.SEVERE,
+                        "exceptions while fetching user role requests." + ex.getStackTrace(), ex);
+
+            } finally {
+                DBConnection.closeConnection(conn, st, rs);
+            }
+        }
+
+        String userRoleRequestXml = xmlGenerator.xmlToString();
+        return userRoleRequestXml;
+    }
+
+    @Override
+    public Boolean updateUserRoleRequest(UserRoleRequest userRoleRequest)
+            throws IllegalArgumentException {
+
+        Connection conn = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        conn = DBConnection.getDBConnection(getBasePath());
+
+        boolean success = false;
+
+        if (conn != null) {
+            try {
+                // update the UserRoleRequest values
+                st = conn.prepareStatement(SQLStatements
+                        .updateUserRoleRequestStatement(userRoleRequest));
+                int result = st.executeUpdate();
+
+                if (result == 1) {
+                    // now update the role based on if the request was granted
+                    // or denied. 2 = execute, 3 = read only
+                    int role = userRoleRequest.isRequestGranted() ? 2 : 3;
+
+                    // update the User role
+                    st = conn.prepareStatement(SQLStatements.updateUserRoleStatement(
+                            userRoleRequest.getUserName(), role));
+                    result = st.executeUpdate();
+
+                    User user = getUser(userRoleRequest.getUserName());
+                    sendResponsePersmissionUpgradeEmail(user, userRoleRequest.isRequestGranted());
+                }
+
+                success = true;
+
+            } catch (Exception ex) {
+                s_logger.log(Level.SEVERE, "Failed to update UserRoleRequest" + ex.getStackTrace(),
+                        ex);
+            } finally {
+                DBConnection.closeConnection(conn, st, rs);
+            }
+        }
+
+        return new Boolean(success);
     }
 
     @Override
@@ -1869,7 +1967,8 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
                 /* Demographics */
                 if (execution.getXmlPath() != null) {
-                    File xmlFile = new File(getExecutionResultsPath() + File.separator + execution.getXmlPath());
+                    File xmlFile = new File(getExecutionResultsPath() + File.separator
+                            + execution.getXmlPath());
                     String xmlString = FileUtils.readFileToString(xmlFile);
                     List<Demographic> demographics = getDemographics(xmlString);
                     execution.setDemographics(demographics);
@@ -1885,6 +1984,31 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         }
 
         return execution;
+    }
+
+    private void sendRequestPersmissionUpgradeEmailAdmin(User user) {
+        String host = getSmtpHost();
+        String from = getSmtpFromAddress();
+        String messageText = getEmailContentsUserRoleRequestAdmin();
+
+        SmtpClient.sendRequestPersmissionUpgradeEmailAdmin(host, from, messageText, user);
+    }
+
+    private void sendRequestPersmissionUpgradeEmailUser(User user) {
+        String host = getSmtpHost();
+        String from = getSmtpFromAddress();
+        String messageText = getEmailContentsUserRoleRequestUser();
+
+        SmtpClient.sendRequestPersmissionUpgradeEmailUser(host, from, messageText, user);
+    }
+
+    private void sendResponsePersmissionUpgradeEmail(User user, boolean granted) {
+        String host = getSmtpHost();
+        String from = getSmtpFromAddress();
+        String messageText = granted ? getEmailContentsUserRoleReplyGranted()
+                : getEmailContentsUserRoleReplyDenied();
+
+        SmtpClient.sendResponsePersmissionUpgradeEmail(host, from, messageText, user);
     }
 
     private String convertDate(String dateStr) {

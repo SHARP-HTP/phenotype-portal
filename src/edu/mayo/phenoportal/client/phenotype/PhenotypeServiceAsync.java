@@ -41,6 +41,11 @@ public interface PhenotypeServiceAsync {
     void getUserRoleRequest(User user, AsyncCallback<UserRoleRequest> callback)
             throws IllegalArgumentException;
 
+    void getUserRoleRequests(AsyncCallback<String> callback) throws IllegalArgumentException;
+
+    void updateUserRoleRequest(UserRoleRequest userRoleRequest, AsyncCallback<Boolean> callback)
+            throws IllegalArgumentException;
+
     void getHelpPages(HashMap<String, String> fileInfo,
             AsyncCallback<HashMap<String, String>> callback) throws IllegalArgumentException;
 
