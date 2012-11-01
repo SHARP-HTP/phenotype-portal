@@ -424,7 +424,9 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
                     if (valueSetOidColumn > -1) {
                         for (Row row : sheet) {
-                            if (row.getCell(valueSetOidColumn).toString().equalsIgnoreCase(oid)) {
+                            if (row != null &&
+                              row.getCell(valueSetOidColumn) != null &&
+                              row.getCell(valueSetOidColumn).toString().equalsIgnoreCase(oid)) {
                                 if (valueSet == null) {
                                     valueSet = new ValueSet();
                                     valueSet.setValues(new HashMap<String, String>());
