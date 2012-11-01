@@ -380,94 +380,95 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
         try {
             wb = new HSSFWorkbook(new FileInputStream(xlsFilename));
-            int sheetIdx = 1;
-            do {
-                Sheet sheet = wb.getSheetAt(sheetIdx);
-                Row headerRow = sheet.getRow(0);
-                if (headerRow != null) {
-                    int valueSetOidColumn = -1;
-                    int valueSetDeveloperColumn = -1;
-                    int valueSetNameCol = -1;
-                    int qdmCategoryCol = -1;
-                    int codeSystemCol = -1;
-                    int codeSystemVersionCol = -1;
-                    int codeCol = -1;
-                    int descriptorCol = -1;
+            int sheetIdx = 0;
+            if (wb.getNumberOfSheets() > 0) {
+                do {
+                    Sheet sheet = wb.getSheetAt(sheetIdx);
+                    Row headerRow = sheet.getRow(0);
+                    if (headerRow != null) {
+                        int valueSetOidColumn = -1;
+                        int valueSetDeveloperColumn = -1;
+                        int valueSetNameCol = -1;
+                        int qdmCategoryCol = -1;
+                        int codeSystemCol = -1;
+                        int codeSystemVersionCol = -1;
+                        int codeCol = -1;
+                        int descriptorCol = -1;
 
-                    for (Cell cell : headerRow) {
-                        if (cell.getRichStringCellValue().getString()
-                                .equalsIgnoreCase("Value Set Developer")) {
-                            valueSetDeveloperColumn = cell.getColumnIndex();
-                        } else if (cell.getRichStringCellValue().getString()
-                                .equalsIgnoreCase("Value Set OID")) {
-                            valueSetOidColumn = cell.getColumnIndex();
-                        } else if (cell.getRichStringCellValue().getString()
-                                .equalsIgnoreCase("Value Set Name")) {
-                            valueSetNameCol = cell.getColumnIndex();
-                        } else if (cell.getRichStringCellValue().getString()
-                                .equalsIgnoreCase("QDM Category")) {
-                            qdmCategoryCol = cell.getColumnIndex();
-                        } else if (cell.getRichStringCellValue().getString()
-                                .equalsIgnoreCase("Code System")) {
-                            codeSystemCol = cell.getColumnIndex();
-                        } else if (cell.getRichStringCellValue().getString()
-                                .equalsIgnoreCase("Code System Version")) {
-                            codeSystemVersionCol = cell.getColumnIndex();
-                        } else if (cell.getRichStringCellValue().getString()
-                                .equalsIgnoreCase("Code")) {
-                            codeCol = cell.getColumnIndex();
-                        } else if (cell.getRichStringCellValue().getString()
-                                .equalsIgnoreCase("Descriptor")) {
-                            descriptorCol = cell.getColumnIndex();
+                        for (Cell cell : headerRow) {
+                            if (cell.getRichStringCellValue().getString()
+                                    .equalsIgnoreCase("Value Set Developer")) {
+                                valueSetDeveloperColumn = cell.getColumnIndex();
+                            } else if (cell.getRichStringCellValue().getString()
+                                    .equalsIgnoreCase("Value Set OID")) {
+                                valueSetOidColumn = cell.getColumnIndex();
+                            } else if (cell.getRichStringCellValue().getString()
+                                    .equalsIgnoreCase("Value Set Name")) {
+                                valueSetNameCol = cell.getColumnIndex();
+                            } else if (cell.getRichStringCellValue().getString()
+                                    .equalsIgnoreCase("QDM Category")) {
+                                qdmCategoryCol = cell.getColumnIndex();
+                            } else if (cell.getRichStringCellValue().getString()
+                                    .equalsIgnoreCase("Code System")) {
+                                codeSystemCol = cell.getColumnIndex();
+                            } else if (cell.getRichStringCellValue().getString()
+                                    .equalsIgnoreCase("Code System Version")) {
+                                codeSystemVersionCol = cell.getColumnIndex();
+                            } else if (cell.getRichStringCellValue().getString()
+                                    .equalsIgnoreCase("Code")) {
+                                codeCol = cell.getColumnIndex();
+                            } else if (cell.getRichStringCellValue().getString()
+                                    .equalsIgnoreCase("Descriptor")) {
+                                descriptorCol = cell.getColumnIndex();
+                            }
                         }
-                    }
 
-                    if (valueSetOidColumn > -1) {
-                        for (Row row : sheet) {
-                            if (row != null &&
-                              row.getCell(valueSetOidColumn) != null &&
-                              row.getCell(valueSetOidColumn).toString().equalsIgnoreCase(oid)) {
-                                if (valueSet == null) {
-                                    valueSet = new ValueSet();
-                                    valueSet.setValues(new HashMap<String, String>());
+                        if (valueSetOidColumn > -1) {
+                            for (Row row : sheet) {
+                                if (row != null &&
+                                  row.getCell(valueSetOidColumn) != null &&
+                                  row.getCell(valueSetOidColumn).toString().equalsIgnoreCase(oid)) {
+                                    if (valueSet == null) {
+                                        valueSet = new ValueSet();
+                                        valueSet.setValues(new HashMap<String, String>());
+                                    }
+
+                                    if (valueSet.getCodeSystem() == null) {
+                                        valueSet.setCodeSystem(row.getCell(codeSystemCol).toString());
+                                    }
+
+                                    if (valueSet.getName() == null) {
+                                        valueSet.setName(row.getCell(valueSetNameCol).toString());
+                                    }
+
+                                    if (valueSet.getOid() == null) {
+                                        valueSet.setOid(row.getCell(valueSetOidColumn).toString());
+                                    }
+
+                                    if (valueSet.getCodeSystemVersion() == null) {
+                                        valueSet.setCodeSystemVersion(row.getCell(codeSystemVersionCol)
+                                                .toString());
+                                    }
+
+                                    if (valueSet.getQdmCategory() == null) {
+                                        valueSet.setQdmCategory(row.getCell(qdmCategoryCol).toString());
+                                    }
+
+                                    if (valueSet.getDeveloper() == null) {
+                                        valueSet.setDeveloper(row.getCell(valueSetDeveloperColumn)
+                                                .toString());
+                                    }
+
+                                    String code = row.getCell(codeCol).toString();
+                                    String desc = row.getCell(descriptorCol).toString();
+                                    valueSet.getValues().put(code, desc);
                                 }
-
-                                if (valueSet.getCodeSystem() == null) {
-                                    valueSet.setCodeSystem(row.getCell(codeSystemCol).toString());
-                                }
-
-                                if (valueSet.getName() == null) {
-                                    valueSet.setName(row.getCell(valueSetNameCol).toString());
-                                }
-
-                                if (valueSet.getOid() == null) {
-                                    valueSet.setOid(row.getCell(valueSetOidColumn).toString());
-                                }
-
-                                if (valueSet.getCodeSystemVersion() == null) {
-                                    valueSet.setCodeSystemVersion(row.getCell(codeSystemVersionCol)
-                                            .toString());
-                                }
-
-                                if (valueSet.getQdmCategory() == null) {
-                                    valueSet.setQdmCategory(row.getCell(qdmCategoryCol).toString());
-                                }
-
-                                if (valueSet.getDeveloper() == null) {
-                                    valueSet.setDeveloper(row.getCell(valueSetDeveloperColumn)
-                                            .toString());
-                                }
-
-                                String code = row.getCell(codeCol).toString();
-                                String desc = row.getCell(descriptorCol).toString();
-                                valueSet.getValues().put(code, desc);
                             }
                         }
                     }
-                }
-                sheetIdx++;
-            } while (valueSet == null && sheetIdx <= wb.getNumberOfSheets());
-
+                    sheetIdx++;
+                } while (valueSet == null && sheetIdx < wb.getNumberOfSheets());
+            }
             if (valueSet != null) {
                 if (valueSet.getCodeSystem().equalsIgnoreCase("GROUPING")) {
                     for (String vsOid : valueSet.getValues().keySet()) {
