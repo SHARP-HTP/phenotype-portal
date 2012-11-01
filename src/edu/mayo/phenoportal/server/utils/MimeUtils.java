@@ -32,7 +32,6 @@ public class MimeUtils {
         String mime;
         Collection mimeTypes = MimeUtil.getMimeTypes(file);
         MimeType mimeType = MimeUtil.getMostSpecificMimeType(mimeTypes);
-        System.out.println(file.getName() + ":" + mimeType.toString());
         mime = mimeType.toString();
         return mime;
     }

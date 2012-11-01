@@ -308,6 +308,19 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         return sb.toString();
     }
 
+	public List<String> getOids(String html) {
+		List<String> oids = new ArrayList<String>();
+		Pattern pattern = Pattern.compile("\\((\\d+(\\.(?=\\d+))?)+\\)");
+		Matcher matcher = pattern.matcher(html);
+		while (matcher.find()) {
+			String oid = matcher.group(0);
+			oid = oid.substring(1, oid.length() - 1);
+			oids.add(oid);
+		}
+
+		return oids;
+	}
+
     private String getDetails(String oid, String xlsFilename) {
         StringBuilder details = null;
         String TABLE_STYLE = "cellspacing=\"1\" style=\"width: 80%; padding-bottom: 1em;\"";
@@ -451,7 +464,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                     }
                 }
                 sheetIdx++;
-            } while (valueSet == null && sheetIdx <= 2);
+            } while (valueSet == null && sheetIdx <= wb.getNumberOfSheets());
 
             if (valueSet != null) {
                 if (valueSet.getCodeSystem().equalsIgnoreCase("GROUPING")) {
