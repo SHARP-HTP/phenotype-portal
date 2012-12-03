@@ -9,6 +9,8 @@ import edu.mayo.phenoportal.client.core.AlgorithmData;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeServiceAsync;
 
+import java.util.List;
+
 /**
  * Tab for displaying the Criteria info for the selected phenotype.
  */
@@ -39,13 +41,25 @@ public class CriteriaTab extends Tab implements ReportTab {
     protected void setCriteriaInfo() {
 
         PhenotypeServiceAsync async = (PhenotypeServiceAsync) GWT.create(PhenotypeService.class);
-        async.getCriteria(i_algoAlgorithmData.getAlgorithmName(),
-                i_algoAlgorithmData.getParentId(), i_algoAlgorithmData.getAlgorithmVersion(),
+//        async.getCriteria(i_algoAlgorithmData.getAlgorithmName(),
+//                i_algoAlgorithmData.getParentId(), i_algoAlgorithmData.getAlgorithmVersion(),
+//                new AsyncCallback<String>() {
+//                    @Override
+//                    public void onSuccess(String result) {
+//                        i_htmlPane.setContents(result);
+//                        // i_htmlPane.draw();
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Throwable caught) {
+//                        GWT.log("Error getting criteria: " + caught);
+//                    }
+//                });
+	            async.getPopulationCriteria(i_algoAlgorithmData,
                 new AsyncCallback<String>() {
                     @Override
                     public void onSuccess(String result) {
-                        i_htmlPane.setContents(result);
-                        // i_htmlPane.draw();
+	                    System.out.println("popCriteria:\n" + result);
                     }
 
                     @Override
@@ -53,6 +67,36 @@ public class CriteriaTab extends Tab implements ReportTab {
                         GWT.log("Error getting criteria: " + caught);
                     }
                 });
+	    async.getDataCriteriaOids(i_algoAlgorithmData,
+	      new AsyncCallback<List<String>>() {
+		      @Override
+		      public void onSuccess(List<String> result) {
+			      System.out.println("dataCriteriaOids:");
+			      for (String oid:result) {
+				      System.out.println(oid);
+			      }
+		      }
+
+		      @Override
+		      public void onFailure(Throwable caught) {
+			      GWT.log("Error getting criteria: " + caught);
+		      }
+	      });
+	    async.getSupplementalCriteriaOids(i_algoAlgorithmData,
+	      new AsyncCallback<List<String>>() {
+		      @Override
+		      public void onSuccess(List<String> result) {
+			      System.out.println("supplCriteriaOids:");
+			      for (String oid:result) {
+				      System.out.println(oid);
+			      }
+		      }
+
+		      @Override
+		      public void onFailure(Throwable caught) {
+			      GWT.log("Error getting criteria: " + caught);
+		      }
+	      });
     }
 
     @Override

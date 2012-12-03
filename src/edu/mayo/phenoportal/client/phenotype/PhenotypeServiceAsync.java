@@ -2,9 +2,11 @@ package edu.mayo.phenoportal.client.phenotype;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import edu.mayo.phenoportal.client.core.AlgorithmData;
 import edu.mayo.phenoportal.shared.Execution;
 import edu.mayo.phenoportal.shared.News;
 import edu.mayo.phenoportal.shared.SharpNews;
@@ -15,9 +17,6 @@ public interface PhenotypeServiceAsync {
 
     void getPhenotypeCategories(String categoryId, AsyncCallback<String> callback)
             throws IllegalArgumentException;
-
-    void getCriteria(String fileName, String parentId, String version,
-            AsyncCallback<String> callback) throws IllegalArgumentException;
 
     void executePhenotype(String fileName, String parentId, String version, Date fromDate,
             Date toDate, String userName, AsyncCallback<Execution> callback)
@@ -83,4 +82,12 @@ public interface PhenotypeServiceAsync {
 
     void openEditor(Execution execution, AsyncCallback<String> callback);
 
+	void getPopulationCriteria(AlgorithmData algorithmData, AsyncCallback<String> async)
+	  ;
+
+	void getDataCriteriaOids(AlgorithmData algorithmData, AsyncCallback<List<String>> async)
+	  ;
+
+	void getSupplementalCriteriaOids(AlgorithmData algorithmData, AsyncCallback<List<String>> async)
+	  ;
 }

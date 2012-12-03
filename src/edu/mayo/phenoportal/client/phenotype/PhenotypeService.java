@@ -2,10 +2,12 @@ package edu.mayo.phenoportal.client.phenotype;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
+import edu.mayo.phenoportal.client.core.AlgorithmData;
 import edu.mayo.phenoportal.shared.Execution;
 import edu.mayo.phenoportal.shared.News;
 import edu.mayo.phenoportal.shared.SharpNews;
@@ -17,8 +19,14 @@ public interface PhenotypeService extends RemoteService {
 
     String getPhenotypeCategories(String categoryId) throws IllegalArgumentException;
 
-    String getCriteria(String fileName, String parentId, String version)
-            throws IllegalArgumentException;
+	String getPopulationCriteria(AlgorithmData algorithmData)
+	  throws IllegalArgumentException;
+
+	List<String> getDataCriteriaOids(AlgorithmData algorithmData)
+	  throws IllegalArgumentException;
+
+	List<String> getSupplementalCriteriaOids(AlgorithmData algorithmData)
+	  throws IllegalArgumentException;
 
     Execution executePhenotype(String fileName, String parentId, String version, Date fromDate,
             Date toDate, String userName) throws IllegalArgumentException;

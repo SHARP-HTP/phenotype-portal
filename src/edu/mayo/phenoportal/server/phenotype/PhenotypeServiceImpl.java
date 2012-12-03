@@ -54,6 +54,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import edu.mayo.phenoportal.client.core.AlgorithmData;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -96,6 +97,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
     private static Logger s_logger = Logger.getLogger(PhenotypeServiceImpl.class.getName());
     private static final long serialVersionUID = 1L;
     private static final int BASE_VAL = 10000;
+	private static final String ERROR_HTML = "<b>Could not retrieve the criteria information.</b>";
 
     // XML Settings
     public static final String ROOT = "List";
@@ -213,102 +215,103 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         }
     }
 
-    @Override
-    public String getCriteria(String fileName, String parentId, String version)
-            throws IllegalArgumentException {
+	@Override
+	public String getPopulationCriteria(AlgorithmData algorithmData) {
+		/* TODO: check for cached version */
+		String html = getHtml(algorithmData);
+		StringBuilder sb = new StringBuilder();
 
-        String completeHtml = "";
-        String errorHtml = "<b>Could not retrieve the criteria information.</b>";
+		if (!html.equals(ERROR_HTML)) {
+			String startTitle = "<title>";
+			String endTitle = "</title>";
+			String title = getHtmlSnippet(html, startTitle, endTitle);
 
-        Connection conn = null;
-        PreparedStatement st = null;
-        ResultSet rs = null;
-        conn = DBConnection.getDBConnection(getBasePath());
-        s_logger.info("Basepath:" + getBasePath());
+			String startMatch = "<b>Initial Patient Population";
+			String endMatch = "</div>";
+			sb = new StringBuilder(getHtmlSnippet(html, startMatch, endMatch));
+			sb.insert(0, "<h3>" + title.substring(startTitle.length(), title.length() - endTitle.length()) + "</h3><ul><li>");
+		} else {
+			sb.append(html);
+		}
+		/* TODO: cache result */
 
-        if (conn != null) {
-            try {
-                st = conn.prepareStatement(SQLStatements.selectCriteriaStatement(fileName,
-                        parentId, version));
+		return sb.toString();
+	}
 
-                rs = st.executeQuery();
+	@Override
+	public List<String> getDataCriteriaOids(AlgorithmData algorithmData) {
+		/* TODO:  check for cached version */
+		String html = getHtml(algorithmData);
 
-                while (rs.next()) {
-                    String location = rs.getString(4);
+		String startMatch = "href=\"#toc\">Data criteria (QDM Data Elements)</a></h3>";
+		String endMatch = "</div>";
 
-                    // String criteriaFileLocation =
-                    // readPathFromStartupPropertiesFile();
-                    String criteriaFileLocation = getPathFromStartupPropertiesFile();
-                    s_logger.fine("criteriaFileLocation:" + criteriaFileLocation);
+		List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
+		/* TODO: cache result */
 
-                    String fileLocation = criteriaFileLocation + '/' + location;
-                    s_logger.fine("fileLocation:" + fileLocation);
+		return oids;
+	}
 
-                    String fullHtml = readFile(fileLocation, errorHtml);
+	@Override
+	public List<String> getSupplementalCriteriaOids(AlgorithmData algorithmData) {
+		/* TODO: check for cached version */
+		String html = getHtml(algorithmData);
 
-                    // TODO: PUT IN CHECK FOR NO FILE
+		String startMatch = "href=\"#toc\">Supplemental Data Elements</a></h3>";
+		String endMatch = "</div>";
 
-                    String startTitleTag = "<title>";
-                    String endTitleTag = "</title>";
+		List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
+		/* TODO: cache result */
 
-                    String startCriteria = "<b>Initial Patient Population";
-                    String endCriteria = "</body>";
+		return oids;
+	}
 
-                    if (!fullHtml.equals("") && !fullHtml.equals(errorHtml)) {
-                        // get the title
-                        String title = fullHtml.substring(fullHtml.indexOf(startTitleTag)
-                                + startTitleTag.length(), fullHtml.indexOf(endTitleTag));
+	private String getHtml(AlgorithmData algorithmData) {
+		String completeHtml = null;
 
-                        // get the main criteria
-                        String criteria = fullHtml.substring(fullHtml.indexOf(startCriteria),
-                                fullHtml.indexOf(endCriteria));
+		Connection conn = DBConnection.getDBConnection(getBasePath());
+		PreparedStatement st;
+		ResultSet rs;
+		s_logger.fine("Basepath:" + getBasePath());
 
-                        completeHtml = "<h3>" + title + "</h3><ul><li>" + criteria;
+		if (conn != null) {
+			try {
+				st = conn.prepareStatement(SQLStatements.selectCriteriaStatement(algorithmData.getAlgorithmName(),
+				  algorithmData.getParentId(), algorithmData.getAlgorithmVersion()));
 
-                    } else {
-                        // The file didn't exist or it wasn't a complete file
-                        // that we were expecting. The fullHtml should be an
-                        // error message that is being returned.
-                        completeHtml = fullHtml;
-                    }
+				rs = st.executeQuery();
 
-                    String xlsPath = fileLocation.substring(0, fileLocation.lastIndexOf('.'))
-                            + ".xls";
-                    completeHtml = parseValueSets(completeHtml, xlsPath);
-                }
+				while (rs.next()) {
+					String location = rs.getString(4);
+					String criteriaFileLocation = getPathFromStartupPropertiesFile();
 
-            } catch (Exception ex) {
+					s_logger.fine("criteriaFileLocation:" + criteriaFileLocation);
 
-                s_logger.log(Level.SEVERE,
-                        "failed to fetch Criteria from the HTML file" + ex.getMessage(), ex);
-                completeHtml = errorHtml;
-                s_logger.info("The HTML file did not exist or it was not complete");
-            } finally {
-                DBConnection.closeConnection(conn, st, rs);
-            }
-        }
-        return completeHtml;
-    }
+					String fileLocation = criteriaFileLocation + '/' + location;
+					s_logger.fine("fileLocation:" + fileLocation);
 
-    private String parseValueSets(String html, String xlsFilename) {
-        // REGEX: /^\((\d+(\.(?=\d+))?)+\).*$/
-        StringBuilder sb = new StringBuilder(html);
-        Pattern pattern = Pattern.compile("\\((\\d+(\\.(?=\\d+))?)+\\)");
-        Matcher matcher = pattern.matcher(html);
-        int lastIndex = 0;
-        while (matcher.find()) {
-            String oid = matcher.group(0);
-            oid = oid.substring(1, oid.length() - 1);
-            int insertAt = sb.indexOf("</li>", sb.indexOf(oid, lastIndex));
-            String details = getDetails(oid, xlsFilename);
-            sb.insert(insertAt, details);
-            lastIndex = insertAt + details.length();
-        }
+					completeHtml = readFile(fileLocation, ERROR_HTML);
+				}
+			} catch (SQLException sqle) {
+				s_logger.log(Level.SEVERE, "failed to fetch Criteria from the HTML file" + sqle.getMessage(), sqle);
+			}
+		}
+		if (completeHtml == null) completeHtml = ERROR_HTML;
+		return completeHtml;
+	}
 
-        return sb.toString();
-    }
+	private String getHtmlSnippet(String document, String start, String end) {
+		int idxStart = document.indexOf(start);
+		idxStart = idxStart == -1 ? 0 : idxStart;
 
-	public List<String> getOids(String html) {
+		String snippet = document.substring(idxStart);
+		int idxEnd = snippet.indexOf(end);
+		idxEnd = idxEnd == -1 ? snippet.length() : idxEnd + end.length();
+
+		return snippet.substring(0, idxEnd);
+	}
+
+	private List<String> getOids(String html) {
 		List<String> oids = new ArrayList<String>();
 		Pattern pattern = Pattern.compile("\\((\\d+(\\.(?=\\d+))?)+\\)");
 		Matcher matcher = pattern.matcher(html);
@@ -320,169 +323,6 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
 		return oids;
 	}
-
-    private String getDetails(String oid, String xlsFilename) {
-        StringBuilder details = null;
-        String TABLE_STYLE = "cellspacing=\"1\" style=\"width: 80%; padding-bottom: 1em;\"";
-        String TR_STYLE = "style=\"background-color: #D7D5EC\"";
-        String TH_STYLE = "style=\"background-color: #6056B7;color:#FFFFFF;\"";
-        String TD_STYLE = "style=\"vertical-align: top;\"";
-
-        String VALUE_TABLE_STYLE = "cellspacing=\"1\" style=\"width: 100%;\"";
-        String VALUE_TR_STYLE = "style=\"background-color: #D7D5EC\"";
-        String VALUE_TH_STYLE = "style=\"background-color: #6056B7;color:#FFFFFF;\"";
-        String VALUE_TD_STYLE = "style=\"vertical-align: top;\"";
-        String VALUE_TD_STYLE_CENTER = "style=\"vertical-align: top; horizontal-align: center;\"";
-
-        List<ValueSet> valueSets = getValueSet(oid, xlsFilename);
-
-        if (valueSets.size() > 0) {
-            /* Build ValueSet Table */
-            details = new StringBuilder(
-                    String.format(
-                            "<div id=\"VS-%s\" class=\"OidDetails\"><table %s><tr %s><th %s>Code System</th><th %s>Version</th><th %s>Values</th></tr>",
-                            oid, TABLE_STYLE, TR_STYLE, TH_STYLE, TH_STYLE, TH_STYLE));
-
-            for (ValueSet valueSet : valueSets) {
-                String codeSystem = valueSet.getCodeSystem();
-                String version = valueSet.getCodeSystemVersion();
-                Collection<String> keys = valueSet.getValues().keySet();
-
-                /* Code System Rows */
-                details.append(String.format("<tr %s><td %s>%s</td><td %s>%s</td><td %s>",
-                        TR_STYLE, TD_STYLE, codeSystem, TD_STYLE, version, TD_STYLE));
-
-                /* Value Table */
-                details.append(String.format(
-                        "<table %s><tr %s><th %s>Code</th><th %s>Descriptor</th></tr>",
-                        VALUE_TABLE_STYLE, VALUE_TR_STYLE, VALUE_TH_STYLE, VALUE_TH_STYLE));
-
-                for (String key : keys) {
-                    String value = valueSet.getValues().get(key);
-                    details.append(String.format("<tr %s><td %s>%s</td><td>%s</td></tr>",
-                            VALUE_TR_STYLE, VALUE_TD_STYLE_CENTER, key, value));
-                }
-
-                details.append("</table>");
-            }
-
-            /* Close ValueSet Table */
-            details.append("</td></tr></table></div>");
-        }
-
-        return details != null ? details.toString() : "";
-    }
-
-    private List<ValueSet> getValueSet(String oid, String xlsFilename) {
-        Workbook wb = null;
-        List<ValueSet> valueSets = new ArrayList<ValueSet>();
-        ValueSet valueSet = null;
-
-        try {
-            wb = new HSSFWorkbook(new FileInputStream(xlsFilename));
-            int sheetIdx = 0;
-            if (wb.getNumberOfSheets() > 0) {
-                do {
-                    Sheet sheet = wb.getSheetAt(sheetIdx);
-                    Row headerRow = sheet.getRow(0);
-                    if (headerRow != null) {
-                        int valueSetOidColumn = -1;
-                        int valueSetDeveloperColumn = -1;
-                        int valueSetNameCol = -1;
-                        int qdmCategoryCol = -1;
-                        int codeSystemCol = -1;
-                        int codeSystemVersionCol = -1;
-                        int codeCol = -1;
-                        int descriptorCol = -1;
-
-                        for (Cell cell : headerRow) {
-                            if (cell.getRichStringCellValue().getString()
-                                    .equalsIgnoreCase("Value Set Developer")) {
-                                valueSetDeveloperColumn = cell.getColumnIndex();
-                            } else if (cell.getRichStringCellValue().getString()
-                                    .equalsIgnoreCase("Value Set OID")) {
-                                valueSetOidColumn = cell.getColumnIndex();
-                            } else if (cell.getRichStringCellValue().getString()
-                                    .equalsIgnoreCase("Value Set Name")) {
-                                valueSetNameCol = cell.getColumnIndex();
-                            } else if (cell.getRichStringCellValue().getString()
-                                    .equalsIgnoreCase("QDM Category")) {
-                                qdmCategoryCol = cell.getColumnIndex();
-                            } else if (cell.getRichStringCellValue().getString()
-                                    .equalsIgnoreCase("Code System")) {
-                                codeSystemCol = cell.getColumnIndex();
-                            } else if (cell.getRichStringCellValue().getString()
-                                    .equalsIgnoreCase("Code System Version")) {
-                                codeSystemVersionCol = cell.getColumnIndex();
-                            } else if (cell.getRichStringCellValue().getString()
-                                    .equalsIgnoreCase("Code")) {
-                                codeCol = cell.getColumnIndex();
-                            } else if (cell.getRichStringCellValue().getString()
-                                    .equalsIgnoreCase("Descriptor")) {
-                                descriptorCol = cell.getColumnIndex();
-                            }
-                        }
-
-                        if (valueSetOidColumn > -1) {
-                            for (Row row : sheet) {
-                                if (row != null &&
-                                  row.getCell(valueSetOidColumn) != null &&
-                                  row.getCell(valueSetOidColumn).toString().equalsIgnoreCase(oid)) {
-                                    if (valueSet == null) {
-                                        valueSet = new ValueSet();
-                                        valueSet.setValues(new HashMap<String, String>());
-                                    }
-
-                                    if (valueSet.getCodeSystem() == null) {
-                                        valueSet.setCodeSystem(row.getCell(codeSystemCol).toString());
-                                    }
-
-                                    if (valueSet.getName() == null) {
-                                        valueSet.setName(row.getCell(valueSetNameCol).toString());
-                                    }
-
-                                    if (valueSet.getOid() == null) {
-                                        valueSet.setOid(row.getCell(valueSetOidColumn).toString());
-                                    }
-
-                                    if (valueSet.getCodeSystemVersion() == null) {
-                                        valueSet.setCodeSystemVersion(row.getCell(codeSystemVersionCol)
-                                                .toString());
-                                    }
-
-                                    if (valueSet.getQdmCategory() == null) {
-                                        valueSet.setQdmCategory(row.getCell(qdmCategoryCol).toString());
-                                    }
-
-                                    if (valueSet.getDeveloper() == null) {
-                                        valueSet.setDeveloper(row.getCell(valueSetDeveloperColumn)
-                                                .toString());
-                                    }
-
-                                    String code = row.getCell(codeCol).toString();
-                                    String desc = row.getCell(descriptorCol).toString();
-                                    valueSet.getValues().put(code, desc);
-                                }
-                            }
-                        }
-                    }
-                    sheetIdx++;
-                } while (valueSet == null && sheetIdx < wb.getNumberOfSheets());
-            }
-            if (valueSet != null) {
-                if (valueSet.getCodeSystem().equalsIgnoreCase("GROUPING")) {
-                    for (String vsOid : valueSet.getValues().keySet()) {
-                        valueSets.addAll(getValueSet(vsOid, xlsFilename));
-                    }
-                } else {
-                    valueSets.add(valueSet);
-                }
-            }
-        } catch (IOException ioe) {
-            s_logger.log(Level.WARNING, "Unable to load the value set xls file.", ioe);
-        }
-        return valueSets;
-    }
 
     /**
      * Request to execute the phenotype. Will return List<Demographic> object

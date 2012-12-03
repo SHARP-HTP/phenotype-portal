@@ -1,10 +1,12 @@
 package edu.mayo.phenoportal.client.core;
 
+import java.io.Serializable;
+
 /**
  * Class to encapsulate a selected algorithm.
  *
  */
-public class AlgorithmData {
+public class AlgorithmData implements Serializable {
 
 	private String i_categoryId;
 	private String i_parentId;
