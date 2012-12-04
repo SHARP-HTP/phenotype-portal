@@ -14,11 +14,11 @@
 	<!-- Other module inherits -->
 	<inherits name="com.smartgwt.SmartGwt" />
 	
-
+    <!-- add the CTS2 Editor, PATH TO the gwt.xml file -->
+    <inherits name="mayo.edu.cts2.editor.Cts2Editor"/>
 
 	<!-- HighCharts inherit -->
 	<inherits name="org.moxieapps.gwt.highcharts.Highcharts" />
-
 	
 	<!-- Specify the app entry point class. -->
 	<entry-point class='edu.mayo.phenoportal.client.Htp' />

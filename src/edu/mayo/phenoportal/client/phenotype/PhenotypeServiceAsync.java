@@ -82,12 +82,9 @@ public interface PhenotypeServiceAsync {
 
     void openEditor(Execution execution, AsyncCallback<String> callback);
 
-	void getPopulationCriteria(AlgorithmData algorithmData, AsyncCallback<String> async)
-	  ;
+    void getPopulationCriteria(AlgorithmData algorithmData, AsyncCallback<String> async);
 
-	void getDataCriteriaOids(AlgorithmData algorithmData, AsyncCallback<List<String>> async)
-	  ;
+    void getDataCriteriaOids(AlgorithmData algorithmData, AsyncCallback<List<String>> async);
 
-	void getSupplementalCriteriaOids(AlgorithmData algorithmData, AsyncCallback<List<String>> async)
-	  ;
+    void getSupplementalCriteriaOids(AlgorithmData algorithmData, AsyncCallback<List<String>> async);
 }

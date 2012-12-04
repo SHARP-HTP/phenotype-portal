@@ -52,6 +52,19 @@
 		<url-pattern>/htp/images</url-pattern>
 	</servlet-mapping>
 
+
+	<!-- *** servlet for cts2Editor *** -->
+	<servlet>
+	    <servlet-name>Cts2EditorServlet</servlet-name>
+	    <servlet-class>mayo.edu.cts2.editor.server.Cts2EditorServiceImpl</servlet-class>
+	</servlet>
+	  
+	<servlet-mapping>
+	    <servlet-name>Cts2EditorServlet</servlet-name>
+	    <url-pattern>/htp/cts2Editor</url-pattern>
+	</servlet-mapping>
+  
+
 	<!-- Default page to serve -->
 	<welcome-file-list>
 		<welcome-file>Htp.html</welcome-file>

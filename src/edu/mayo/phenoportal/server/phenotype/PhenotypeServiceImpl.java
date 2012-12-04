@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,19 +53,14 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import edu.mayo.phenoportal.client.core.AlgorithmData;
 import org.apache.commons.io.FileUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.jboss.resteasy.util.Base64;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import edu.mayo.phenoportal.client.Htp;
+import edu.mayo.phenoportal.client.core.AlgorithmData;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
 import edu.mayo.phenoportal.server.database.DBConnection;
 import edu.mayo.phenoportal.server.utils.DOMXmlParser;
@@ -80,7 +74,6 @@ import edu.mayo.phenoportal.shared.News;
 import edu.mayo.phenoportal.shared.SharpNews;
 import edu.mayo.phenoportal.shared.User;
 import edu.mayo.phenoportal.shared.UserRoleRequest;
-import edu.mayo.phenoportal.shared.ValueSet;
 import edu.mayo.phenoportal.shared.database.CategoryColumns;
 import edu.mayo.phenoportal.shared.database.DroolsColumns;
 import edu.mayo.phenoportal.shared.database.ExecutionColumns;
@@ -97,7 +90,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
     private static Logger s_logger = Logger.getLogger(PhenotypeServiceImpl.class.getName());
     private static final long serialVersionUID = 1L;
     private static final int BASE_VAL = 10000;
-	private static final String ERROR_HTML = "<b>Could not retrieve the criteria information.</b>";
+    private static final String ERROR_HTML = "<b>Could not retrieve the criteria information.</b>";
 
     // XML Settings
     public static final String ROOT = "List";
@@ -215,114 +208,121 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         }
     }
 
-	@Override
-	public String getPopulationCriteria(AlgorithmData algorithmData) {
-		/* TODO: check for cached version */
-		String html = getHtml(algorithmData);
-		StringBuilder sb = new StringBuilder();
+    @Override
+    public String getPopulationCriteria(AlgorithmData algorithmData) {
+        /* TODO: check for cached version */
+        String html = getHtml(algorithmData);
+        StringBuilder sb = new StringBuilder();
 
-		if (!html.equals(ERROR_HTML)) {
-			String startTitle = "<title>";
-			String endTitle = "</title>";
-			String title = getHtmlSnippet(html, startTitle, endTitle);
+        if (!html.equals(ERROR_HTML)) {
+            String startTitle = "<title>";
+            String endTitle = "</title>";
+            String title = getHtmlSnippet(html, startTitle, endTitle);
 
-			String startMatch = "<b>Initial Patient Population";
-			String endMatch = "</div>";
-			sb = new StringBuilder(getHtmlSnippet(html, startMatch, endMatch));
-			sb.insert(0, "<h3>" + title.substring(startTitle.length(), title.length() - endTitle.length()) + "</h3><ul><li>");
-		} else {
-			sb.append(html);
-		}
-		/* TODO: cache result */
+            String startMatch = "<b>Initial Patient Population";
+            String endMatch = "</div>";
+            sb = new StringBuilder(getHtmlSnippet(html, startMatch, endMatch));
+            sb.insert(
+                    0,
+                    "<h3>"
+                            + title.substring(startTitle.length(),
+                                    title.length() - endTitle.length()) + "</h3><ul><li>");
+        } else {
+            sb.append(html);
+        }
+        /* TODO: cache result */
 
-		return sb.toString();
-	}
+        return sb.toString();
+    }
 
-	@Override
-	public List<String> getDataCriteriaOids(AlgorithmData algorithmData) {
-		/* TODO:  check for cached version */
-		String html = getHtml(algorithmData);
+    @Override
+    public List<String> getDataCriteriaOids(AlgorithmData algorithmData) {
+        /* TODO: check for cached version */
+        String html = getHtml(algorithmData);
 
-		String startMatch = "href=\"#toc\">Data criteria (QDM Data Elements)</a></h3>";
-		String endMatch = "</div>";
+        String startMatch = "href=\"#toc\">Data criteria (QDM Data Elements)</a></h3>";
+        String endMatch = "</div>";
 
-		List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
-		/* TODO: cache result */
+        List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
+        /* TODO: cache result */
 
-		return oids;
-	}
+        return oids;
+    }
 
-	@Override
-	public List<String> getSupplementalCriteriaOids(AlgorithmData algorithmData) {
-		/* TODO: check for cached version */
-		String html = getHtml(algorithmData);
+    @Override
+    public List<String> getSupplementalCriteriaOids(AlgorithmData algorithmData) {
+        /* TODO: check for cached version */
+        String html = getHtml(algorithmData);
 
-		String startMatch = "href=\"#toc\">Supplemental Data Elements</a></h3>";
-		String endMatch = "</div>";
+        String startMatch = "href=\"#toc\">Supplemental Data Elements</a></h3>";
+        String endMatch = "</div>";
 
-		List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
-		/* TODO: cache result */
+        List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
+        /* TODO: cache result */
 
-		return oids;
-	}
+        return oids;
+    }
 
-	private String getHtml(AlgorithmData algorithmData) {
-		String completeHtml = null;
+    private String getHtml(AlgorithmData algorithmData) {
+        String completeHtml = null;
 
-		Connection conn = DBConnection.getDBConnection(getBasePath());
-		PreparedStatement st;
-		ResultSet rs;
-		s_logger.fine("Basepath:" + getBasePath());
+        Connection conn = DBConnection.getDBConnection(getBasePath());
+        PreparedStatement st;
+        ResultSet rs;
+        s_logger.fine("Basepath:" + getBasePath());
 
-		if (conn != null) {
-			try {
-				st = conn.prepareStatement(SQLStatements.selectCriteriaStatement(algorithmData.getAlgorithmName(),
-				  algorithmData.getParentId(), algorithmData.getAlgorithmVersion()));
+        if (conn != null) {
+            try {
+                st = conn.prepareStatement(SQLStatements.selectCriteriaStatement(
+                        algorithmData.getAlgorithmName(), algorithmData.getParentId(),
+                        algorithmData.getAlgorithmVersion()));
 
-				rs = st.executeQuery();
+                rs = st.executeQuery();
 
-				while (rs.next()) {
-					String location = rs.getString(4);
-					String criteriaFileLocation = getPathFromStartupPropertiesFile();
+                while (rs.next()) {
+                    String location = rs.getString(4);
+                    String criteriaFileLocation = getPathFromStartupPropertiesFile();
 
-					s_logger.fine("criteriaFileLocation:" + criteriaFileLocation);
+                    s_logger.fine("criteriaFileLocation:" + criteriaFileLocation);
 
-					String fileLocation = criteriaFileLocation + '/' + location;
-					s_logger.fine("fileLocation:" + fileLocation);
+                    String fileLocation = criteriaFileLocation + '/' + location;
+                    s_logger.fine("fileLocation:" + fileLocation);
 
-					completeHtml = readFile(fileLocation, ERROR_HTML);
-				}
-			} catch (SQLException sqle) {
-				s_logger.log(Level.SEVERE, "failed to fetch Criteria from the HTML file" + sqle.getMessage(), sqle);
-			}
-		}
-		if (completeHtml == null) completeHtml = ERROR_HTML;
-		return completeHtml;
-	}
+                    completeHtml = readFile(fileLocation, ERROR_HTML);
+                }
+            } catch (SQLException sqle) {
+                s_logger.log(Level.SEVERE,
+                        "failed to fetch Criteria from the HTML file" + sqle.getMessage(), sqle);
+            }
+        }
+        if (completeHtml == null)
+            completeHtml = ERROR_HTML;
+        return completeHtml;
+    }
 
-	private String getHtmlSnippet(String document, String start, String end) {
-		int idxStart = document.indexOf(start);
-		idxStart = idxStart == -1 ? 0 : idxStart;
+    private String getHtmlSnippet(String document, String start, String end) {
+        int idxStart = document.indexOf(start);
+        idxStart = idxStart == -1 ? 0 : idxStart;
 
-		String snippet = document.substring(idxStart);
-		int idxEnd = snippet.indexOf(end);
-		idxEnd = idxEnd == -1 ? snippet.length() : idxEnd + end.length();
+        String snippet = document.substring(idxStart);
+        int idxEnd = snippet.indexOf(end);
+        idxEnd = idxEnd == -1 ? snippet.length() : idxEnd + end.length();
 
-		return snippet.substring(0, idxEnd);
-	}
+        return snippet.substring(0, idxEnd);
+    }
 
-	private List<String> getOids(String html) {
-		List<String> oids = new ArrayList<String>();
-		Pattern pattern = Pattern.compile("\\((\\d+(\\.(?=\\d+))?)+\\)");
-		Matcher matcher = pattern.matcher(html);
-		while (matcher.find()) {
-			String oid = matcher.group(0);
-			oid = oid.substring(1, oid.length() - 1);
-			oids.add(oid);
-		}
+    private List<String> getOids(String html) {
+        List<String> oids = new ArrayList<String>();
+        Pattern pattern = Pattern.compile("\\((\\d+(\\.(?=\\d+))?)+\\)");
+        Matcher matcher = pattern.matcher(html);
+        while (matcher.find()) {
+            String oid = matcher.group(0);
+            oid = oid.substring(1, oid.length() - 1);
+            oids.add(oid);
+        }
 
-		return oids;
-	}
+        return oids;
+    }
 
     /**
      * Request to execute the phenotype. Will return List<Demographic> object

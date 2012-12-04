@@ -5,7 +5,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/smartgwt-skins.jar"/>
 	<classpathentry kind="lib" path="lib/smartgwt.jar"/>
-	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.jdt.core_3.6.1.v_A68_R36x.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl-2.6.2.jar"/>
@@ -24,5 +24,6 @@
 	<classpathentry kind="lib" path="lib/resteasy-jaxrs-2.3.4.Final.jar"/>
 	<classpathentry kind="lib" path="lib/mailapi.jar"/>
 	<classpathentry kind="lib" path="lib/smtp.jar"/>
+	<classpathentry kind="lib" path="lib/cts2Editor.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

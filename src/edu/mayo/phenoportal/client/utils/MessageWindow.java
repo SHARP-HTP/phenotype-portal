@@ -32,8 +32,8 @@ public class MessageWindow extends Window {
 
         VLayout layout = new VLayout(5);
 
-        setWidth(450);
-        setHeight(300);
+        setWidth(550);
+        setHeight(400);
         setMargin(20);
 
         setTitle(title);
@@ -105,7 +105,7 @@ public class MessageWindow extends Window {
         buttonLayout.setHeight(40);
         buttonLayout.setLayoutMargin(6);
         buttonLayout.setMembersMargin(10);
-        buttonLayout.setAlign(Alignment.RIGHT);
+        buttonLayout.setAlign(Alignment.CENTER);
 
         i_okButton = new Button("Ok");
         i_okButton.addClickHandler(new ClickHandler() {

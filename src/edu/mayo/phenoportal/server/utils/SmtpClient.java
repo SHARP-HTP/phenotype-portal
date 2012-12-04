@@ -72,7 +72,7 @@ public class SmtpClient {
         } catch (MessagingException mex) {
             success = false;
             s_logger.log(Level.SEVERE,
-                    "exceptions sending out registration email: " + mex.getStackTrace());
+                    "exceptions sending out registration email: " + mex.toString());
         }
 
         return success;

@@ -117,7 +117,6 @@ public class UserRoleRequestXmlDS extends DataSource {
 
             @Override
             public void onSuccess(String result) {
-
                 Object results = XMLTools.selectNodes(result, RECORD_X_PATH);
                 Record[] fetchRecords = recordsFromXML(results);
 
