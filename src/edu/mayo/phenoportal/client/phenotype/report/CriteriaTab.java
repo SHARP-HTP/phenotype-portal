@@ -94,7 +94,6 @@ public class CriteriaTab extends Tab implements ReportTab {
             @Override
             public void onSuccess(String result) {
                 i_htmlPane.setContents(result);
-                i_htmlPane.draw();
             }
 
             @Override
