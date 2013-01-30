@@ -13,6 +13,24 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,8 +59,9 @@ import java.util.zip.ZipInputStream;
 
 public class UploadServlet extends BasePhenoportalHttpServlet {
 
-    private static final long serialVersionUID = 3457906406134591880L;
+    private static final long serialVersionUID = 3457906406134591883L;
     private static String ALGORITHM_PATH = null;
+    private static String MAT_UPLOAD_PATH = "/mat/zips";
     private static Logger logger = Logger.getLogger(UploadServlet.class.getName());
 
     @Override
@@ -71,23 +91,21 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
 
         if (ALGORITHM_PATH == null) {
             ALGORITHM_PATH = getAlgorithmPath(request);
-            logger.info("Algorithm Path: " + ALGORITHM_PATH);
         }
 
         try {
             FileItemFactory factory = new DiskFileItemFactory();
             ServletFileUpload upload = new ServletFileUpload(factory);
             List<FileItem> items = upload.parseRequest(request);
-            Iterator<FileItem> itemIterator = items.iterator();
 
-            while (itemIterator.hasNext()) {
-                FileItem item = itemIterator.next();
-                if (item.isFormField()) {
-                    processFormField(item, uploadItems);
-                } else {
-                    uploadItems.addInputFileItem(item);
-                }
-            }
+	        for (FileItem item : items) {
+		        if (item.isFormField()) {
+			        processFormField(item, uploadItems);
+		        }
+		        else {
+			        uploadItems.addInputFileItem(item);
+		        }
+	        }
 
             boolean valid;
             if (valid = validateMetadata(uploadItems)) {
@@ -98,7 +116,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
             response.getWriter().print(
                     String.format("<script type=\"text/javascript\">\n"
                             + "    window.onload = top.uploadStatus(%b, \"%s\"); \n" + "</script>",
-                            valid, uploadItems.getMessages().toString()));
+                            valid, uploadItems.getMessages()));
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (FileUploadException fue) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -143,7 +161,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
         /* Date will come in from SmartGWT as: $$DATE$$:yyyy-MM-dd HH:mm:ss */
         Date date = null;
 
-        if (dateStr != null && dateStr != "") {
+        if (dateStr != null && !dateStr.trim().equals("")) {
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
                 date = dateFormat.parse(dateStr.substring(9));
@@ -184,8 +202,9 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
                     logger.info("Unsupported file.");
                 }
             }
-
-            success = validateUploadFile(uploadItems);
+			if (success) {
+                success = validateUploadFile(uploadItems);
+			}
             if (success) {
                 success = persistUploadFile(request, uploadItems);
             }
@@ -395,7 +414,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
     }
 
     private boolean persistUploadFile(HttpServletRequest request, UploadItems uploadItems) {
-        boolean success = true;
+        boolean success;
         /* Move files to algorithm directory. */
         String destPath = ALGORITHM_PATH + "/" + uploadItems.getPrefix();
 
@@ -428,6 +447,10 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
 
                 /* Add metadata to database. */
                 success = insertUploadMetadata(request, uploadItems);
+	            /* Add value sets to CTS2 service */
+	            if (success) {
+		            success = insertValueSets(uploadItems, request);
+	            }
             } else {
                 success = false;
                 uploadItems.addMessage("An error occurred while writing the files to the disk.");
@@ -435,7 +458,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
             }
         } catch (IOException ioe) {
             success = false;
-            logger.log(Level.WARNING, "An error occured while persisting the files.", ioe);
+            logger.log(Level.WARNING, "An error occurred while persisting the files.", ioe);
         }
 
         return success;
@@ -522,7 +545,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
                 isSuccessful = false;
                 uploadItems.addMessage("Failed to write the metadata to the database.");
                 logger.log(Level.SEVERE,
-                        "Failed to insert meta data information" + ex.getStackTrace(), ex);
+                        "Failed to insert meta data information. Error: " + ex.getMessage(), ex);
                 if (ex.getMessage().contains("Duplicate entry")) {
                     uploadItems.addMessage("This file has already been uploaded.");
                 }
@@ -532,6 +555,47 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
         }
         return isSuccessful;
     }
+
+	private boolean insertValueSets(UploadItems uploadItems, HttpServletRequest request) throws IOException {
+		boolean success;
+		File zipFile = uploadItems.getZipFile();
+		String url = getValueSetServiceUrl(request) + MAT_UPLOAD_PATH;
+		HttpClient client = new DefaultHttpClient();
+		client.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION,
+		  HttpVersion.HTTP_1_1);
+		HttpContext context = new BasicHttpContext();
+		CredentialsProvider credsProvider = new BasicCredentialsProvider();
+		credsProvider.setCredentials(
+		  AuthScope.ANY,
+		  new UsernamePasswordCredentials(getValueSetServiceUser(request), getValueSetServicePassword(request)));
+		context.setAttribute(ClientContext.CREDS_PROVIDER, credsProvider);
+		int status = -1;
+		HttpResponse response = null;
+
+		try {
+			HttpPost post = new HttpPost(url);
+			MultipartEntity entity = new MultipartEntity(
+			  HttpMultipartMode.BROWSER_COMPATIBLE);
+			entity.addPart("zipType", new StringBody("single", "text/plain",
+			  Charset.forName("UTF-8")));
+			entity.addPart("file", new FileBody(zipFile, "application/zip"));
+			post.setEntity(entity);
+
+			client.execute(post, context);
+			success = true;
+
+		} catch (IOException ioe) {
+			logger.log(
+			  Level.WARNING,
+			  "An error occurred while uploading the MAT value sSets to the CTS2 service.",
+			  ioe);
+			success = false;
+		} finally {
+			client.getConnectionManager().shutdown();
+		}
+
+		return success;
+	}
 
     private void processDownloadAlgorithm(HttpServletRequest request, HttpServletResponse response) {
 
