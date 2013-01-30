@@ -61,7 +61,64 @@ public class UserAddressForm extends DynamicForm {
         i_countryOrRegion.setTitle("Country / Region");
         i_countryOrRegion.setWidth(i_widgetWidth * 2);
         i_countryOrRegion.setRequired(true);
-        i_countryOrRegion.setValueMap("United States", "China", "Japan", "India");
+        i_countryOrRegion
+                .setValueMap("UNITED STATES", "AFGHANISTAN", "ALBANIA", "ALGERIA",
+                        "AMERICAN SAMOA", "ANDORRA", "ANGOLA", "ANGUILLA", "ANTARCTICA",
+                        "ANTIGUA AND BARBUDA", "ARGENTINA", "ARMENIA", "ARUBA",
+                        "ASHMORE AND CARTIER ISL", "AUSTRALIA", "AUSTRIA", "AZERBAIJAN", "BAHAMAS",
+                        " THE", "BAHRAIN", "BAKER ISLAND", "BANGLADESH", "BARBADOS",
+                        "BASSAS DA INDIA", "BELARUS", "BELGIUM", "BELIZE", "BENIN", "BERMUDA",
+                        "BHUTAN", "BOLIVIA", "BOSNIA AND HERCEGOVINA", "BOTSWANA", "BOUVET ISLAND",
+                        "BRAZIL", "BR INDIAN OCEAN TERR", "BRUNEI", "BULGARIA",
+                        "BURKINA (UPPER VOLTA)", "BURMA", "BURUNDI", "CAMBODIA", "CAMEROON",
+                        "CANADA", "CAPE VERDE", "CAYMAN ISLANDS", "CENTRAL AFRICAN REP.", "CHAD",
+                        "CHILE", "CHINA", "CHRISTMAS ISLAND", "CLIPPERTON ISLAND",
+                        "COCOS (KEELING) ISLANDS", "COLOMBIA", "COMOROS", "CONGO", "COOK ISLANDS",
+                        "CORAL SEA ISLANDS", "COSTA RICA", "IVORY COAST", "CROATIA", "CUBA",
+                        "CYPRUS", "CZECH REPUBLIC", "CZECHOSLOVAKIA", "DENMARK", "DJIBOUTI",
+                        "DOMINICA", "DOMINICAN REPUBLIC", "PORTUGUESE TIMOR", "ECUADOR", "EGYPT",
+                        "EL SALVADOR", "EQUATORIAL GUINEA", "ERITREA", "ESTONIA", "ETHIOPIA",
+                        "EUROPA ISLAND", "FALKLAND (IS MALVINAS)", "FAROE ISLANDS", "FIJI",
+                        "FINLAND", "FRANCE", "FRENCH GUIANA", "FRENCH POLYNESIA",
+                        "FR SO & ANTARCTIC LNDS", "GABON", "GAMBIA", " THE", "GAZA STRIP",
+                        "GEORGIA", "GERMANY", "GHANA", "GIBRALTAR", "GLORIOSO ISLANDS", "GREECE",
+                        "GREENLAND", "GRENADA", "GUADELOUPE", "GUAM", "GUATEMALA", "GUERNSEY",
+                        "GUINEA", "GUINEA-BISSAU", "GUYANA", "HAITI", "HEARD IS&MCDONALD ISLS",
+                        "VATICAN CITY", "HONDURAS", "HONG KONG", "HOWLAND ISLAND", "HUNGARY",
+                        "ICELAND", "INDIA", "INDONESIA", "IRAN", "IRAQ", "IRELAND", "MAN",
+                        " ISLE OF", "ISRAEL", "ITALY", "JAMAICA", "JAN MAYEN", "JAPAN",
+                        "JARVIS ISLAND", "JERSEY", "JOHNSTON ATOLL", "JORDAN",
+                        "JUAN DE NOVA ISLAND", "KAZAKHSTAN", "KENYA", "KINGMAN REEF", "KIRIBATI",
+                        "KOREA", "DEM PEOPLES REP", "KOREA", " REPUBLIC OF", "KUWAIT",
+                        "KYRGYZSTAN", "LAOS", "LATVIA", "LEBANON", "LESOTHO", "LIBERIA", "LIBYA",
+                        "LIECHTENSTEIN", "LITHUANIA", "LUXEMBOURG", "MACAU", "MACEDONIA",
+                        "MADAGASCAR", "MALAWI", "MALAYSIA", "MALDIVES", "MALI", "MALTA",
+                        "MARSHALL ISLANDS", "MARTINIQUE", "MAURITANIA", "MAURITIUS", "MAYOTTE",
+                        "MEXICO", "FED STATES MICRONESIA", "MIDWAY ISLAND", "MOLDOVA", "MONACO",
+                        "MONGOLIA", "MONTENEGRO", "MONTSERRAT", "MOROCCO", "MOZAMBIQUE", "NAMIBIA",
+                        "NAURU", "NAVASSA ISLAND", "NEPAL", "NETHERLANDS", "NETHERLANDS ANTILLES",
+                        "IRAQ-S ARABIA NEUTRAL Z", "NEW CALEDONIA", "NEW ZEALAND", "NICARAGUA",
+                        "NIGER", "NIGERIA", "NIUE", "NOT SPECIFIED", "NORFOLK ISLAND",
+                        "NORTHERN MARIANA IS", "NORWAY", "OMAN", "PAKISTAN", "PALAU",
+                        "PALMYRA ATOLL", "PANAMA", "PAPUA NEW GUINEA", "PARACEL ISLANDS",
+                        "PARAGUAY", "PERU", "PHILIPPINES", "PITCAIRN ISLANDS", "POLAND",
+                        "PORTUGAL", "PUERTO RICO", "QATAR", "REUNION", "ROMANIA", "RUSSIA",
+                        "RWANDA", "ST. HELENA", "ST. KITTS AND NEVIS", "ST LUCIA",
+                        "ST. PIERRE AND MIQUELON", "ST. VINCENT/GRENADINES", "WESTERN SAMOA",
+                        "SAN MARINO", "SAO TOME AND PRINCIPE", "SAUDI ARABIA", "SENEGAL", "SERBIA",
+                        "SEYCHELLES", "SIERRA LEONE", "SINGAPORE", "SLOVAK REPUBLIC", "SLOVENIA",
+                        "SOLOMON ISLANDS", "SOMALIA", "SOUTH AFRICA", "S.GEORGIA/S.SANDWIC IS",
+                        "SPAIN", "SPRATLY ISLANDS", "SRI LANKA", "SUDAN", "SURINAME", "SVALBARD",
+                        "SWAZILAND", "SWEDEN", "SWITZERLAND", "SYRIA", "TAIWAN", "TAJIKISTAN",
+                        "TANZANIA", " UNITED REP OF", "THAILAND", "TIMOR-LESTE", "TOGO", "TOKELAU",
+                        "TONGA", "TRINIDAD AND TOBAGO", "TROMELIN ISLAND", "TUNISIA", "TURKEY",
+                        "TURKMENISTAN", "TURKS AND CAICOS ISL", "TUVALU",
+                        "US MISC PACIFIC ISLANDS", "SOVIET UNION", "UGANDA", "UKRAINE",
+                        "UNITED ARAB EMIRATES", "UNITED KINGDOM", "U.S. MINOR OUTLYING ISL",
+                        "URUGUAY", "UZBEKISTAN", "VANUATU (NEW HEBRIDES)", "VENEZUELA", "VIETNAM",
+                        "BRITISH VIRGIN IS.", "VIRGIN ISLANDS", "WAKE ISLAND", "WALLIS AND FUTUNA",
+                        "WEST BANK", "WESTERN SAHARA", "YEMEN", "YUGOSLAVIA", "ZAIRE", "ZAMBIA",
+                        "ZIMBABWE");
         i_countryOrRegion.setColSpan(2);
 
         i_streetAddress = new TextItem("street");
@@ -81,7 +138,14 @@ public class UserAddressForm extends DynamicForm {
         i_state.setSelectOnFocus(true);
         i_state.setTitle("State");
         i_state.setWidth(i_widgetWidth);
-        i_state.setValueMap("Arizona", "Florida", "Minnesota", "Wisconsin");
+        i_state.setValueMap("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado",
+                "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois",
+                "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",
+                "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana",
+                "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York",
+                "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania",
+                "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah",
+                "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming");
         i_state.setRequired(true);
 
         i_zipCode = new TextItem("zip");
