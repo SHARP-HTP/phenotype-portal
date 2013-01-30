@@ -27,12 +27,15 @@
 		<copy todir="${dist.lib}" file="${lib.dir}/commons-fileupload-1.2.2.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/commons-io-2.4.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/commons-logging-1.1.1.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/core-0.8.2-SNAPSHOT.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/cts2Editor.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/guava-12.0.1.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/httpmime-4.2.3.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/jaxrs-api-2.3.4.Final.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/log4j-1.2.16.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/mailapi.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/mime-util-1.3.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/model-0.8.2-SNAPSHOT.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/mysql-connector-java-5.1.19-bin.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/poi-3.8-20120326.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/resteasy-jaxrs-2.3.4.Final.jar" />
@@ -100,7 +103,7 @@
 		<delete dir="${dist.dir}" failonerror="false" />
 	</target>
 
-	<target name="deploy-tomcat" depends="war" description="Deploys war to Tomcat">
+	<target name="deploy-tomcat" depends="clean,war" description="Deploys war to Tomcat">
 		<copy file="${dist.dir}/${dist.name}" todir="${tomcat.application.deploy.dir}" />
 	</target>
 
