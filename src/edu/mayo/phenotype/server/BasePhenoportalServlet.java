@@ -73,6 +73,14 @@ public class BasePhenoportalServlet extends RemoteServiceServlet {
         return getStartupProperties().getProperty("smtp.host");
     }
 
+    public String getSmtpPort() {
+        return getStartupProperties().getProperty("smtp.port");
+    }
+
+    public String getSmtpPassword() {
+        return getStartupProperties().getProperty("smtp.pw");
+    }
+
     public String getEmailContentsUserRegistration() {
         return getStartupProperties().getProperty("email.contents.user.registration");
     }

@@ -1846,16 +1846,20 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         String host = getSmtpHost();
         String from = getSmtpFromAddress();
         String messageText = getEmailContentsUserRoleRequestAdmin();
+        String port = getSmtpPort();
+        String pw = getSmtpPassword();
 
-        SmtpClient.sendRequestPersmissionUpgradeEmailAdmin(host, from, messageText, user);
+        SmtpClient.sendRequestPersmissionUpgradeEmailAdmin(host, from, pw, port, messageText, user);
     }
 
     private void sendRequestPersmissionUpgradeEmailUser(User user) {
         String host = getSmtpHost();
         String from = getSmtpFromAddress();
         String messageText = getEmailContentsUserRoleRequestUser();
+        String port = getSmtpPort();
+        String pw = getSmtpPassword();
 
-        SmtpClient.sendRequestPersmissionUpgradeEmailUser(host, from, messageText, user);
+        SmtpClient.sendRequestPersmissionUpgradeEmailUser(host, from, pw, port, messageText, user);
     }
 
     private void sendResponsePersmissionUpgradeEmail(User user, boolean granted) {
@@ -1863,8 +1867,10 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         String from = getSmtpFromAddress();
         String messageText = granted ? getEmailContentsUserRoleReplyGranted()
                 : getEmailContentsUserRoleReplyDenied();
+        String port = getSmtpPort();
+        String pw = getSmtpPassword();
 
-        SmtpClient.sendResponsePersmissionUpgradeEmail(host, from, messageText, user);
+        SmtpClient.sendResponsePersmissionUpgradeEmail(host, from, pw, port, messageText, user);
     }
 
     private String convertDate(String dateStr) {

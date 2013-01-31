@@ -59,7 +59,7 @@ public class FaqData {
                         "There are not any date range restrictions, but please note that a large date range will result a longer query/wait time.. The application will email you if the query takes more than a minute and inform you that the query is running in the background."),
                 new HelpRecord(
                         "How can I contact you for further questions?",
-                        "Please email us on at <a id=\"htpLinks\" href=\"mailto:phenotypeportal@mayo.edu\">phenotypeportal@mayo.edu</a>")
+                        "Please email us on at <a id=\"htpLinks\" href=\"mailto:phenotypeportal@informatics.mayo.edu\">phenotypeportal@informatics.mayo.edu</a>")
 
         };
 

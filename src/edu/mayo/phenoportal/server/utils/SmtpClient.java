@@ -5,8 +5,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -26,8 +28,8 @@ public class SmtpClient {
     private static final String LAST_NAME = "LAST_NAME";
     private static final String USER_NAME = "USER_NAME";
 
-    public static boolean sendRegistrationSuccessEmail(String host, String from,
-            String messageText, User user) {
+    public static boolean sendRegistrationSuccessEmail(final String host, final String from,
+            final String pw, final String port, String messageText, User user) {
 
         messageText = messageText.replaceAll(FIRST_NAME, user.getFirstName());
         messageText = messageText.replaceAll(LAST_NAME, user.getLastName());
@@ -37,12 +39,19 @@ public class SmtpClient {
 
         // Get system properties
         Properties properties = System.getProperties();
-
-        // Setup mail server
         properties.setProperty("mail.smtp.host", host);
+        properties.setProperty("mail.smtp.port", port);
+        properties.setProperty("mail.smtp.from", from);
+        properties.put("mail.smtp.auth", true);
 
-        // Get the default Session object.
-        Session session = Session.getDefaultInstance(properties);
+        Session session = Session.getDefaultInstance(properties, new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(from, pw);
+            }
+
+        });
 
         try {
 
@@ -78,8 +87,9 @@ public class SmtpClient {
         return success;
     }
 
-    public static boolean sendRequestPersmissionUpgradeEmailAdmin(String host, String adminEmail,
-            String messageText, User user) {
+    public static boolean sendRequestPersmissionUpgradeEmailAdmin(final String host,
+            final String adminEmail, final String pw, final String port, String messageText,
+            User user) {
 
         messageText = messageText.replaceAll(FIRST_NAME, user.getFirstName());
         messageText = messageText.replaceAll(LAST_NAME, user.getLastName());
@@ -89,12 +99,19 @@ public class SmtpClient {
 
         // Get system properties
         Properties properties = System.getProperties();
-
-        // Setup mail server
         properties.setProperty("mail.smtp.host", host);
+        properties.setProperty("mail.smtp.port", port);
+        properties.setProperty("mail.smtp.from", adminEmail);
+        properties.put("mail.smtp.auth", true);
 
-        // Get the default Session object.
-        Session session = Session.getDefaultInstance(properties);
+        Session session = Session.getDefaultInstance(properties, new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(adminEmail, pw);
+            }
+
+        });
 
         try {
 
@@ -129,8 +146,9 @@ public class SmtpClient {
         return success;
     }
 
-    public static boolean sendRequestPersmissionUpgradeEmailUser(String host, String adminEmail,
-            String messageText, User user) {
+    public static boolean sendRequestPersmissionUpgradeEmailUser(String host,
+            final String adminEmail, final String pw, final String port, String messageText,
+            User user) {
 
         messageText = messageText.replaceAll(FIRST_NAME, user.getFirstName());
         messageText = messageText.replaceAll(LAST_NAME, user.getLastName());
@@ -139,12 +157,19 @@ public class SmtpClient {
 
         // Get system properties
         Properties properties = System.getProperties();
-
-        // Setup mail server
         properties.setProperty("mail.smtp.host", host);
+        properties.setProperty("mail.smtp.port", port);
+        properties.setProperty("mail.smtp.from", adminEmail);
+        properties.put("mail.smtp.auth", true);
 
-        // Get the default Session object.
-        Session session = Session.getDefaultInstance(properties);
+        Session session = Session.getDefaultInstance(properties, new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(adminEmail, pw);
+            }
+
+        });
 
         try {
 
@@ -179,8 +204,8 @@ public class SmtpClient {
         return success;
     }
 
-    public static boolean sendResponsePersmissionUpgradeEmail(String host, String adminEmail,
-            String messageText, User user) {
+    public static boolean sendResponsePersmissionUpgradeEmail(String host, final String adminEmail,
+            final String pw, final String port, String messageText, User user) {
 
         messageText = messageText.replaceAll(FIRST_NAME, user.getFirstName());
         messageText = messageText.replaceAll(LAST_NAME, user.getLastName());
@@ -189,12 +214,19 @@ public class SmtpClient {
 
         // Get system properties
         Properties properties = System.getProperties();
-
-        // Setup mail server
         properties.setProperty("mail.smtp.host", host);
+        properties.setProperty("mail.smtp.port", port);
+        properties.setProperty("mail.smtp.from", adminEmail);
+        properties.put("mail.smtp.auth", true);
 
-        // Get the default Session object.
-        Session session = Session.getDefaultInstance(properties);
+        Session session = Session.getDefaultInstance(properties, new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(adminEmail, pw);
+            }
+
+        });
 
         try {
 
@@ -205,8 +237,6 @@ public class SmtpClient {
             // value of the InternetAddress.getLocalAddress method.
             message.setFrom(new InternetAddress(adminEmail));
 
-            // if (validateEmailAddress(to1)) {
-            InternetAddress[] toAaddress = { new InternetAddress(adminEmail) };
             message.setRecipients(Message.RecipientType.TO, user.getEmail());
 
             // Set the "Subject" header field.

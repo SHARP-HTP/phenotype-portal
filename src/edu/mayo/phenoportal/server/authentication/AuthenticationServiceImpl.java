@@ -230,8 +230,10 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
         String host = getSmtpHost();
         String from = getSmtpFromAddress();
         String messageText = getEmailContentsUserRegistration();
+        String port = getSmtpPort();
+        String pw = getSmtpPassword();
 
-        SmtpClient.sendRegistrationSuccessEmail(host, from, messageText, user);
+        SmtpClient.sendRegistrationSuccessEmail(host, from, pw, port, messageText, user);
     }
 
 }
