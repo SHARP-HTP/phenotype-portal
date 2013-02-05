@@ -11,7 +11,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
 
 import edu.mayo.phenoportal.client.Htp;
 import edu.mayo.phenoportal.client.core.ContextAreas;
-import edu.mayo.phenoportal.client.core.ContextAreas.types;
 import edu.mayo.phenoportal.client.events.ContextAreaChangedEvent;
 import edu.mayo.phenoportal.client.events.LoggedInEvent;
 import edu.mayo.phenoportal.client.events.LoggedInEventHandler;
@@ -27,7 +26,7 @@ public class AlgorithmPanel extends VLayout {
 
     private static final int BUTTON_WIDTH = 175;
 
-    private static final String CREATE_URL = "https://mat.qualityforum.org/Login.html";
+    private static final String CREATE_URL = "https://www.emeasuretool.cms.gov/MeasureAuthoringTool/Login.html";
 
     private IButton i_createButton;
     private IButton i_uploadButton;
