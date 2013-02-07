@@ -72,7 +72,7 @@ public class SQLStatements {
             ps.setString(15, execution.getBpmnPath());
             ps.setString(16, execution.getRulesPath());
 
-            logger.log(Level.INFO, ps.toString());
+            logger.log(Level.FINE, ps.toString());
             return ps;
         } else {
             throw new SQLException("Unable to establish a connection, connection is null.");
@@ -378,7 +378,7 @@ public class SQLStatements {
             ps.setString(3, execution.getAlgorithmVersion());
             ps.setString(4, execution.getAlgorithmCategoryId());
 
-            logger.log(Level.INFO, ps.toString());
+            logger.log(Level.FINE, ps.toString());
             return ps;
         } else {
             throw new SQLException("Unable to establish a connection, connection is null.");
