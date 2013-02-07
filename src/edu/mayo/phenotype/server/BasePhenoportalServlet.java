@@ -101,6 +101,22 @@ public class BasePhenoportalServlet extends RemoteServiceServlet {
         return getStartupProperties().getProperty("email.contents.user.role.reply.denied");
     }
 
+	public String getCts2RestUrl() {
+		return getStartupProperties().getProperty("cts2.valuesetdefinition.maintenance.url");
+	}
+
+	public String getCts2RestUser() {
+		return getStartupProperties().getProperty("cts2.valuesetdefinition.maintenance.user");
+	}
+
+	public String getCts2RestPassword() {
+		return getStartupProperties().getProperty("cts2.valuesetdefinition.maintenance.password");
+	}
+
+	public String getCts2EntityRestUrl() {
+		return getStartupProperties().getProperty("cts2.valuesetdefinition.maintenance.entities.url");
+	}
+
     protected Properties getStartupProperties() {
         if (startupProperties == null) {
             Properties props = new Properties();

@@ -53,6 +53,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import mayo.edu.cts2.editor.server.Cts2EditorServiceProperties;
 import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.util.Base64;
 import org.w3c.dom.Document;
@@ -235,6 +236,9 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         return sb.toString();
     }
 
+	private Object cts2ServerPropertiesLock = new Object();
+	private boolean cts2RestPropertiesSet = false;
+
     @Override
     public List<String> getDataCriteriaOids(AlgorithmData algorithmData) {
         /* TODO: check for cached version */
@@ -245,6 +249,14 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
         List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
         /* TODO: cache result */
+
+	    synchronized (cts2ServerPropertiesLock) {
+		    if (!cts2RestPropertiesSet) {
+			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(getCts2RestUrl());
+			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(getCts2RestUser(), getCts2RestPassword());
+			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceEntitiesUrl(getCts2EntityRestUrl());
+		    }
+	    }
 
         return oids;
     }
@@ -259,6 +271,14 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
         List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
         /* TODO: cache result */
+
+	    synchronized (cts2ServerPropertiesLock) {
+		    if (!cts2RestPropertiesSet) {
+			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(getCts2RestUrl());
+			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(getCts2RestUser(), getCts2RestPassword());
+			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceEntitiesUrl(getCts2EntityRestUrl());
+		    }
+	    }
 
         return oids;
     }
