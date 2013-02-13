@@ -1,7 +1,11 @@
 package edu.mayo.phenoportal.client.phenotype.report;
 
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.IButton;
@@ -12,6 +16,7 @@ import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
+
 import edu.mayo.phenoportal.client.Htp;
 import edu.mayo.phenoportal.client.core.AlgorithmData;
 import edu.mayo.phenoportal.client.events.LoggedInEvent;
@@ -30,11 +35,6 @@ import edu.mayo.phenoportal.shared.DemographicStat;
 import edu.mayo.phenoportal.shared.DemographicsCategory;
 import edu.mayo.phenoportal.shared.Execution;
 import edu.mayo.phenoportal.shared.User;
-
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Panel to select the from and to dates for executing a specific
@@ -240,49 +240,7 @@ public class PhenotypeDateRange extends VLayout {
                 Date fromDate = i_fromDate.getValueAsDate();
                 Date toDate = i_toDate.getValueAsDate();
 
-                DateTimeFormat fmt = DateTimeFormat.getFormat("MM/dd/yyyy");
-                String startDate = (fmt.format(fromDate));
-                String endDate = (fmt.format(toDate));
-
-                Date executeFromDate;
-                Date executeToDate;
-
-                Date startDateValidFrom;
-                Date startDateValidTo;
-                Date endDateValidFrom;
-                Date endDateValidTo;
-
-                String fromMin = "1/1/1995";
-                String fromMax = "12/31/2002";
-                String toMin = "12/31/2010";
-                String toMax = "6/31/2012";
-
-                executeFromDate = DateTimeFormat.getFormat("MM/dd/yyyy").parse(startDate);
-                executeToDate = DateTimeFormat.getFormat("MM/dd/yyyy").parse(endDate);
-                startDateValidFrom = DateTimeFormat.getFormat("MM/dd/yyyy").parse(fromMin);
-                startDateValidTo = DateTimeFormat.getFormat("MM/dd/yyyy").parse(fromMax);
-                endDateValidFrom = DateTimeFormat.getFormat("MM/dd/yyyy").parse(toMin);
-                endDateValidTo = DateTimeFormat.getFormat("MM/dd/yyyy").parse(toMax);
-
-                if (executeFromDate.before(startDateValidFrom)
-                        || executeFromDate.after(startDateValidTo)) {
-                    String title = "Invalid Date";
-                    String message = "The From date range must be between " + fromMin + " and "
-                            + fromMax + ".";
-                    MessageWindow messageWindow = new MessageWindow(title, message);
-                    messageWindow.show();
-
-                } else if (executeToDate.before(endDateValidFrom)
-                        || executeToDate.after(endDateValidTo)) {
-                    String title = "Invalid Date";
-                    String message = "The To date range must be between " + toMin + " and " + toMax
-                            + ".";
-                    MessageWindow messageWindow = new MessageWindow(title, message);
-                    messageWindow.show();
-
-                }
-
-                else if (toDate.before(fromDate)) {
+                if (toDate.before(fromDate)) {
                     String title = "Invalid Dates";
                     String message = "The From date must be before the To date.";
                     MessageWindow messageWindow = new MessageWindow(title, message);

@@ -27,5 +27,6 @@
 	<classpathentry kind="lib" path="lib/cts2Editor.jar"/>
 	<classpathentry kind="lib" path="lib/core-0.8.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/model-0.8.2-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/httpmime-4.2.3.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

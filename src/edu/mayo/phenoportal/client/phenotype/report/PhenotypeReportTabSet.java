@@ -1,7 +1,10 @@
 package edu.mayo.phenoportal.client.phenotype.report;
 
+import java.util.List;
+
 import com.smartgwt.client.types.Side;
 import com.smartgwt.client.widgets.tab.TabSet;
+
 import edu.mayo.phenoportal.client.Htp;
 import edu.mayo.phenoportal.client.core.AlgorithmData;
 import edu.mayo.phenoportal.client.events.LoggedOutEvent;
@@ -13,8 +16,6 @@ import edu.mayo.phenoportal.client.events.PhenotypeSelectionChangedEventHandler;
 import edu.mayo.phenoportal.shared.Demographic;
 import edu.mayo.phenoportal.shared.Execution;
 import edu.mayo.phenoportal.shared.Image;
-
-import java.util.List;
 
 /**
  * TabSet to manage the tabs for a selected phenotype. There will be 4 tabs:
@@ -46,7 +47,7 @@ public class PhenotypeReportTabSet extends TabSet {
         init();
         createPhenotypeExecuteCompletedEventHandler();
         createLoggeOutRequestEventHanlder();
-	    createPhenotypeSelectionChangedEventHandler();
+        createPhenotypeSelectionChangedEventHandler();
     }
 
     public void init() {
@@ -118,21 +119,19 @@ public class PhenotypeReportTabSet extends TabSet {
         selectTab(i_fileInfoTab);
     }
 
-	public void updateResults(Execution execution) {
-		if (execution != null &&
-		  execution.getDemographics() != null &&
-		  execution.getImage() != null) {
-			generateGraphs(execution.getDemographics());
-			generateWorkflow(execution.getImage());
+    public void updateResults(Execution execution) {
+        if (execution != null && execution.getDemographics() != null
+                && execution.getImage() != null) {
+            generateGraphs(execution.getDemographics());
+            generateWorkflow(execution.getImage());
 
-			disableExecutionResultsTabs(false);
-		}
-		else {
-			disableExecutionResultsTabs(true);
-		}
-	}
+            disableExecutionResultsTabs(false);
+        } else {
+            disableExecutionResultsTabs(true);
+        }
+    }
 
-	/*
+    /*
      * create both the summary and demographics graphs
      */
     private void generateGraphs(List<Demographic> demographicResult) {
@@ -150,7 +149,7 @@ public class PhenotypeReportTabSet extends TabSet {
         i_workflowTab.insertImage(image);
 
         // select the workflow tab
-        selectTab(i_workflowTab);
+        // selectTab(i_workflowTab);
     }
 
     /**
@@ -181,17 +180,17 @@ public class PhenotypeReportTabSet extends TabSet {
                 });
     }
 
-	private void createPhenotypeSelectionChangedEventHandler() {
-		Htp.EVENT_BUS.addHandler(PhenotypeSelectionChangedEvent.TYPE,
-		  new PhenotypeSelectionChangedEventHandler() {
+    private void createPhenotypeSelectionChangedEventHandler() {
+        Htp.EVENT_BUS.addHandler(PhenotypeSelectionChangedEvent.TYPE,
+                new PhenotypeSelectionChangedEventHandler() {
 
-			  @Override
-			  public void onPhenotypeSelectionChanged(
-				PhenotypeSelectionChangedEvent phenotypeSelectionChangedEvent) {
-				  selectTab(i_fileInfoTab);
-			  }
-		  });
-	}
+                    @Override
+                    public void onPhenotypeSelectionChanged(
+                            PhenotypeSelectionChangedEvent phenotypeSelectionChangedEvent) {
+                        selectTab(i_fileInfoTab);
+                    }
+                });
+    }
 
     /**
      * Create a handler to listen for a logged out request.
