@@ -1,7 +1,6 @@
 package edu.mayo.phenoportal.server.phenotype;
 
 import edu.mayo.phenotype.server.BasePhenoportalServlet;
-import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXParseException;
@@ -30,11 +29,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
-import java.net.URLConnection;
-import java.security.cert.CertificateException;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +89,8 @@ public class RestExecuter extends BasePhenoportalServlet {
         String CRLF = "\r\n"; // Line separator required by multipart/form-data.
 
         URL url = new URL(s_restUrl + "/executions");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+	    connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
 
         // infinite timeout on the connection
         connection.setConnectTimeout(0);
@@ -174,7 +172,8 @@ public class RestExecuter extends BasePhenoportalServlet {
     public String pollStatus(String url) throws Exception {
         URL executions = new URL(url);
 
-        URLConnection connection = executions.openConnection();
+	    HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
+	    connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
         connection.setRequestProperty("Accept", "application/xml");
         InputStream in = connection.getInputStream();
 
@@ -205,7 +204,8 @@ public class RestExecuter extends BasePhenoportalServlet {
         String resultStr = "";
 
         try {
-            URLConnection connection = executions.openConnection();
+	        HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
+	        connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
             connection.setRequestProperty("Accept", "application/xml");
             in = connection.getInputStream();
 
@@ -250,7 +250,8 @@ public class RestExecuter extends BasePhenoportalServlet {
             throws Exception {
         URL executions = new URL(url);
 
-        URLConnection connection = executions.openConnection();
+	    HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
+	    connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
         connection.setRequestProperty("Accept", "image/png");
         InputStream in = connection.getInputStream();
 
@@ -315,25 +316,20 @@ public class RestExecuter extends BasePhenoportalServlet {
 
     private void trustSelfSignedSSL() {
         try {
-            SSLContext ctx = SSLContext.getInstance("TLS");
+            SSLContext ctx = SSLContext.getInstance("SSL");
             X509TrustManager tm = new X509TrustManager() {
 
-                @Override
                 public X509Certificate[] getAcceptedIssuers() {
                     return null;
                 }
 
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType)
-                        throws CertificateException {
+                public void checkServerTrusted(X509Certificate[] chain, String authType) {
                 }
 
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain, String authType)
-                        throws CertificateException {
+                public void checkClientTrusted(X509Certificate[] chain, String authType) {
                 }
             };
-            ctx.init(null, new TrustManager[] { tm }, null);
+            ctx.init(null, new TrustManager[] { tm }, new SecureRandom());
             SSLContext.setDefault(ctx);
         } catch (Exception e) {
             throw new RuntimeException(e);
