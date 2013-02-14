@@ -117,6 +117,10 @@ public class BasePhenoportalServlet extends RemoteServiceServlet {
 		return getStartupProperties().getProperty("cts2.valuesetdefinition.maintenance.entities.url");
 	}
 
+	public int getCts2RestPageSize() {
+		return Integer.parseInt(getStartupProperties().getProperty("cts2.valuesetdefinition.maintenance.pagesize"));
+	}
+
     protected Properties getStartupProperties() {
         if (startupProperties == null) {
             Properties props = new Properties();

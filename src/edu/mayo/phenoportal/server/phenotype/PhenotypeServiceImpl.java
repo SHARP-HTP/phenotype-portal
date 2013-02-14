@@ -255,6 +255,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(getCts2RestUrl());
 			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(getCts2RestUser(), getCts2RestPassword());
 			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceEntitiesUrl(getCts2EntityRestUrl());
+			    Cts2EditorServiceProperties.setValueSetRestPageSize(getCts2RestPageSize());
 		    }
 	    }
 
@@ -277,6 +278,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(getCts2RestUrl());
 			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(getCts2RestUser(), getCts2RestPassword());
 			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceEntitiesUrl(getCts2EntityRestUrl());
+			    Cts2EditorServiceProperties.setValueSetRestPageSize(getCts2RestPageSize());
 		    }
 	    }
 
