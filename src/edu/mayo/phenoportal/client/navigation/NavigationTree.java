@@ -1,5 +1,6 @@
 package edu.mayo.phenoportal.client.navigation;
 
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -151,9 +152,12 @@ public class NavigationTree extends TreeGrid {
         // attribute to false.
         // This doesn't seem to affect the tree.
 
+        // clear out the current records
+        // setData(new ListGridRecord[0]);
+        i_dataSource.setCacheData(new Record[0]);
+
         i_dataSource.setCategoryId("0");
         i_dataSource.executeFetch(null);
-
     }
 
     /**
