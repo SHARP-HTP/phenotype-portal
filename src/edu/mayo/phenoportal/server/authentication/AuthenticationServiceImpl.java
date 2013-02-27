@@ -1,5 +1,12 @@
 package edu.mayo.phenoportal.server.authentication;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -105,7 +112,9 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
 
     @Override
     public Boolean registerUser(User user) throws IllegalArgumentException {
-        boolean success = setUser(user);
+	    boolean success = registerMatUser(user);
+	    if (success)
+            success = setUser(user);
         return Boolean.valueOf(success);
     }
 
@@ -235,5 +244,66 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
 
         SmtpClient.sendRegistrationSuccessEmail(host, from, pw, port, messageText, user);
     }
+
+	private boolean registerMatUser(User user) {
+		boolean result = false;
+		String charset = "UTF-8";
+		String url = getMatEditorUrl() + "/createUser";
+		OutputStream output = null;
+		InputStream response = null;
+
+		try {
+			String query = String.format("userId=%s&firstName=%s&lastName=%s&email=%s&phone=%s&password=%s",
+			  URLEncoder.encode(user.getUserName(), charset),
+			  URLEncoder.encode(user.getFirstName(), charset),
+			  URLEncoder.encode(user.getLastName(), charset),
+			  URLEncoder.encode(user.getEmail(), charset),
+		      URLEncoder.encode(user.getPhoneNumber(), charset),
+	          URLEncoder.encode(user.getPassword(), charset));
+
+			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+			connection.setConnectTimeout(0);
+			connection.setDoOutput(true);
+			connection.setDoInput(true);
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Accept-Charset", charset);
+			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+			connection.setRequestProperty("charset", charset);
+			connection.setRequestProperty("Content-Length", Integer.toString(query.length()));
+			connection.setUseCaches(false);
+			output = connection.getOutputStream();
+			output.write(query.getBytes(charset));
+			output.flush();
+
+			if (connection.getResponseCode() == 200) {
+				response = connection.getInputStream();
+				System.out.println(response.toString());
+				result = true;
+			}
+			else {
+				result = false;
+			}
+		}
+		catch (MalformedURLException mue) { }
+		catch (IOException ioe) {}
+		finally {
+			if (output != null) {
+				try {
+					output.close();
+				} catch(Exception e) {
+					s_logger.log(Level.FINE, "Failed to close outputStream.", e);
+				}
+			}
+			if (response != null) {
+				try {
+					response.close();
+				} catch (Exception e) {
+					s_logger.log(Level.FINE, "Failed to close inputStream.", e);
+				}
+			}
+		}
+
+		return result;
+	}
 
 }
