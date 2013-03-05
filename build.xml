@@ -92,7 +92,7 @@
 
 	<target name="build" depends="gwtc" description="Build this project" />
 
-	<target name="war" depends="build" description="Create a war file">
+	<target name="war" depends="clean,build" description="Create a war file">
 		<mkdir dir="${dist.dir}" />
 		<zip destfile="${dist.dir}/${dist.name}" basedir="war" />
 	</target>
@@ -103,7 +103,7 @@
 		<delete dir="${dist.dir}" failonerror="false" />
 	</target>
 
-	<target name="deploy-tomcat" depends="clean,war" description="Deploys war to Tomcat">
+	<target name="deploy-tomcat" depends="war" description="Deploys war to Tomcat">
 		<copy file="${dist.dir}/${dist.name}" todir="${tomcat.application.deploy.dir}" />
 	</target>
 
