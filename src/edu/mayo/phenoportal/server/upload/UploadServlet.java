@@ -30,7 +30,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,8 +47,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
+
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +58,7 @@ import java.util.zip.ZipInputStream;
 
 public class UploadServlet extends BasePhenoportalHttpServlet {
 
-    private static final long serialVersionUID = 3457906406134591883L;
+    private static final long serialVersionUID = 3457906406134591884L;
     private static String ALGORITHM_PATH = null;
     private static String MAT_UPLOAD_PATH = "/mat/zips";
     private static Logger logger = Logger.getLogger(UploadServlet.class.getName());
@@ -152,8 +151,16 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
             uploadItems.setAssocName(item.getString());
         } else if (fieldName.equals(UploadColumns.ID.colName())) {
             uploadItems.setId(item.getString());
-        } else {
-            logger.log(Level.INFO, String.format("Ignoring form field '%s'.\n", fieldName));
+        } else if (fieldName.equals("ZIP_PATH")) {
+	        try {
+		        FileInputStream inStream = new FileInputStream(new File(item.getString()));
+		        extractZip(inStream, uploadItems);
+	        } catch (IOException ioe) {
+		        logger.log(Level.WARNING, "Failed to extract the zip file.", ioe);
+	        }
+	        catch (PhenoportalFileException pfe) {
+		        logger.log(Level.WARNING, "Failed to extract the zip file.", pfe);
+	        }
         }
     }
 
@@ -248,7 +255,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
             throws IOException, PhenoportalFileException {
         if (uploadItems.getZipFile() == null) {
             uploadItems.setZipFile(File.createTempFile(UUID.randomUUID().toString(), ".zip_tmp"));
-            ByteStreams.copy(inputStream, new FileOutputStream(uploadItems.getZipFile()));
+	        ByteStreams.copy(inputStream, new FileOutputStream(uploadItems.getZipFile()));
         } else {
             uploadItems.addMessage("Two zip files detected.");
             return false;
@@ -282,7 +289,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
     }
 
     private boolean processExtractedFiles(List<File> files, UploadItems uploadItems)
-            throws PhenoportalFileException {
+            throws IOException {
         boolean success = true;
         for (File file : files) {
             if (!file.isDirectory() && success) {
@@ -292,7 +299,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
         return success;
     }
 
-    private boolean setFile(File file, UploadItems uploadItems) throws PhenoportalFileException {
+    private boolean setFile(File file, UploadItems uploadItems) throws IOException {
         boolean success = true;
         String mimeType = MimeUtils.getMimeType(file);
 
@@ -300,32 +307,24 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
             if (uploadItems.getHtmlFile() == null)
                 uploadItems.setHtmlFile(file);
             else {
-                // success = false;
-                // messages.append("Two html files detected in the zip.");
                 logger.info("Two html files detected in the zip.");
             }
         } else if (MimeUtils.isXmlFile(mimeType)) {
             if (uploadItems.getXmlFile() == null)
                 uploadItems.setXmlFile(file);
             else {
-                // success = false;
-                // messages.append("Two XML files detected in the zip.");
                 logger.info("Two XML files detected in the zip.");
             }
         } else if (MimeUtils.isXlsFile(mimeType)) {
             if (uploadItems.getXlsFile() == null)
                 uploadItems.setXlsFile(file);
             else {
-                // success = false;
-                // messages.append("Two XLS files detected in the zip.");
                 logger.info("Two XLS files detected in the zip.");
             }
         } else if (MimeUtils.isZipFile(mimeType)) {
             if (uploadItems.getZipFile() == null)
                 uploadItems.setZipFile(file);
             else {
-                // success = false;
-                // messages.append("Two zip files detected.");
                 logger.info("Two zip files detected");
             }
         } else {
@@ -371,7 +370,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
     }
 
     private boolean validateUploadFile(UploadItems uploadItems) {
-        /* Required: Zip, XML, HTML, XLS */
+        /* Required: Zip, XML, HTML */
         boolean valid = true;
 
         if (uploadItems.getZipFile() == null) {
@@ -388,18 +387,6 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
             valid = false;
             uploadItems.addMessage("The zip file must contain a valid HTML file.");
         }
-
-        if (uploadItems.getXlsFile() == null) {
-            valid = false;
-            uploadItems.addMessage("The zip file must contain a valid XLS file.");
-        }
-
-        if (valid)
-            logger.info(String.format(
-                    "Algorithm uploaded: Name: %sVersion: %sXML: %sHTML: %sXLS: %s", uploadItems
-                            .getName(), uploadItems.getVersion(), uploadItems.getXmlFile()
-                            .getName(), uploadItems.getHtmlFile().getName(), uploadItems
-                            .getXlsFile().getName()));
 
         return valid;
     }
@@ -422,22 +409,29 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
 
         try {
             if (new File(destPath).mkdirs()) {
+	            if (uploadItems.getZipFile() != null) {
+	                File newZip = new File(destPath + "/" + uploadItems.getPrefix() + ".zip");
+	                Files.copy(uploadItems.getZipFile(), newZip);
+	                uploadItems.setZipFile(newZip);
+                }
 
-                File newZip = new File(destPath + "/" + uploadItems.getPrefix() + ".zip");
-                Files.copy(uploadItems.getZipFile(), newZip);
-                uploadItems.setZipFile(newZip);
+	            if (uploadItems.getXmlFile() != null) {
+	                File newXml = new File(destPath + "/" + uploadItems.getPrefix() + ".xml");
+	                Files.copy(uploadItems.getXmlFile(), newXml);
+	                uploadItems.setXmlFile(newXml);
+                }
 
-                File newXml = new File(destPath + "/" + uploadItems.getPrefix() + ".xml");
-                Files.copy(uploadItems.getXmlFile(), newXml);
-                uploadItems.setXmlFile(newXml);
+	            if (uploadItems.getHtmlFile() != null) {
+	                File newHtml = new File(destPath + "/" + uploadItems.getPrefix() + ".html");
+	                Files.copy(uploadItems.getHtmlFile(), newHtml);
+	                uploadItems.setHtmlFile(newHtml);
+	            }
 
-                File newHtml = new File(destPath + "/" + uploadItems.getPrefix() + ".html");
-                Files.copy(uploadItems.getHtmlFile(), newHtml);
-                uploadItems.setHtmlFile(newHtml);
-
-                File newXls = new File(destPath + "/" + uploadItems.getPrefix() + ".xls");
-                Files.copy(uploadItems.getXlsFile(), newXls);
-                uploadItems.setXlsFile(newXls);
+	            if (uploadItems.getXlsFile() != null) {
+	                File newXls = new File(destPath + "/" + uploadItems.getPrefix() + ".xls");
+	                Files.copy(uploadItems.getXlsFile(), newXls);
+	                uploadItems.setXlsFile(newXls);
+	            }
 
                 if (uploadItems.getDocFile() != null) {
                     File newDoc = new File(destPath + "/" + uploadItems.getPrefix() + ".doc");
@@ -447,8 +441,8 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
 
                 /* Add metadata to database. */
                 success = insertUploadMetadata(request, uploadItems);
-	            /* Add value sets to CTS2 service */
-	            if (success) {
+	            /* If value sets spreadsheet is present add value sets to CTS2 service */
+	            if (success && uploadItems.getXlsFile() != null) {
 		            success = insertValueSets(uploadItems, request);
 	            }
             } else {
@@ -488,12 +482,11 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
                 st.setString(6, uploadItems.getInstitution());
                 st.setDate(7, new java.sql.Date(uploadItems.getCreateDate().getTime()));
                 st.setString(8, uploadItems.getComment());
-                st.setString(9, prefix + uploadItems.getXmlFile().getName());
-                st.setString(10, prefix + uploadItems.getXlsFile().getName());
-                st.setString(11, prefix + uploadItems.getHtmlFile().getName());
-                st.setString(12, prefix + uploadItems.getZipFile().getName());
-                st.setString(13, uploadItems.getDocFile() != null ? prefix
-                        + uploadItems.getDocFile().getName() : "");
+                st.setString(9,  uploadItems.getXmlFile()  != null ? prefix + uploadItems.getXmlFile().getName()  : "");
+                st.setString(10, uploadItems.getXlsFile()  != null ? prefix + uploadItems.getXlsFile().getName()  : "");
+                st.setString(11, uploadItems.getHtmlFile() != null ? prefix + uploadItems.getHtmlFile().getName() : "");
+                st.setString(12, uploadItems.getZipFile()  != null ? prefix + uploadItems.getZipFile().getName()  : "");
+                st.setString(13, uploadItems.getDocFile()  != null ? prefix + uploadItems.getDocFile().getName()  : "");
                 st.setString(14, uploadItems.getStatus());
                 st.setString(15, uploadItems.getAssocLink());
                 st.setString(16, uploadItems.getAssocName());

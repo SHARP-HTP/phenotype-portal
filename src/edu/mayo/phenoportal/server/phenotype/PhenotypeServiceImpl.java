@@ -53,6 +53,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import edu.mayo.phenoportal.server.upload.ImportServlet;
+import edu.mayo.phenoportal.shared.MatImport;
 import mayo.edu.cts2.editor.server.Cts2EditorServiceProperties;
 import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.util.Base64;
@@ -1545,7 +1547,24 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         return editorUrl + droolsId;
     }
 
-    private void insertDrools(Connection connection, Drools droolsMetadata, String droolsId,
+	@Override
+	public String getMatEditorUrl(User user) {
+		String url = "";
+		if (user != null) {
+			url = super.getMatEditorUrl() + "/Login.html?userId="+user.getUserName()+"&htpId="+user.getPassword();
+		}
+		else {
+			url = super.getMatEditorUrl();
+		}
+		return url;
+	}
+
+	@Override
+	public MatImport getMatImport(String tokenId) throws IllegalArgumentException {
+		return ImportServlet.getMatImport(tokenId);
+	}
+
+	private void insertDrools(Connection connection, Drools droolsMetadata, String droolsId,
             String username, String algorithmName) {
         /* insert into drools table */
         PreparedStatement st = null;

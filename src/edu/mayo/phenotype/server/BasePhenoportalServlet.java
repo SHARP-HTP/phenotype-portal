@@ -125,6 +125,14 @@ public class BasePhenoportalServlet extends RemoteServiceServlet {
 		return getStartupProperties().getProperty("mat.editor.url");
 	}
 
+	public String getMatEditorUrlInternal() {
+		String url = getStartupProperties().getProperty("mat.editor.url.internal");
+		if (url == null || url.trim().isEmpty()) {
+			url = getStartupProperties().getProperty("mat.editor.url");
+		}
+		return url;
+	}
+
     protected Properties getStartupProperties() {
         if (startupProperties == null) {
             Properties props = new Properties();

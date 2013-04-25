@@ -20,6 +20,7 @@ import edu.mayo.phenoportal.client.authentication.AuthenticationService;
 import edu.mayo.phenoportal.server.database.DBConnection;
 import edu.mayo.phenoportal.server.utils.DateConverter;
 import edu.mayo.phenoportal.server.utils.SmtpClient;
+import edu.mayo.phenoportal.shared.MatImport;
 import edu.mayo.phenoportal.shared.User;
 import edu.mayo.phenoportal.shared.database.UserColumns;
 import edu.mayo.phenoportal.utils.SQLStatements;
@@ -68,6 +69,18 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
 
         return user;
     }
+
+	public User validateImportUser(MatImport matImport) {
+		String sessionId;
+
+		User user = getUser(matImport.user);
+		if (user != null) {
+			sessionId = getCurrentSessionId();
+			setSessionForUser(user);
+			user.setSessionId(sessionId);
+		}
+		return user;
+	}
 
     @Override
     public User isValidSession() throws IllegalArgumentException {
@@ -211,14 +224,11 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
         conn = DBConnection.getDBConnection(getBasePath());
         boolean isSuccessful = false;
 
-        // need to store the hashed password
-        String pwHashed = generateHashPw(user.getPassword());
-
         if (conn != null) {
             try {
                 long registrationDate = System.currentTimeMillis();
                 user.setRegistrationDate(DateConverter.getTimeString(new Date(registrationDate)));
-                st = conn.prepareStatement(SQLStatements.insertUserStatement(user, pwHashed));
+                st = conn.prepareStatement(SQLStatements.insertUserStatement(user, user.getPassword()));
 
                 st.execute();
                 sendRegistrationEmail(user);
@@ -248,18 +258,20 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
 	private boolean registerMatUser(User user) {
 		boolean result = false;
 		String charset = "UTF-8";
-		String url = getMatEditorUrl() + "/createUser";
+		String url = getMatEditorUrlInternal() + "/createUser";
 		OutputStream output = null;
 		InputStream response = null;
 
 		try {
-			String query = String.format("userId=%s&firstName=%s&lastName=%s&email=%s&phone=%s&password=%s",
+			String hashedpw = generateHashPw(user.getPassword());
+			String query = String.format("userId=%s&firstName=%s&lastName=%s&email=%s&phone=%s&password=%s&htpid=%s",
 			  URLEncoder.encode(user.getUserName(), charset),
 			  URLEncoder.encode(user.getFirstName(), charset),
 			  URLEncoder.encode(user.getLastName(), charset),
 			  URLEncoder.encode(user.getEmail(), charset),
 		      URLEncoder.encode(user.getPhoneNumber(), charset),
-	          URLEncoder.encode(user.getPassword(), charset));
+			  URLEncoder.encode(user.getPassword(), charset),
+			  URLEncoder.encode(hashedpw, charset));
 
 			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 			connection.setConnectTimeout(0);
@@ -271,6 +283,7 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
 			connection.setRequestProperty("charset", charset);
 			connection.setRequestProperty("Content-Length", Integer.toString(query.length()));
 			connection.setUseCaches(false);
+			connection.connect();
 			output = connection.getOutputStream();
 			output.write(query.getBytes(charset));
 			output.flush();
@@ -278,14 +291,21 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
 			if (connection.getResponseCode() == 200) {
 				response = connection.getInputStream();
 				System.out.println(response.toString());
+				user.setPassword(hashedpw);
 				result = true;
 			}
 			else {
 				result = false;
 			}
 		}
-		catch (MalformedURLException mue) { }
-		catch (IOException ioe) {}
+		catch (MalformedURLException mue) {
+			s_logger.log(Level.WARNING, "Unable to create MAT user.", mue);
+			result = false;
+		}
+		catch (IOException ioe) {
+			s_logger.log(Level.WARNING, "Unable to create MAT user.", ioe);
+			result = false;
+		}
 		finally {
 			if (output != null) {
 				try {

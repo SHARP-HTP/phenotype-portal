@@ -49,11 +49,72 @@ public class UploadPanel extends VLayout {
     private VLayout i_formLayout;
     private static DynamicForm i_form;
     private HiddenItem i_categoryId;
+	private TextItem nameText;
+	private TextItem versionText;
+	private TextItem institutionText;
+	private TextAreaItem descriptionText;
+	private TextItem assocNameText;
+	private TextItem assocLinkText;
+	private UploadItem zipFileItem;
+	private TextItem zipTextItem;
+	private HiddenItem zipPath;
 
     public UploadPanel() {
         super();
         init();
     }
+
+	public void setNameText(String nameText) {
+		this.nameText.setValue(nameText);
+	}
+
+	public void setVersionText(String versionText) {
+		this.versionText.setValue(versionText);
+	}
+
+	public void setInstitutionText(String institutionText) {
+		this.institutionText.setValue(institutionText);
+	}
+
+	public void setDescriptionText(String descriptionText) {
+		this.descriptionText.setValue(descriptionText);
+	}
+
+	public void setAssocNameText(String assocNameText) {
+		this.assocNameText.setValue(assocNameText);
+	}
+
+	public void setAssocLinkText(String assocLinkText) {
+		this.assocLinkText.setValue(assocLinkText);
+	}
+
+	public void setNqfFilePath(String path) {
+		if (path != null && !path.isEmpty()) {
+			zipPath.setValue(path);
+			zipTextItem.enable();
+			zipTextItem.show();
+
+			zipFileItem.disable();
+			zipFileItem.hide();
+		}
+		else {
+			zipPath.setValue("");
+			zipTextItem.hide();
+			zipTextItem.disable();
+
+			zipFileItem.enable();
+			zipFileItem.show();
+		}
+	}
+
+	public void clearTextFields() {
+		this.nameText.clearValue();
+		this.versionText.clearValue();
+		this.institutionText.clearValue();
+		this.descriptionText.clearValue();
+		this.assocNameText.clearValue();
+		this.assocLinkText.clearValue();
+	}
 
     /**
      * After the upload is completed, display success/failure message.
@@ -107,6 +168,9 @@ public class UploadPanel extends VLayout {
         addMember(i_formLayout);
 
         exportNativeMethods();
+
+	    zipTextItem.disable();
+		zipTextItem.hide();
     }
 
     private static native void exportNativeMethods() /*-{
@@ -122,11 +186,11 @@ public class UploadPanel extends VLayout {
         i_form.setMargin(10);
         i_form.setCellPadding(5);
 
-        TextItem nameText = createTextItem(UploadColumns.NAME.colName(),
+        nameText = createTextItem(UploadColumns.NAME.colName(),
                 "<nobr>What is the name for this algortihm file?</nobr>", WIDGET_WIDTH,
                 UploadColumns.NAME.normName(), true);
 
-        TextItem versionText = createTextItem(UploadColumns.VERSION.colName(),
+        versionText = createTextItem(UploadColumns.VERSION.colName(),
                 "<nobr>Version Number Ex.(2.5)</nobr>", WIDGET_WIDTH,
                 UploadColumns.VERSION.normName(), true);
         versionText.setKeyPressFilter("[0-9.]");
@@ -140,7 +204,7 @@ public class UploadPanel extends VLayout {
         selectItem.setRequired(true);
         selectItem.setValueMap("Final", "Testing", "Under Development");
 
-        TextItem institutionText = createTextItem(UploadColumns.INSTITUTION.colName(),
+        institutionText = createTextItem(UploadColumns.INSTITUTION.colName(),
                 "<nobr>Where do you work?</nobr>", WIDGET_WIDTH,
                 UploadColumns.INSTITUTION.normName(), false);
 
@@ -150,7 +214,7 @@ public class UploadPanel extends VLayout {
         createDate.setTitle(UploadColumns.CREATEDATE.normName());
         createDate.setPrompt("<nobr>When did you create this algorithm?</nobr>");
 
-        TextAreaItem descriptionText = new TextAreaItem(UploadColumns.DESCRIPTION.colName());
+        descriptionText = new TextAreaItem(UploadColumns.DESCRIPTION.colName());
         descriptionText.setWidth(WIDGET_WIDTH);
         descriptionText.setWrapTitle(false);
         descriptionText.setHeight(WIDGET_HEIGHT);
@@ -165,12 +229,21 @@ public class UploadPanel extends VLayout {
         commentsText.setTitle(UploadColumns.COMMENT.normName());
         commentsText.setPrompt("<nobr>Any additional comments?</nobr>");
 
-        UploadItem zipFileItem = new UploadItem(UploadColumns.ZIP_FILE.colName());
+        zipFileItem = new UploadItem(UploadColumns.ZIP_FILE.colName());
         zipFileItem.setWidth(WIDGET_WIDTH);
         zipFileItem.setWrapTitle(false);
         zipFileItem.setTitle(UploadColumns.ZIP_FILE.normName());
         zipFileItem.setRequired(true);
         zipFileItem.setPrompt("<nobr>Path to the zip file.</nobr>");
+
+	    zipTextItem = new TextItem("ZIP_TEXT");
+	    zipTextItem.setWidth(WIDGET_WIDTH);
+	    zipTextItem.setWrapTitle(false);
+	    zipTextItem.setTitle((UploadColumns.ZIP_FILE.normName()));
+	    zipTextItem.setEmptyDisplayValue("Import From MAT");
+	    zipTextItem.setCanEdit(false);
+
+	    zipPath = new HiddenItem("ZIP_PATH");
 
         UploadItem docFileItem = new UploadItem(UploadColumns.WORD_FILE.colName());
         docFileItem.setWidth(WIDGET_WIDTH);
@@ -178,11 +251,11 @@ public class UploadPanel extends VLayout {
         docFileItem.setTitle(UploadColumns.WORD_FILE.normName());
         docFileItem.setPrompt("<nobr>Path to the Word file.</nobr>");
 
-        TextItem assocNameText = createTextItem(UploadColumns.ASSOC_NAME.colName(),
+        assocNameText = createTextItem(UploadColumns.ASSOC_NAME.colName(),
                 "<nobr>Is there a name for this algorithm (e.g. PheKB, NQF, etc.)?</nobr>",
                 WIDGET_WIDTH, "PheKB/NQF Name", false);
 
-        TextItem assocLinkText = createTextItem(
+        assocLinkText = createTextItem(
                 UploadColumns.ASSOC_LINK.colName(),
                 "<nobr>Is there an associated link for this algorithm (e.g. PheKB, NQF, etc.)</nobr>",
                 WIDGET_WIDTH, "PheKB/NQF Link", false);
@@ -229,7 +302,7 @@ public class UploadPanel extends VLayout {
         final HiddenItem userItem = new HiddenItem(UploadColumns.USER.colName());
 
         i_form.setFields(nameText, versionText, selectItem, institutionText, createDate,
-                descriptionText, commentsText, zipFileItem, docFileItem, assocLinkText,
+                descriptionText, commentsText, zipFileItem, zipTextItem, zipPath, docFileItem, assocLinkText,
                 assocNameText, categoryText, userItem, i_categoryId);
 
         ButtonItem uploadButton = new ButtonItem("Upload");

@@ -55,6 +55,7 @@ import edu.mayo.phenoportal.client.profile.ProfilePanel;
 import edu.mayo.phenoportal.client.upload.UploadContainer;
 import edu.mayo.phenoportal.client.utils.ModalWindow;
 import edu.mayo.phenoportal.client.utils.UiHelper;
+import edu.mayo.phenoportal.shared.MatImport;
 import edu.mayo.phenoportal.shared.User;
 
 /**
@@ -78,13 +79,11 @@ public class Htp implements EntryPoint {
     private AdminPanel i_adminPanel;
     private UserManual i_userManualPanel;
     private ProfilePanel i_profilePanel;
-
     private HeaderMenu i_headerMenu;
     private NavigationHeader i_navigationHeader;
-
     private LoginPanel i_loginPanel;
-
     private ModalWindow i_busyIndicator;
+	private String tokenId;
 
     private static User i_loggedInUser;
 
@@ -93,13 +92,13 @@ public class Htp implements EntryPoint {
 
     // This is for development mode
     public static boolean DEBUG_MODE = false;
+	public static MatImport MAT_IMPORT = null;
 
     /**
      * This is the entry point method.
      */
     @Override
     public void onModuleLoad() {
-
         lgr.log(Level.INFO, "init OnLoadModule()...");
         // get rid of scroll bars, and clear out the window's built-in margin,
         // because we want to take advantage of the entire client area
@@ -169,13 +168,14 @@ public class Htp implements EntryPoint {
 
         checkServerForValidSession();
         initWindowClosingConfirmationDialog();
+
+		checkServerForImport();
     }
 
     /**
      * Method to set the property log file upon module load
      */
     private void setLoggingProperties() {
-
         lgr.log(Level.INFO, "Initializing the logging property file...");
         PhenotypeServiceAsync phenotService = GWT.create(PhenotypeService.class);
         phenotService.initializeLogging(new AsyncCallback<Void>() {
@@ -463,6 +463,51 @@ public class Htp implements EntryPoint {
         });
     }
 
+	private Boolean isImport() {
+		tokenId = Window.Location.getParameter("tokenId");
+		return tokenId != null && !tokenId.isEmpty();
+	}
+
+	private void checkServerForImport() {
+		if (isImport()) {
+			PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
+			phenotypeService.getMatImport(tokenId, new AsyncCallback<MatImport>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					MAT_IMPORT = null;
+				}
+
+				@Override
+				public void onSuccess(MatImport result) {
+					MAT_IMPORT = result;
+					try {
+						AuthenticationServiceAsync authService = GWT.create(AuthenticationService.class);
+						authService.validateImportUser(result, new AsyncCallback<User>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								MAT_IMPORT = null;
+							}
+
+							@Override
+							public void onSuccess(User result) {
+								checkServerForValidSession();
+								Htp.EVENT_BUS.fireEvent(new ContextAreaChangedEvent(ContextAreas.types.UPLOAD));
+							}
+						});
+					}
+					catch (Exception e) {
+						lgr.log(Level.INFO, e.getMessage());
+						e.printStackTrace();
+						MAT_IMPORT = null;
+					}
+				}
+			});
+		}
+		else {
+			MAT_IMPORT = null;
+		}
+	}
+
     /**
      * Get the instance of the welcome panel. Only create one instance of it.
      * 
@@ -499,6 +544,17 @@ public class Htp implements EntryPoint {
             i_uploadContainer = new UploadContainer();
         }
 
+	    if (MAT_IMPORT != null) {
+			i_uploadContainer.setNameText(MAT_IMPORT.title);
+			i_uploadContainer.setVersionText(MAT_IMPORT.version);
+			i_uploadContainer.setInstitutionText(MAT_IMPORT.institution);
+			i_uploadContainer.setDescriptionText(MAT_IMPORT.description);
+			i_uploadContainer.setAssocNameText(MAT_IMPORT.nqfName);
+			i_uploadContainer.setAssocLinkText(MAT_IMPORT.nqfLink);
+		    i_uploadContainer.setNqfFilePath(MAT_IMPORT.filePath);
+	    } else {
+		    i_uploadContainer.clearTextFields();
+	    }
         return i_uploadContainer;
     }
 

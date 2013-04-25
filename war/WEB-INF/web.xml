@@ -44,6 +44,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>algorithmImport</servlet-name>
+		<servlet-class>edu.mayo.phenoportal.server.upload.ImportServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>algorithmImport</servlet-name>
+		<url-pattern>/algorithmimport</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>images</servlet-name>
 		<servlet-class>edu.mayo.phenoportal.server.phenotype.ImageServlet</servlet-class>
 	</servlet>
@@ -64,7 +73,14 @@
 	    <url-pattern>/htp/cts2Editor</url-pattern>
 	</servlet-mapping>
   
-
+	<listener>
+		<listener-class>edu.mayo.phenoportal.server.upload.ImportServlet</listener-class>
+	</listener>
+	<!-- Remove stale sessions after 5 minutes -->
+	<session-config>
+		<session-timeout>5</session-timeout>
+	</session-config>
+	
 	<!-- Default page to serve -->
 	<welcome-file-list>
 		<welcome-file>Htp.html</welcome-file>

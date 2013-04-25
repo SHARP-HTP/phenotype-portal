@@ -9,6 +9,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import edu.mayo.phenoportal.client.core.AlgorithmData;
 import edu.mayo.phenoportal.shared.Execution;
+import edu.mayo.phenoportal.shared.MatImport;
 import edu.mayo.phenoportal.shared.News;
 import edu.mayo.phenoportal.shared.SharpNews;
 import edu.mayo.phenoportal.shared.User;
@@ -80,5 +81,9 @@ public interface PhenotypeService extends RemoteService {
     Execution getDbStats(String type) throws IllegalArgumentException;
 
     String openEditor(Execution execution) throws IllegalArgumentException;
+
+	String getMatEditorUrl(User user) throws IllegalArgumentException;
+
+	MatImport getMatImport(String tokenId) throws IllegalArgumentException;
 
 }

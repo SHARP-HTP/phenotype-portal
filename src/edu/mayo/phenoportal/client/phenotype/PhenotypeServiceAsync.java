@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import edu.mayo.phenoportal.client.core.AlgorithmData;
 import edu.mayo.phenoportal.shared.Execution;
+import edu.mayo.phenoportal.shared.MatImport;
 import edu.mayo.phenoportal.shared.News;
 import edu.mayo.phenoportal.shared.SharpNews;
 import edu.mayo.phenoportal.shared.User;
@@ -87,4 +88,8 @@ public interface PhenotypeServiceAsync {
     void getDataCriteriaOids(AlgorithmData algorithmData, AsyncCallback<List<String>> async);
 
     void getSupplementalCriteriaOids(AlgorithmData algorithmData, AsyncCallback<List<String>> async);
+
+	void getMatEditorUrl(User user, AsyncCallback<String> async);
+
+	void getMatImport(String tokenId, AsyncCallback<MatImport> async);
 }

@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.fileupload.FileItem;
 
@@ -32,7 +33,8 @@ public class UploadItems implements Serializable {
     private String assocLink;
     private String assocName;
     private Date uploadDate;
-    private String prefix;
+    private String prefix = UUID.randomUUID().toString();
+	private byte[] bytes;
     private final List<FileItem> inputFiles = new ArrayList<FileItem>(2);
     private final StringBuilder messages = new StringBuilder();
 
@@ -180,7 +182,15 @@ public class UploadItems implements Serializable {
         return prefix;
     }
 
-    public String getMessages() {
+	public byte[] getBytes() {
+		return bytes;
+	}
+
+	public void setBytes(byte[] bytes) {
+		this.bytes = bytes;
+	}
+
+	public String getMessages() {
         return messages.toString();
     }
 

@@ -3,7 +3,9 @@ package edu.mayo.phenoportal.client.navigation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -16,6 +18,9 @@ import edu.mayo.phenoportal.client.events.LoggedInEvent;
 import edu.mayo.phenoportal.client.events.LoggedInEventHandler;
 import edu.mayo.phenoportal.client.events.LoggedOutEvent;
 import edu.mayo.phenoportal.client.events.LoggedOutEventHandler;
+import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
+import edu.mayo.phenoportal.client.phenotype.PhenotypeServiceAsync;
+import edu.mayo.phenoportal.client.utils.MessageWindow;
 import edu.mayo.phenoportal.shared.User;
 
 public class AlgorithmPanel extends VLayout {
@@ -52,7 +57,22 @@ public class AlgorithmPanel extends VLayout {
 
             @Override
             public void onClick(ClickEvent event) {
-                Window.open(CREATE_URL, "mat", null);
+	            /* TODO: Implement with actual users creds */
+	            PhenotypeServiceAsync service = GWT.create(PhenotypeService.class);
+	            service.getMatEditorUrl(Htp.getLoggedInUser(), new AsyncCallback<String>() {
+		            @Override
+		            public void onFailure(Throwable caught) {
+			            String title = "Login Failed";
+			            String message = "Failed to login to the Measure Authoring Tool.<br/>&nbsp;Invalid Id/Password. Please try again.";
+			            MessageWindow messageWindow = new MessageWindow(title, message);
+			            messageWindow.show();
+		            }
+
+		            @Override
+		            public void onSuccess(String result) {
+			            Window.open(result, "mat", null);
+		            }
+	            });
             }
         });
 
