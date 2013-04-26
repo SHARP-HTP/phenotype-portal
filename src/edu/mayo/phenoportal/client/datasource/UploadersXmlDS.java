@@ -34,7 +34,7 @@ public class UploadersXmlDS extends DataSource {
         uploaderField.setPrimaryKey(true);
         DataSourceTextField algorithmField = new DataSourceTextField(UploadColumns.NAME.colName());
         DataSourceTextField versionField = new DataSourceTextField(UploadColumns.VERSION.colName());
-        DataSourceTextField categoryField = new DataSourceTextField(UploadColumns.ID.colName());
+        DataSourceTextField categoryField = new DataSourceTextField(UploadColumns.PARENT_ID.colName());
         DataSourceTextField dateField = new DataSourceTextField(UploadColumns.UPLOAD_DATE.colName());
 
         setFields(uploaderField, algorithmField, versionField, categoryField, dateField);

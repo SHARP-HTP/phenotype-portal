@@ -16,7 +16,7 @@ public class UploadersXmlGenerator extends DOMXmlGenerator {
     protected static final String USER_NAME = UploadColumns.USER.colName();
     protected static final String ALG_NAME = UploadColumns.NAME.colName();
     protected static final String VERSION = UploadColumns.VERSION.colName();
-    protected static final String CATEGORY = UploadColumns.ID.colName();
+    protected static final String CATEGORY = UploadColumns.PARENT_ID.colName();
     protected static final String UP_DATE = UploadColumns.UPLOAD_DATE.colName();
 
     public void createUploaderXml(String username, String algname, String version, String category,

@@ -33,7 +33,7 @@ public class UploadItems implements Serializable {
     private String assocLink;
     private String assocName;
     private Date uploadDate;
-    private String prefix = UUID.randomUUID().toString();
+    private String dir = UUID.randomUUID().toString();
 	private byte[] bytes;
     private final List<FileItem> inputFiles = new ArrayList<FileItem>(2);
     private final StringBuilder messages = new StringBuilder();
@@ -174,12 +174,12 @@ public class UploadItems implements Serializable {
         this.uploadDate = uploadDate;
     }
 
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
+    public void setDir(String dir) {
+        this.dir = dir;
     }
 
-    public String getPrefix() {
-        return prefix;
+    public String getDir() {
+        return dir;
     }
 
 	public byte[] getBytes() {

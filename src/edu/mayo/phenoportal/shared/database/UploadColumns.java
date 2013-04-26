@@ -1,23 +1,24 @@
 package edu.mayo.phenoportal.shared.database;
 
 public enum UploadColumns {
-    ID(1, "parentID", "Category"), 
-    NAME(2, "name", "Algorithm Name"), 
-    VERSION(3, "version", "Version"), 
-    USER(4, "user", "User"), 
-    DESCRIPTION(5, "description", "Description"), 
-    INSTITUTION(6,"institution", "Institution"), 
-    CREATEDATE(7, "creationDate", "Creation Date"), 
-    COMMENT(8, "comments", "Comments"), 
-    STATUS(9, "status", "Status"), 
-    XML_FILE(10, "xmlFile", "XML File"), 
-    XLS_FILE(11, "xlsFile", "XLS File"), 
-    HTML_FILE(12, "htmlFile", "HTML File"), 
-    ZIP_FILE(13, "zipFile", "Zip File"), 
-    WORD_FILE(14, "wordFile", "Word File"), 
-    ASSOC_LINK(15,"assocLink", "Associated Link"), 
-    ASSOC_NAME(16, "assocName", "Associated Name"), 
-    UPLOAD_DATE(17, "uploadDate", "Upload Date");
+    ID(1, "id", "id"),
+    PARENT_ID(2, "parentID", "Category"),
+    NAME(3, "name", "Algorithm Name"),
+    VERSION(4, "version", "Version"),
+    USER(5, "user", "User"),
+    DESCRIPTION(6, "description", "Description"),
+    INSTITUTION(7,"institution", "Institution"),
+    CREATEDATE(8, "creationDate", "Creation Date"),
+    COMMENT(9, "comments", "Comments"),
+    STATUS(10, "status", "Status"),
+    XML_FILE(11, "xmlFile", "XML File"),
+    XLS_FILE(12, "xlsFile", "XLS File"),
+    HTML_FILE(13, "htmlFile", "HTML File"),
+    ZIP_FILE(14, "zipFile", "Zip File"),
+    WORD_FILE(15, "wordFile", "Word File"),
+    ASSOC_LINK(16,"assocLink", "Associated Link"),
+    ASSOC_NAME(17, "assocName", "Associated Name"),
+    UPLOAD_DATE(18, "uploadDate", "Upload Date");
 
     private final int colNum;
     private final String colName;

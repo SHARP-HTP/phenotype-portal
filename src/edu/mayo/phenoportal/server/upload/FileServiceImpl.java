@@ -36,22 +36,23 @@ public class FileServiceImpl extends BasePhenoportalServlet implements FileServi
                 rs = st.executeQuery();
 
                 while (rs.next()) {
-                    clientUploadItems.setId(rs.getString(UploadColumns.ID.colNum()));
-                    clientUploadItems.setName(rs.getString(UploadColumns.NAME.colNum()));
-                    clientUploadItems.setUser(rs.getString(UploadColumns.USER.colNum()));
-                    clientUploadItems.setVersion(rs.getString(UploadColumns.VERSION.colNum()));
-                    clientUploadItems.setDescription(rs.getString(UploadColumns.DESCRIPTION.colNum()));
-                    clientUploadItems.setInstitution(rs.getString(UploadColumns.INSTITUTION.colNum()));
-                    clientUploadItems.setCreateDate(rs.getString(UploadColumns.CREATEDATE.colNum()));
-                    clientUploadItems.setComment(rs.getString(UploadColumns.COMMENT.colNum()));
-                    clientUploadItems.setStatus(rs.getString(UploadColumns.STATUS.colNum()));
-                    clientUploadItems.setAssocLink(rs.getString(UploadColumns.ASSOC_LINK.colNum()));
-                    clientUploadItems.setAssocName(rs.getString(UploadColumns.ASSOC_NAME.colNum()));
-                    clientUploadItems.setZipFile(rs.getString(UploadColumns.ZIP_FILE.colNum()));
-                    clientUploadItems.setHtmlFile(rs.getString(UploadColumns.HTML_FILE.colNum()));
-                    clientUploadItems.setXmlFile(rs.getString(UploadColumns.XML_FILE.colNum()));
-                    clientUploadItems.setXlsFile(rs.getString(UploadColumns.XLS_FILE.colNum()));
-                    clientUploadItems.setDocFile(rs.getString(UploadColumns.WORD_FILE.colNum()));
+                    clientUploadItems.setId(rs.getInt("id"));
+                    clientUploadItems.setParentId(rs.getString("parentId"));
+                    clientUploadItems.setName(rs.getString("name"));
+                    clientUploadItems.setUser(rs.getString("user"));
+                    clientUploadItems.setVersion(rs.getString("version"));
+                    clientUploadItems.setDescription(rs.getString("description"));
+                    clientUploadItems.setInstitution(rs.getString("institution"));
+                    clientUploadItems.setCreateDate(rs.getString("creationDate"));
+                    clientUploadItems.setComment(rs.getString("comments"));
+                    clientUploadItems.setStatus(rs.getString("status"));
+                    clientUploadItems.setAssocLink(rs.getString("assocLink"));
+                    clientUploadItems.setAssocName(rs.getString("assocName"));
+                    clientUploadItems.setZipFile(rs.getString("zipFile"));
+                    clientUploadItems.setHtmlFile(rs.getString("htmlFile"));
+                    clientUploadItems.setXmlFile(rs.getString("xmlFile"));
+                    clientUploadItems.setXlsFile(rs.getString("xlsFile"));
+                    clientUploadItems.setDocFile(rs.getString("wordFile"));
                 }
 
             } catch (Exception ex) {

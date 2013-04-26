@@ -28,7 +28,7 @@ public class SQLStatements {
     private static Logger logger = Logger.getLogger(SQLStatements.class.getName());
 
     public static String countAlgorithmSiblings(String parentId) {
-        return "SELECT COUNT(*) FROM Upload " + "WHERE " + UploadColumns.ID.colName() + " = "
+        return "SELECT COUNT(*) FROM Upload " + "WHERE " + UploadColumns.PARENT_ID.colName() + " = "
                 + parentId + ";";
     }
 
@@ -92,7 +92,7 @@ public class SQLStatements {
      */
     public static String insertUploadStatement(UploadItems formItems) {
 
-        return "INSERT INTO Upload " + "(" + UploadColumns.ID.colName() + ","
+        return "INSERT INTO Upload " + "(" + UploadColumns.PARENT_ID.colName() + ","
                 + UploadColumns.NAME.colName() + "," + UploadColumns.USER.colName() + ","
                 + UploadColumns.VERSION.colName() + "," + UploadColumns.DESCRIPTION.colName() + ","
                 + UploadColumns.INSTITUTION.colName() + "," + UploadColumns.CREATEDATE.colName()
@@ -128,22 +128,22 @@ public class SQLStatements {
         return "SELECT " + UploadColumns.NAME.colName() + ", "
                 + UploadColumns.DESCRIPTION.colName() + ", " + UploadColumns.VERSION.colName()
                 + ", " + UploadColumns.USER.colName() + " FROM Upload WHERE "
-                + UploadColumns.ID.colName() + "= '" + categoryId + "'" + " ORDER by "
+                + UploadColumns.PARENT_ID.colName() + "= '" + categoryId + "'" + " ORDER by "
                 + UploadColumns.NAME + ";";
     }
 
     public static String selectZipFileStatement(String fileName, String parentId, String version) {
         return "SELECT " + UploadColumns.ZIP_FILE.colName() + " FROM Upload WHERE "
-                + UploadColumns.ID.colName() + "= '" + parentId + "' AND "
+                + UploadColumns.PARENT_ID.colName() + "= '" + parentId + "' AND "
                 + UploadColumns.NAME.colName() + "= '" + fileName + "' AND "
                 + UploadColumns.VERSION.colName() + "= '" + version + "';";
 
     }
 
     public static String selectCriteriaStatement(String fileName, String parentId, String version) {
-        return "SELECT " + UploadColumns.NAME.colName() + ", " + UploadColumns.ID.colName() + ", "
+        return "SELECT " + UploadColumns.NAME.colName() + ", " + UploadColumns.PARENT_ID.colName() + ", "
                 + UploadColumns.VERSION.colName() + ", " + UploadColumns.HTML_FILE.colName()
-                + " FROM Upload WHERE " + UploadColumns.ID.colName() + "= '" + parentId + "' AND "
+                + " FROM Upload WHERE " + UploadColumns.PARENT_ID.colName() + "= '" + parentId + "' AND "
                 + UploadColumns.NAME.colName() + "= '" + fileName + "' AND "
                 + UploadColumns.VERSION.colName() + "= '" + version + "';";
     }
@@ -173,7 +173,7 @@ public class SQLStatements {
     }
 
     public static String selectUploadStatement(String parentId, String fileName, String version) {
-        return "SELECT * " + " FROM Upload where " + UploadColumns.ID.colName() + " = '" + parentId
+        return "SELECT * " + " FROM Upload where " + UploadColumns.PARENT_ID.colName() + " = '" + parentId
                 + "' and " + UploadColumns.NAME.colName() + " = '" + fileName + "' and "
                 + UploadColumns.VERSION.colName() + " = '" + version + "';";
     }

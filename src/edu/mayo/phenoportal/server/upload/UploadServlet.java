@@ -149,7 +149,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
             uploadItems.setAssocLink(item.getString());
         } else if (fieldName.equals(UploadColumns.ASSOC_NAME.colName())) {
             uploadItems.setAssocName(item.getString());
-        } else if (fieldName.equals(UploadColumns.ID.colName())) {
+        } else if (fieldName.equals(UploadColumns.PARENT_ID.colName())) {
             uploadItems.setId(item.getString());
         } else if (fieldName.equals("ZIP_PATH")) {
 	        try {
@@ -202,7 +202,6 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
                         uploadItems.addMessage("Two word documents detected.");
                     }
                 } else if (MimeUtils.isZipFile(mimeType)) {
-                    uploadItems.setPrefix(getPrefix(fileItem.getName(), uploadItems));
                     success = extractZip(fileItem.getInputStream(), uploadItems);
 
                 } else {
@@ -226,30 +225,30 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
         return success;
     }
 
-    public String getPrefix(String filename, UploadItems uploadItems) {
-        StringBuilder prefix = new StringBuilder();
-        Pattern pattern = Pattern.compile("^NQF_\\d+_.*$");
-
-        if (pattern.matcher(filename).matches()) {
-            prefix.append(filename.substring(0, filename.indexOf('_', 4)));
-        } else {
-            prefix.append(filename.substring(0, Math.min(10, filename.length())));
-        }
-
-        if (prefix.charAt(prefix.length() - 1) != '_') {
-            prefix.append('_');
-        }
-
-        String id = uploadItems.getId();
-        id = id == null ? "" : id;
-
-        String version = uploadItems.getVersion();
-        version = version == null ? "" : version;
-
-        prefix.append(String.format("%s_%s", id, version));
-
-        return prefix.toString();
-    }
+//    public String getPrefix(String filename, UploadItems uploadItems) {
+//        StringBuilder prefix = new StringBuilder();
+//        Pattern pattern = Pattern.compile("^NQF_\\d+_.*$");
+//
+//        if (pattern.matcher(filename).matches()) {
+//            prefix.append(filename.substring(0, filename.indexOf('_', 4)));
+//        } else {
+//            prefix.append(filename.substring(0, Math.min(10, filename.length())));
+//        }
+//
+//        if (prefix.charAt(prefix.length() - 1) != '_') {
+//            prefix.append('_');
+//        }
+//
+//        String id = uploadItems.getId();
+//        id = id == null ? "" : id;
+//
+//        String version = uploadItems.getVersion();
+//        version = version == null ? "" : version;
+//
+//        prefix.append(String.format("%s_%s", id, version));
+//
+//        return prefix.toString();
+//    }
 
     private boolean extractZip(InputStream inputStream, UploadItems uploadItems)
             throws IOException, PhenoportalFileException {
@@ -403,38 +402,38 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
     private boolean persistUploadFile(HttpServletRequest request, UploadItems uploadItems) {
         boolean success;
         /* Move files to algorithm directory. */
-        String destPath = ALGORITHM_PATH + "/" + uploadItems.getPrefix();
+        String destPath = ALGORITHM_PATH + "/" + uploadItems.getDir();
 
         logger.info("Persisting files to file system @ " + destPath);
 
         try {
             if (new File(destPath).mkdirs()) {
 	            if (uploadItems.getZipFile() != null) {
-	                File newZip = new File(destPath + "/" + uploadItems.getPrefix() + ".zip");
+	                File newZip = new File(destPath + "/" + UUID.randomUUID().toString() + ".zip");
 	                Files.copy(uploadItems.getZipFile(), newZip);
 	                uploadItems.setZipFile(newZip);
                 }
 
 	            if (uploadItems.getXmlFile() != null) {
-	                File newXml = new File(destPath + "/" + uploadItems.getPrefix() + ".xml");
+	                File newXml = new File(destPath + "/" + UUID.randomUUID().toString() + ".xml");
 	                Files.copy(uploadItems.getXmlFile(), newXml);
 	                uploadItems.setXmlFile(newXml);
                 }
 
 	            if (uploadItems.getHtmlFile() != null) {
-	                File newHtml = new File(destPath + "/" + uploadItems.getPrefix() + ".html");
+	                File newHtml = new File(destPath + "/" + UUID.randomUUID().toString() + ".html");
 	                Files.copy(uploadItems.getHtmlFile(), newHtml);
 	                uploadItems.setHtmlFile(newHtml);
 	            }
 
 	            if (uploadItems.getXlsFile() != null) {
-	                File newXls = new File(destPath + "/" + uploadItems.getPrefix() + ".xls");
+	                File newXls = new File(destPath + "/" + UUID.randomUUID().toString() + ".xls");
 	                Files.copy(uploadItems.getXlsFile(), newXls);
 	                uploadItems.setXlsFile(newXls);
 	            }
 
                 if (uploadItems.getDocFile() != null) {
-                    File newDoc = new File(destPath + "/" + uploadItems.getPrefix() + ".doc");
+                    File newDoc = new File(destPath + "/" + UUID.randomUUID().toString() + ".doc");
                     Files.copy(uploadItems.getDocFile(), newDoc);
                     uploadItems.setDocFile(newDoc);
                 }
@@ -471,7 +470,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
         if (conn != null) {
             try {
                 // insert the algorithm
-                String prefix = uploadItems.getPrefix() + "/";
+                String dir = uploadItems.getDir() + "/";
                 st = conn.prepareStatement(SQLStatements.insertUploadStatement(uploadItems));
 
                 st.setString(1, uploadItems.getId());
@@ -482,11 +481,11 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
                 st.setString(6, uploadItems.getInstitution());
                 st.setDate(7, new java.sql.Date(uploadItems.getCreateDate().getTime()));
                 st.setString(8, uploadItems.getComment());
-                st.setString(9,  uploadItems.getXmlFile()  != null ? prefix + uploadItems.getXmlFile().getName()  : "");
-                st.setString(10, uploadItems.getXlsFile()  != null ? prefix + uploadItems.getXlsFile().getName()  : "");
-                st.setString(11, uploadItems.getHtmlFile() != null ? prefix + uploadItems.getHtmlFile().getName() : "");
-                st.setString(12, uploadItems.getZipFile()  != null ? prefix + uploadItems.getZipFile().getName()  : "");
-                st.setString(13, uploadItems.getDocFile()  != null ? prefix + uploadItems.getDocFile().getName()  : "");
+                st.setString(9,  uploadItems.getXmlFile()  != null ? dir + uploadItems.getXmlFile().getName()  : "");
+                st.setString(10, uploadItems.getXlsFile()  != null ? dir + uploadItems.getXlsFile().getName()  : "");
+                st.setString(11, uploadItems.getHtmlFile() != null ? dir + uploadItems.getHtmlFile().getName() : "");
+                st.setString(12, uploadItems.getZipFile()  != null ? dir + uploadItems.getZipFile().getName()  : "");
+                st.setString(13, uploadItems.getDocFile()  != null ? dir + uploadItems.getDocFile().getName()  : "");
                 st.setString(14, uploadItems.getStatus());
                 st.setString(15, uploadItems.getAssocLink());
                 st.setString(16, uploadItems.getAssocName());
@@ -593,6 +592,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
     private void processDownloadAlgorithm(HttpServletRequest request, HttpServletResponse response) {
 
         String zipPath = request.getParameter("ZipFilePath");
+	    String fileName = request.getParameter("FileName");
 
         File algorithmFile = new File(getAlgorithmPath(request) + "/" + zipPath);
         logger.info("Download requested: " + algorithmFile.getAbsolutePath());
@@ -602,7 +602,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
             response.setContentType("application/octet-stream");
             response.setContentLength((int) algorithmFile.length());
             response.setHeader("Content-Disposition",
-                    "attachment; filename=\"" + algorithmFile.getName() + "\"");
+                    "attachment; filename=\"" + fileName + "\"");
 
             try {
                 OutputStream out = response.getOutputStream();

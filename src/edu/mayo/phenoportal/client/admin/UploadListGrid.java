@@ -25,8 +25,8 @@ public class UploadListGrid extends ListGrid {
                 UploadColumns.NAME.normName());
         ListGridField versionField = new ListGridField(UploadColumns.VERSION.colName(),
                 UploadColumns.VERSION.normName());
-        ListGridField categoryField = new ListGridField(UploadColumns.ID.colName(),
-                UploadColumns.ID.normName());
+        ListGridField categoryField = new ListGridField(UploadColumns.PARENT_ID.colName(),
+                UploadColumns.PARENT_ID.normName());
         ListGridField dateField = new ListGridField(UploadColumns.UPLOAD_DATE.colName(),
                 UploadColumns.UPLOAD_DATE.normName());
 

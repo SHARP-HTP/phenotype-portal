@@ -265,7 +265,7 @@ public class UploadPanel extends VLayout {
         categoryIcon.setPrompt("Select the category");
 
         // HiddenItem to store the id/int value of the category
-        i_categoryId = new HiddenItem(UploadColumns.ID.colName());
+        i_categoryId = new HiddenItem(UploadColumns.PARENT_ID.colName());
 
         // This TextItem is just used to display the category
         final TextItem categoryText = createTextItem(CATEGORY_NAME,
@@ -402,7 +402,7 @@ public class UploadPanel extends VLayout {
         i_form.setValue(UploadColumns.WORD_FILE.colName(), "");
         i_form.setValue(UploadColumns.ASSOC_LINK.colName(), "");
         i_form.setValue(UploadColumns.ASSOC_NAME.colName(), "");
-        i_form.setValue(UploadColumns.ID.colName(), "");
+        i_form.setValue(UploadColumns.PARENT_ID.colName(), "");
 
         // hidden form items
         i_form.setValue(UploadColumns.USER.colName(), "");

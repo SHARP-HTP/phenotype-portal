@@ -98,6 +98,7 @@ DROP TABLE IF EXISTS `Upload`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
 CREATE TABLE `Upload` (
+	`id` int(11) unsigned NOT NULL auto_increment,
   `parentID` varchar(10) NOT NULL COMMENT 'to which this belongs',
   `name` varchar(100) NOT NULL COMMENT 'user input name for algorithm',
   `version` varchar(10) NOT NULL COMMENT 'multiple versions of algorithm may be uploaded',
@@ -115,7 +116,7 @@ CREATE TABLE `Upload` (
   `assocLink` varchar(200) default NULL COMMENT 'optional link to pheKB site',
   `assocName` varchar(100) default NULL COMMENT 'name of optional link to pheKB site',
   `uploadDate` varchar(50) default NULL,
-  PRIMARY KEY  (`parentID`,`name`,`version`)
+  PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC COMMENT='This table contains the information about the uploaded files';
 SET character_set_client = @saved_cs_client;
 

@@ -55,7 +55,7 @@ public class UploadedAlgorithmXmlDS extends DataSource {
                 UploadColumns.ASSOC_LINK.colName());
         DataSourceTextField assocNameField = new DataSourceTextField(
                 UploadColumns.ASSOC_NAME.colName());
-        DataSourceTextField categoryField = new DataSourceTextField(UploadColumns.ID.colName());
+        DataSourceTextField categoryField = new DataSourceTextField(UploadColumns.PARENT_ID.colName());
 
         setFields(nameField, versionField, userField, descriptionField, institutionField,
                 uploadDateField, creationDateField, commentsField, statusField, assocLinkField,

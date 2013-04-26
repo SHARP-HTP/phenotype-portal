@@ -618,7 +618,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                     xmlGenerator.createUploaderXml(rs.getString(UploadColumns.USER.colNum()),
                             rs.getString(UploadColumns.NAME.colNum()),
                             rs.getString(UploadColumns.VERSION.colNum()),
-                            rs.getString(UploadColumns.ID.colNum()),
+                            rs.getString(UploadColumns.PARENT_ID.colNum()),
                             rs.getString(UploadColumns.UPLOAD_DATE.colNum()));
                 }
             } catch (Exception ex) {
@@ -1132,7 +1132,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
                 while (rs.next()) {
                     // create an xml node for this algorithm
-                    xmlGenerator.createAlgorithmXml(rs.getString(UploadColumns.ID.colNum()),
+                    xmlGenerator.createAlgorithmXml(rs.getString(UploadColumns.PARENT_ID.colNum()),
                             rs.getString(UploadColumns.NAME.colNum()),
                             rs.getString(UploadColumns.VERSION.colNum()),
                             rs.getString(UploadColumns.USER.colNum()),

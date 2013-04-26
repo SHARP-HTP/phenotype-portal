@@ -4,7 +4,8 @@ import java.io.Serializable;
 
 public class ClientUploadItems implements Serializable {
 
-    private String id;
+	private int id;
+    private String parentId;
     private String name;
     private String user;
     private String version;
@@ -23,12 +24,20 @@ public class ClientUploadItems implements Serializable {
     private String uploadDate;
     private String prefix;
 
-    public String getId() {
-        return id;
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getParentId() {
+        return parentId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 
     public String getName() {
@@ -160,7 +169,7 @@ public class ClientUploadItems implements Serializable {
     }
 
     public String getPrefix() {
-        return name + "_" + id + "_" + version;
+        return name + "_" + parentId + "_" + version;
     }
 
 }

@@ -113,10 +113,14 @@ public class FileInfoTab extends Tab implements ReportTab {
                         HiddenItem zipPath = new HiddenItem("ZipFilePath");
                         zipPath.setValue(uploadItems.getZipFile());
 
+	                    HiddenItem fileName = new HiddenItem("FileName");
+	                    String name = uploadItems.getName().replaceAll("\\s", "");
+	                    fileName.setValue(name.substring(0, (Math.min(name.length(), 12))) + ".zip");
+
                         i_downloadLabel = createDownload();
                         i_fileInfoPanel.addMember(i_downloadLabel);
 
-                        i_downloadForm.setFields(zipPath);
+                        i_downloadForm.setFields(zipPath, fileName);
 
                         i_fileInfoForm = new DynamicForm();
                         i_fileInfoForm.setWidth(800);
