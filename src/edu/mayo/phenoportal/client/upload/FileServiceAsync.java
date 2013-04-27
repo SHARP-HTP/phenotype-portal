@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface FileServiceAsync {
 
-    void retrieveUploadMetadata(String parentId, String fileName, String version,
+    void retrieveUploadMetadata(int id,
             AsyncCallback<ClientUploadItems> asyncCallback);
 
 }

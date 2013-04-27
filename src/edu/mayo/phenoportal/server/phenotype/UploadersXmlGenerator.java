@@ -1,5 +1,6 @@
 package edu.mayo.phenoportal.server.phenotype;
 
+import edu.mayo.phenoportal.shared.AlgorithmType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
@@ -16,10 +17,11 @@ public class UploadersXmlGenerator extends DOMXmlGenerator {
     protected static final String USER_NAME = UploadColumns.USER.colName();
     protected static final String ALG_NAME = UploadColumns.NAME.colName();
     protected static final String VERSION = UploadColumns.VERSION.colName();
+    protected static final String TYPE = UploadColumns.TYPE.colName();
     protected static final String CATEGORY = UploadColumns.PARENT_ID.colName();
     protected static final String UP_DATE = UploadColumns.UPLOAD_DATE.colName();
 
-    public void createUploaderXml(String username, String algname, String version, String category,
+    public void createUploaderXml(String username, String algname, String version, String type, String category,
             String update) {
 
         Element uploaderElement = i_document.createElement(UPLOADER);
@@ -38,6 +40,11 @@ public class UploadersXmlGenerator extends DOMXmlGenerator {
         Text versionText = i_document.createTextNode(version);
         versionElement.appendChild(versionText);
         uploaderElement.appendChild(versionElement);
+
+	    Element typeElement = i_document.createElement(TYPE);
+	    Text typeText = i_document.createTextNode((AlgorithmType.valueOf(type)).toString());
+	    typeElement.appendChild(typeText);
+	    uploaderElement.appendChild(typeElement);
 
         Element categoryElement = i_document.createElement(CATEGORY);
         Text categoryText = i_document.createTextNode(category);

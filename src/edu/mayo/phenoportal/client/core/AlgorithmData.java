@@ -8,6 +8,7 @@ import java.io.Serializable;
  */
 public class AlgorithmData implements Serializable {
 
+	private int id;
 	private String i_categoryId;
 	private String i_parentId;
 	private String i_algorithmVersion;
@@ -16,7 +17,7 @@ public class AlgorithmData implements Serializable {
 	private String i_algorithmName;
 	
 	public AlgorithmData() {
-
+		id = -1;
 		i_categoryId = "";
 		i_parentId = "";
 		i_algorithmVersion = "";
@@ -25,10 +26,10 @@ public class AlgorithmData implements Serializable {
 		i_algorithmName = "";
 	}
 	
-	public AlgorithmData(String categoryId, String parentId,
+	public AlgorithmData(int id, String categoryId, String parentId,
 			String algorithmVersion, String algorithmUser,
 			String algorithmDescription, String algorithmName) {
-
+		this.id = id;
 		i_categoryId = categoryId;
 		i_parentId = parentId;
 		i_algorithmVersion = algorithmVersion;
@@ -37,95 +38,62 @@ public class AlgorithmData implements Serializable {
 		i_algorithmName = algorithmName;
 	}
 
-
-	/**
-	 * @return the categoryId
-	 */
 	public String getCategoryId() {
 		return i_categoryId;
 	}
 
-
-	/**
-	 * @param the categoryId to set
-	 */
 	public void setCategoryId(String categoryId) {
 		i_categoryId = categoryId;
 	}
 
-
-	/**
-	 * @return the parentId
-	 */
 	public String getParentId() {
 		return i_parentId;
 	}
 
-
-	/**
-	 * @param the i_parentId to set
-	 */
 	public void setParentId(String parentId) {
 		i_parentId = parentId;
 	}
 
-
-	/**
-	 * @return the i_algorithmVersion
-	 */
 	public String getAlgorithmVersion() {
 		return i_algorithmVersion;
 	}
 
 
-	/**
-	 * @param i_algorithmVersion the i_algorithmVersion to set
-	 */
 	public void setAlgorithmVersion(String algorithmVersion) {
 		i_algorithmVersion = algorithmVersion;
 	}
 
 
-	/**
-	 * @return the i_algorithmUser
-	 */
 	public String getAlgorithmUser() {
 		return i_algorithmUser;
 	}
 
 
-	/**
-	 * @param the i_algorithmUser to set
-	 */
 	public void setAlgorithmUser(String algorithmUser) {
 		i_algorithmUser = algorithmUser;
 	}
 
-
-	/**
-	 * @return the i_algorithmDescription
-	 */
 	public String getAlgorithmDescription() {
 		return i_algorithmDescription;
 	}
 
-
-	/**
-	 * @param i_algorithmDescription the i_algorithmDescription to set
-	 */
 	public void setAlgorithmDescription(String algorithmDescription) {
 		i_algorithmDescription = algorithmDescription;
 	}
-
 
 	public String getAlgorithmName() {
 		return i_algorithmName;
 	}
 
-
 	public void setAlgorithmName(String algorithmName) {
 		i_algorithmName = algorithmName;
 	}
-	
-	
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 }

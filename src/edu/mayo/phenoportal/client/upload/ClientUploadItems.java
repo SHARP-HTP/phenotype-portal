@@ -1,5 +1,7 @@
 package edu.mayo.phenoportal.client.upload;
 
+import edu.mayo.phenoportal.shared.AlgorithmType;
+
 import java.io.Serializable;
 
 public class ClientUploadItems implements Serializable {
@@ -23,6 +25,7 @@ public class ClientUploadItems implements Serializable {
     private String assocName;
     private String uploadDate;
     private String prefix;
+	private AlgorithmType type;
 
 	public int getId() {
 		return id;
@@ -172,4 +175,11 @@ public class ClientUploadItems implements Serializable {
         return name + "_" + parentId + "_" + version;
     }
 
+	public AlgorithmType getType() {
+		return type;
+	}
+
+	public void setType(AlgorithmType type) {
+		this.type = type;
+	}
 }

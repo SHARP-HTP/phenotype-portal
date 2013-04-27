@@ -64,6 +64,7 @@ public class NavigationPane extends VLayout {
 
                         // onClick of the algorithm to show the dataPanel.
                         AlgorithmData algData = new AlgorithmData(
+                                Integer.parseInt(record.getAttribute("AlgoId")),
                                 record.getAttribute("CategoryId"), record.getAttribute("ParentId"),
                                 record.getAttribute("AlgoVersion"),
                                 record.getAttribute("AlgoUser"), record.getAttribute("AlgoDesc"),

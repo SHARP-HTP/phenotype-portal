@@ -18,7 +18,8 @@ public enum UploadColumns {
     WORD_FILE(15, "wordFile", "Word File"),
     ASSOC_LINK(16,"assocLink", "Associated Link"),
     ASSOC_NAME(17, "assocName", "Associated Name"),
-    UPLOAD_DATE(18, "uploadDate", "Upload Date");
+    UPLOAD_DATE(18, "uploadDate", "Upload Date"),
+    TYPE(19, "type", "Algorithm Type");
 
     private final int colNum;
     private final String colName;

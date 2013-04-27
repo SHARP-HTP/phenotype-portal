@@ -25,13 +25,15 @@ public class UploadListGrid extends ListGrid {
                 UploadColumns.NAME.normName());
         ListGridField versionField = new ListGridField(UploadColumns.VERSION.colName(),
                 UploadColumns.VERSION.normName());
+	    ListGridField typeField = new ListGridField(UploadColumns.TYPE.colName(),
+                UploadColumns.TYPE.normName());
         ListGridField categoryField = new ListGridField(UploadColumns.PARENT_ID.colName(),
                 UploadColumns.PARENT_ID.normName());
         ListGridField dateField = new ListGridField(UploadColumns.UPLOAD_DATE.colName(),
                 UploadColumns.UPLOAD_DATE.normName());
 
         setGroupByField(UploadColumns.USER.colName());
-        setFields(userNameField, algorithmNameField, versionField, categoryField, dateField);
+        setFields(userNameField, algorithmNameField, versionField, typeField, categoryField, dateField);
 
         setAutoFetchData(true);
         setCanEdit(false);

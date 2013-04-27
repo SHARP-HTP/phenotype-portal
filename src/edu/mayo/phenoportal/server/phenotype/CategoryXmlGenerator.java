@@ -70,11 +70,17 @@ public class CategoryXmlGenerator extends DOMXmlGenerator {
 
 	}
 
-	public void createPhenotypeAlgorithmsDOMTree(String categoryId, String parentId,
+	public void createPhenotypeAlgorithmsDOMTree(int algorithmId, String categoryId, String parentId,
 			int count, int level, String algorithmName, String algorithmDesc,
 			String algorithmUser, String algorithmVersion) {
 
 		Element phenotypeElement = i_document.createElement(PHENOTYPE);
+
+		Element phenotypeIdElement = i_document.createElement("AlgoId");
+		Text phenotypeIdText = i_document.createTextNode(Integer
+		  .toString(algorithmId));
+		phenotypeIdElement.appendChild(phenotypeIdText);
+		phenotypeElement.appendChild(phenotypeIdElement);
 
 		// categoryId
 		Element categoryIDElement = i_document.createElement(CATEGORY_ID);

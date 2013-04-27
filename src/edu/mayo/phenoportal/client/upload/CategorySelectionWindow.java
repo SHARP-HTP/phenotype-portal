@@ -94,7 +94,10 @@ public class CategorySelectionWindow extends Window {
 
                     if (isValidLevel(level)) {
 
-                        i_algorithmData = new AlgorithmData(record.getAttribute("CategoryId"),
+	                    String strId = record.getAttribute("AlgoId");
+	                    strId = strId == null || strId.trim().isEmpty() ? "-1" : strId;
+                        i_algorithmData = new AlgorithmData(Integer.parseInt(strId),
+                                record.getAttribute("CategoryId"),
                                 record.getAttribute("ParentId"),
                                 record.getAttribute("AlgoVersion"),
                                 record.getAttribute("AlgoUser"), record.getAttribute("AlgoDesc"),
@@ -103,16 +106,6 @@ public class CategorySelectionWindow extends Window {
                     } else {
                         i_algorithmData = null;
                     }
-
-                    System.out.println("-----  " + record.getAttribute("Count") + " Count: "
-                            + record.getAttribute("Level") + " Level: "
-                            + record.getAttribute("CategoryId") + " CategoryId: "
-                            + record.getAttribute("ParentId") + " ParentId: "
-                            + record.getAttribute("AlgoVersion") + " AlgoVersion:"
-                            + record.getAttribute("AlgoUser") + " AlgoUser:"
-                            + record.getAttribute("AlgoDesc") + " AlgoDesc"
-                            + record.getAttribute("Name") + " Name"
-                            + record.getAttribute("isFolder") + "isFolder");
                 }
             }
         });

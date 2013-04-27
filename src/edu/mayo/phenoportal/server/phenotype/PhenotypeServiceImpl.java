@@ -185,18 +185,18 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
                     // create a unique id for the algorithm. This is needed for
                     // the UI tree.
-                    algorithmId = categoryIdInt + increment++;
+                    algorithmId = rs.getInt(1);
 
                     String parentId = categoryId;
 
                     int count = 0; // count is ignored for algorithms
                     int level = 4; // algorithms are always level 4
-                    String algorithmName = rs.getString(1);
-                    String algorithmDesc = rs.getString(2);
-                    String algorithmVersion = rs.getString(3);
-                    String algorithmUser = rs.getString(4);
+                    String algorithmName = rs.getString(2);
+                    String algorithmDesc = rs.getString(3);
+                    String algorithmVersion = rs.getString(4);
+                    String algorithmUser = rs.getString(5);
 
-                    generator.createPhenotypeAlgorithmsDOMTree(Integer.toString(algorithmId),
+                    generator.createPhenotypeAlgorithmsDOMTree(algorithmId, categoryId + algorithmId,
                             parentId, count, level, algorithmName, algorithmDesc, algorithmUser,
                             algorithmVersion);
                 }
@@ -297,9 +297,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
         if (conn != null) {
             try {
-                st = conn.prepareStatement(SQLStatements.selectCriteriaStatement(
-                        algorithmData.getAlgorithmName(), algorithmData.getParentId(),
-                        algorithmData.getAlgorithmVersion()));
+                st = conn.prepareStatement(SQLStatements.selectCriteriaStatement(algorithmData.getId()));
 
                 rs = st.executeQuery();
 
@@ -354,24 +352,17 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
      */
 
     @Override
-    public Execution executePhenotype(String fileName, String parentId, String version,
-            Date fromDate, Date toDate, String userName) throws IllegalArgumentException {
+    public Execution executePhenotype(AlgorithmData algorithmData, Date fromDate, Date toDate, String userName) throws IllegalArgumentException {
 
         String locationUrl;
         String executionStatus = "";
         Execution execution = new Execution();
-        String zipPathInfo = getZipFile(fileName, parentId, version);
+        String zipPathInfo = getZipFile(algorithmData.getId());
         String zipPath = getPathFromStartupPropertiesFile() + '/' + zipPathInfo;
         File zipFile = new File(zipPath);
         String executionDateRangeFrom = DateConverter.getDateString(fromDate);
         String executionDateRangeTo = DateConverter.getDateString(toDate);
         long startExecution = System.currentTimeMillis();
-
-        s_logger.log(Level.INFO,
-                "Executing the Algorithm user selected and this is written to the server side log:  File:"
-                        + fileName + " parentId:" + parentId + " version:" + version
-                        + " from date:" + executionDateRangeFrom + " to date:"
-                        + executionDateRangeTo + " user:" + userName);
 
         try {
             // execute the algorithm. This will return immediately with an id to
@@ -396,7 +387,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
             // continue if the status was successful
             if (executionStatus.equals(RestExecuter.STATUS_COMPLETE)) {
-                setFileName(fileName, version, parentId);
+                setFileName(algorithmData.getAlgorithmName(), algorithmData.getAlgorithmVersion(), algorithmData.getParentId());
                 persistExecution(execution);
             }
 
@@ -415,10 +406,10 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
                 Execution exeItem = new Execution();
                 exeItem.setUser(userName);
-                exeItem.setAlgorithmName(fileName);
-                exeItem.setAlgorithmVersion(version);
-                exeItem.setAlgorithmCategoryPath(getCategoryPath(parentId));
-                exeItem.setAlgorithmCategoryId(parentId);
+                exeItem.setAlgorithmName(algorithmData.getAlgorithmName());
+                exeItem.setAlgorithmVersion(algorithmData.getAlgorithmVersion());
+                exeItem.setAlgorithmCategoryPath(getCategoryPath(algorithmData.getParentId()));
+                exeItem.setAlgorithmCategoryId(algorithmData.getParentId());
                 exeItem.setStartDate(DateConverter.getTimeString(new Date(startExecution)));
                 exeItem.setEndDate(DateConverter.getTimeString(new Date(endExecution)));
                 exeItem.setStatus(executionStatus);
@@ -615,11 +606,12 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
                 while (rs.next()) {
                     // create an xml node for this user
-                    xmlGenerator.createUploaderXml(rs.getString(UploadColumns.USER.colNum()),
-                            rs.getString(UploadColumns.NAME.colNum()),
-                            rs.getString(UploadColumns.VERSION.colNum()),
-                            rs.getString(UploadColumns.PARENT_ID.colNum()),
-                            rs.getString(UploadColumns.UPLOAD_DATE.colNum()));
+                    xmlGenerator.createUploaderXml(rs.getString(UploadColumns.USER.colName()),
+                            rs.getString(UploadColumns.NAME.colName()),
+                            rs.getString(UploadColumns.VERSION.colName()),
+                            rs.getString(UploadColumns.TYPE.colName()),
+                            rs.getString(UploadColumns.PARENT_ID.colName()),
+                            rs.getString(UploadColumns.UPLOAD_DATE.colName()));
                 }
             } catch (Exception ex) {
 
@@ -993,7 +985,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
      * @param version
      * @return
      */
-    private String getZipFile(String fileName, String parentId, String version) {
+    private String getZipFile(int algorithmId) {
         String zipPath = null;
 
         Connection conn = null;
@@ -1003,8 +995,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
         if (conn != null) {
             try {
-                st = conn.prepareStatement(SQLStatements.selectZipFileStatement(fileName, parentId,
-                        version));
+                st = conn.prepareStatement(SQLStatements.selectZipFileStatement(algorithmId));
                 rs = st.executeQuery();
 
                 if (rs.next()) {

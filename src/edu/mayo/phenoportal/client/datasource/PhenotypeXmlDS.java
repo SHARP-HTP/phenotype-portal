@@ -65,13 +65,15 @@ public class PhenotypeXmlDS extends DataSource {
         DataSourceTextField algoVersionField = new DataSourceTextField("AlgoVersion", "AlgoVersion");
         DataSourceTextField algoUserField = new DataSourceTextField("AlgoUser", "AlgoUser");
         DataSourceTextField algoDescField = new DataSourceTextField("AlgoDesc", "AlgoDesc");
+	    DataSourceIntegerField algoIdField = new DataSourceIntegerField("AlgoId", "AlgoId");
+	    algoIdField.setHidden(true);
 
         DataSourceBooleanField isFolderField = new DataSourceBooleanField("isFolder", "isFolder");
         isFolderField.setHidden(true);
         isFolderField.setRequired(true);
 
         setFields(phenotypeNameField, categoryIdField, parentIdField, countField, levelField,
-                algoVersionField, algoUserField, algoDescField, isFolderField);
+                algoVersionField, algoUserField, algoDescField, isFolderField, algoIdField);
 
         setClientOnly(true);
 

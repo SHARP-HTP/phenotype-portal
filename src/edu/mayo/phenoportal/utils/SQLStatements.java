@@ -101,8 +101,9 @@ public class SQLStatements {
                 + "," + UploadColumns.ZIP_FILE.colName() + "," + UploadColumns.WORD_FILE.colName()
                 + "," + UploadColumns.STATUS.colName() + "," + UploadColumns.ASSOC_LINK.colName()
                 + "," + UploadColumns.ASSOC_NAME.colName() + ","
-                + UploadColumns.UPLOAD_DATE.colName()
-                + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                + UploadColumns.UPLOAD_DATE.colName() + ","
+                + UploadColumns.TYPE.colName()
+                + ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
     }
 
     public static String insertUserStatement(User user, String pwHashed) {
@@ -125,27 +126,24 @@ public class SQLStatements {
     }
 
     public static String selectAlgorithmsStatement(String categoryId) {
-        return "SELECT " + UploadColumns.NAME.colName() + ", "
+        return "SELECT " + UploadColumns.ID.colName() + ", "
+                + UploadColumns.NAME.colName() + ", "
                 + UploadColumns.DESCRIPTION.colName() + ", " + UploadColumns.VERSION.colName()
                 + ", " + UploadColumns.USER.colName() + " FROM Upload WHERE "
                 + UploadColumns.PARENT_ID.colName() + "= '" + categoryId + "'" + " ORDER by "
                 + UploadColumns.NAME + ";";
     }
 
-    public static String selectZipFileStatement(String fileName, String parentId, String version) {
+    public static String selectZipFileStatement(int algorithmId) {
         return "SELECT " + UploadColumns.ZIP_FILE.colName() + " FROM Upload WHERE "
-                + UploadColumns.PARENT_ID.colName() + "= '" + parentId + "' AND "
-                + UploadColumns.NAME.colName() + "= '" + fileName + "' AND "
-                + UploadColumns.VERSION.colName() + "= '" + version + "';";
+                + UploadColumns.ID.colName() + "= " + algorithmId + ";";
 
     }
 
-    public static String selectCriteriaStatement(String fileName, String parentId, String version) {
+    public static String selectCriteriaStatement(int algorithmId) {
         return "SELECT " + UploadColumns.NAME.colName() + ", " + UploadColumns.PARENT_ID.colName() + ", "
                 + UploadColumns.VERSION.colName() + ", " + UploadColumns.HTML_FILE.colName()
-                + " FROM Upload WHERE " + UploadColumns.PARENT_ID.colName() + "= '" + parentId + "' AND "
-                + UploadColumns.NAME.colName() + "= '" + fileName + "' AND "
-                + UploadColumns.VERSION.colName() + "= '" + version + "';";
+                + " FROM Upload WHERE " + UploadColumns.ID.colName() + "= " + algorithmId + ";";
     }
 
     public static String selectCategoryNameStatement(String childId) {
@@ -172,10 +170,8 @@ public class SQLStatements {
         return "SELECT * FROM Execution ORDER by " + ExecutionColumns.USER_NAME.colName() + ";";
     }
 
-    public static String selectUploadStatement(String parentId, String fileName, String version) {
-        return "SELECT * " + " FROM Upload where " + UploadColumns.PARENT_ID.colName() + " = '" + parentId
-                + "' and " + UploadColumns.NAME.colName() + " = '" + fileName + "' and "
-                + UploadColumns.VERSION.colName() + " = '" + version + "';";
+    public static String selectUploadStatement(int id) {
+        return "SELECT * " + " FROM Upload where id="+id+";";
     }
 
     public static String selectUploadersStatement() {

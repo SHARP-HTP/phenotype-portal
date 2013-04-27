@@ -87,8 +87,7 @@ public class FileInfoTab extends Tab implements ReportTab {
 
         FileServiceAsync uploadFileService = GWT.create(FileService.class);
 
-        uploadFileService.retrieveUploadMetadata(i_algoAlgorithmData.getParentId(),
-                i_algoAlgorithmData.getAlgorithmName(), i_algoAlgorithmData.getAlgorithmVersion(),
+        uploadFileService.retrieveUploadMetadata(i_algoAlgorithmData.getId(),
                 new AsyncCallback<ClientUploadItems>() {
 
                     @Override
@@ -129,6 +128,7 @@ public class FileInfoTab extends Tab implements ReportTab {
                         StaticTextItem nameItem = createItem("File Name", uploadItems.getName());
                         StaticTextItem statusItem = createItem("Status", uploadItems.getStatus());
                         StaticTextItem versionItem = createItem("Version", uploadItems.getVersion());
+                        StaticTextItem typeItem = createItem("Algorithm Type", uploadItems.getType().toString());
                         StaticTextItem creationDateItem = createItem("Creation Date",
                                 uploadItems.getCreateDate());
                         StaticTextItem userItem = createItem("Uploader/Creator",
@@ -158,7 +158,7 @@ public class FileInfoTab extends Tab implements ReportTab {
                             }
                         });
 
-                        i_fileInfoForm.setItems(nameItem, statusItem, versionItem,
+                        i_fileInfoForm.setItems(nameItem, statusItem, versionItem, typeItem,
                                 creationDateItem, userItem, institutionItem, descriptionItem,
                                 commentsItem, associatedNameItem, associatedLinkItem);
 

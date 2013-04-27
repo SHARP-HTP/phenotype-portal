@@ -27,7 +27,7 @@ public interface PhenotypeService extends RemoteService {
     List<String> getSupplementalCriteriaOids(AlgorithmData algorithmData)
             throws IllegalArgumentException;
 
-    Execution executePhenotype(String fileName, String parentId, String version, Date fromDate,
+    Execution executePhenotype(AlgorithmData algorithmData, Date fromDate,
             Date toDate, String userName) throws IllegalArgumentException;
 
     String getExecutions() throws IllegalArgumentException;

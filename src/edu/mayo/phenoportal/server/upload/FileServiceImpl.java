@@ -3,6 +3,7 @@ package edu.mayo.phenoportal.server.upload;
 import edu.mayo.phenoportal.client.upload.ClientUploadItems;
 import edu.mayo.phenoportal.client.upload.FileService;
 import edu.mayo.phenoportal.server.database.DBConnection;
+import edu.mayo.phenoportal.shared.AlgorithmType;
 import edu.mayo.phenoportal.shared.database.UploadColumns;
 import edu.mayo.phenoportal.utils.SQLStatements;
 import edu.mayo.phenotype.server.BasePhenoportalServlet;
@@ -19,7 +20,7 @@ public class FileServiceImpl extends BasePhenoportalServlet implements FileServi
     static final Logger lgr = Logger.getLogger(FileServiceImpl.class.getName());
 
     @Override
-    public ClientUploadItems retrieveUploadMetadata(String parentId, String fileName, String version) {
+    public ClientUploadItems retrieveUploadMetadata(int id) {
 
         Connection conn = null;
         PreparedStatement st = null;
@@ -30,8 +31,7 @@ public class FileServiceImpl extends BasePhenoportalServlet implements FileServi
         if (conn != null) {
             try {
 
-                st = conn.prepareStatement(SQLStatements.selectUploadStatement(parentId, fileName,
-                        version));
+                st = conn.prepareStatement(SQLStatements.selectUploadStatement(id));
 
                 rs = st.executeQuery();
 
@@ -53,6 +53,7 @@ public class FileServiceImpl extends BasePhenoportalServlet implements FileServi
                     clientUploadItems.setXmlFile(rs.getString("xmlFile"));
                     clientUploadItems.setXlsFile(rs.getString("xlsFile"));
                     clientUploadItems.setDocFile(rs.getString("wordFile"));
+	                clientUploadItems.setType(AlgorithmType.valueOf(rs.getString("type")));
                 }
 
             } catch (Exception ex) {

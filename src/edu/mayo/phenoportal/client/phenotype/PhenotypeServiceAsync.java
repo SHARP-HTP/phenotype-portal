@@ -19,7 +19,7 @@ public interface PhenotypeServiceAsync {
     void getPhenotypeCategories(String categoryId, AsyncCallback<String> callback)
             throws IllegalArgumentException;
 
-    void executePhenotype(String fileName, String parentId, String version, Date fromDate,
+    void executePhenotype(AlgorithmData algorithmData, Date fromDate,
             Date toDate, String userName, AsyncCallback<Execution> callback)
             throws IllegalArgumentException;
 

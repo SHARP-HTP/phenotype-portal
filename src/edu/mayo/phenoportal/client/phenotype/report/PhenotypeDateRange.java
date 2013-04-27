@@ -246,8 +246,7 @@ public class PhenotypeDateRange extends VLayout {
                     MessageWindow messageWindow = new MessageWindow(title, message);
                     messageWindow.show();
                 } else {
-                    executePhenotype(i_algorithmData.getAlgorithmName(),
-                            i_algorithmData.getParentId(), i_algorithmData.getAlgorithmVersion(),
+                    executePhenotype(i_algorithmData,
                             fromDate, toDate);
                 }
             }
@@ -263,13 +262,12 @@ public class PhenotypeDateRange extends VLayout {
      * Execute the phenotype with the selected dates On Success, It will return
      * the List<Demographic> object
      */
-    private void executePhenotype(String phenotypeName, String parentId, String version,
-            Date fromDate, Date toDate) {
+    private void executePhenotype(AlgorithmData algorithmData, Date fromDate, Date toDate) {
 
         Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteStartedEvent());
 
         PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
-        phenotypeService.executePhenotype(phenotypeName, parentId, version, fromDate, toDate, Htp
+        phenotypeService.executePhenotype(algorithmData, fromDate, toDate, Htp
                 .getLoggedInUser().getUserName(), new AsyncCallback<Execution>() {
 
             @Override

@@ -5,6 +5,7 @@ import com.google.common.io.Files;
 import edu.mayo.phenoportal.server.database.DBConnection;
 import edu.mayo.phenoportal.server.exception.PhenoportalFileException;
 import edu.mayo.phenoportal.server.utils.MimeUtils;
+import edu.mayo.phenoportal.shared.AlgorithmType;
 import edu.mayo.phenoportal.shared.database.UploadColumns;
 import edu.mayo.phenoportal.utils.SQLStatements;
 import edu.mayo.phenotype.server.BasePhenoportalHttpServlet;
@@ -438,6 +439,15 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
                     uploadItems.setDocFile(newDoc);
                 }
 
+	            /* Determine algorithm type */
+	            if (uploadItems.getXmlFile() != null && uploadItems.getHtmlFile() != null && uploadItems.getXlsFile() != null) {
+		            uploadItems.setType(AlgorithmType.NQF2013);
+	            } else if (uploadItems.getXmlFile() != null && uploadItems.getHtmlFile() != null && uploadItems.getXlsFile() == null) {
+		            uploadItems.setType(AlgorithmType.NQF2014);
+	            } else {
+		            uploadItems.setType(AlgorithmType.UNKNOWN);
+	            }
+
                 /* Add metadata to database. */
                 success = insertUploadMetadata(request, uploadItems);
 	            /* If value sets spreadsheet is present add value sets to CTS2 service */
@@ -490,6 +500,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
                 st.setString(15, uploadItems.getAssocLink());
                 st.setString(16, uploadItems.getAssocName());
                 st.setDate(17, new java.sql.Date(System.currentTimeMillis()));
+	            st.setString(18, uploadItems.getType().name());
 
                 st.execute();
 

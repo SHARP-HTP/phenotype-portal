@@ -31,13 +31,13 @@ public class UploadersXmlDS extends DataSource {
         setRecordXPath(RECORD_X_PATH);
 
         DataSourceTextField uploaderField = new DataSourceTextField(UploadColumns.USER.colName());
-        uploaderField.setPrimaryKey(true);
         DataSourceTextField algorithmField = new DataSourceTextField(UploadColumns.NAME.colName());
         DataSourceTextField versionField = new DataSourceTextField(UploadColumns.VERSION.colName());
+	    DataSourceTextField typeField = new DataSourceTextField(UploadColumns.TYPE.colName());
         DataSourceTextField categoryField = new DataSourceTextField(UploadColumns.PARENT_ID.colName());
         DataSourceTextField dateField = new DataSourceTextField(UploadColumns.UPLOAD_DATE.colName());
 
-        setFields(uploaderField, algorithmField, versionField, categoryField, dateField);
+        setFields(uploaderField, algorithmField, versionField, typeField, categoryField, dateField);
 
         setClientOnly(true);
     }

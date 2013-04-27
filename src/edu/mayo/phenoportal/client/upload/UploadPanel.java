@@ -302,8 +302,8 @@ public class UploadPanel extends VLayout {
         final HiddenItem userItem = new HiddenItem(UploadColumns.USER.colName());
 
         i_form.setFields(nameText, versionText, selectItem, institutionText, createDate,
-                descriptionText, commentsText, zipFileItem, zipTextItem, zipPath, docFileItem, assocLinkText,
-                assocNameText, categoryText, userItem, i_categoryId);
+                descriptionText, commentsText, zipFileItem, zipTextItem, zipPath, docFileItem,
+                assocNameText, assocLinkText, categoryText, userItem, i_categoryId);
 
         ButtonItem uploadButton = new ButtonItem("Upload");
         uploadButton.addClickHandler(new ClickHandler() {

@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import edu.mayo.phenoportal.shared.AlgorithmType;
 import org.apache.commons.fileupload.FileItem;
 
 // import org.apache.log4j.Logger;
@@ -34,6 +35,7 @@ public class UploadItems implements Serializable {
     private String assocName;
     private Date uploadDate;
     private String dir = UUID.randomUUID().toString();
+	private AlgorithmType type;
 	private byte[] bytes;
     private final List<FileItem> inputFiles = new ArrayList<FileItem>(2);
     private final StringBuilder messages = new StringBuilder();
@@ -208,4 +210,11 @@ public class UploadItems implements Serializable {
         return this.inputFiles;
     }
 
+	public AlgorithmType getType() {
+		return type;
+	}
+
+	public void setType(AlgorithmType type) {
+		this.type = type;
+	}
 }
