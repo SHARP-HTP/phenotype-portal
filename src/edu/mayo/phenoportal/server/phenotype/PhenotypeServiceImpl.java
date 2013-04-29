@@ -340,7 +340,9 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         while (matcher.find()) {
             String oid = matcher.group(0);
             oid = oid.substring(1, oid.length() - 1);
-            oids.add(oid);
+	        if (!oids.contains(oid)) {
+                oids.add(oid);
+	        }
         }
 
         return oids;
