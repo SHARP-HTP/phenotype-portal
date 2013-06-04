@@ -5,6 +5,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+
 import edu.mayo.phenoportal.client.Htp;
 import edu.mayo.phenoportal.client.events.LoggedInEvent;
 import edu.mayo.phenoportal.client.events.LoggedInEventHandler;
@@ -24,22 +25,22 @@ import edu.mayo.phenoportal.shared.Execution;
  */
 public class PhenotypePanel extends HLayout {
 
-	private PhenotypeDateRange i_inputRange;
-	private PhenotypeReportTabSet i_reportTabs;
+    private PhenotypeDateRange i_inputRange;
+    private PhenotypeReportTabSet i_reportTabs;
 
-	private AlgorithmData i_algorithmData;
-	private NavigationPane i_navigationPane;
+    private AlgorithmData i_algorithmData;
+    private NavigationPane i_navigationPane;
 
-	public PhenotypePanel() {
-		super();
+    public PhenotypePanel() {
+        super();
 
-		init();
-	}
+        init();
+    }
 
-	private void init() {
-		setWidth100();
-		setHeight100();
-		
+    private void init() {
+        setWidth100();
+        setHeight100();
+
         i_navigationPane = new NavigationPane();
 
         // add rounded borders to the layout.
@@ -48,81 +49,83 @@ public class PhenotypePanel extends HLayout {
         i_inputRange = new PhenotypeDateRange();
         i_reportTabs = new PhenotypeReportTabSet();
 
-		addMember(i_navigationPane);
+        addMember(i_navigationPane);
 
-		VLayout dataPanel = new VLayout();
+        VLayout dataPanel = new VLayout();
 
-		// add rounded borders to the layout.
-		UiHelper.createLayoutWithBorders(dataPanel);
-		
+        // add rounded borders to the layout.
+        UiHelper.createLayoutWithBorders(dataPanel);
+
         dataPanel.addMember(i_inputRange);
         dataPanel.addMember(i_reportTabs);
 
-		addMember(dataPanel);
+        addMember(dataPanel);
 
-		createPhenotypeSelectionChangedEventHandler();
-		createLoggedInEventHandler();
-	}
+        createPhenotypeSelectionChangedEventHandler();
+        createLoggedInEventHandler();
+    }
 
-	public void refreshTreeNavigation() {
-		i_navigationPane.refreshTreeNavigation();
-	}
+    public void refreshTreeNavigation() {
+        i_navigationPane.refreshTreeNavigation();
+    }
 
-	public void updateSelection(AlgorithmData algorithmData) {
-		i_algorithmData = algorithmData;
+    public void updateSelection(AlgorithmData algorithmData) {
+        i_algorithmData = algorithmData;
 
-		i_inputRange.updateSelection(i_algorithmData);
-		i_reportTabs.updateSelection(i_algorithmData);
+        i_inputRange.updateSelection(i_algorithmData);
+        i_reportTabs.updateSelection(i_algorithmData);
 
-		if (Htp.getLoggedInUser() != null) {
-			PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
-			phenotypeService.getLatestExecution(i_algorithmData.getAlgorithmName(), i_algorithmData.getAlgorithmVersion(), i_algorithmData
-			  .getParentId(), Htp.getLoggedInUser().getUserName(), new AsyncCallback<Execution>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					i_inputRange.updateLatestExecutionDetails(null);
-					i_reportTabs.updateResults(null);
-					SC.warn("Unable to display the latest execution results.");
-				}
+        if (Htp.getLoggedInUser() != null) {
+            PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
+            phenotypeService.getLatestExecution(i_algorithmData.getAlgorithmName(), i_algorithmData
+                    .getAlgorithmVersion(), i_algorithmData.getParentId(), Htp.getLoggedInUser()
+                    .getUserName(), new AsyncCallback<Execution>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    i_inputRange.updateLatestExecutionDetails(null);
+                    i_reportTabs.updateResults(null);
+                    SC.warn("Unable to display the latest execution results.");
+                }
 
-				@Override
-				public void onSuccess(Execution execution) {
-					i_inputRange.updateLatestExecutionDetails(execution);
-					i_reportTabs.updateResults(execution);
-				}
-			});
+                @Override
+                public void onSuccess(Execution execution) {
+                    i_inputRange.updateLatestExecutionDetails(execution);
+                    i_reportTabs.updateResults(execution);
+                }
+            });
 
-		}
-		// i_reportTabs.disableSummaryAndDemographicsTabs(true);
-	}
+        }
+        // i_reportTabs.disableSummaryAndDemographicsTabs(true);
+    }
 
-	public void createPhenotypeSelectionChangedEventHandler() {
-		Htp.EVENT_BUS.addHandler(PhenotypeSelectionChangedEvent.TYPE,
-		  new PhenotypeSelectionChangedEventHandler() {
+    public void createPhenotypeSelectionChangedEventHandler() {
+        Htp.EVENT_BUS.addHandler(PhenotypeSelectionChangedEvent.TYPE,
+                new PhenotypeSelectionChangedEventHandler() {
 
-			  @Override
-			  public void onPhenotypeSelectionChanged(
-				PhenotypeSelectionChangedEvent phenotypeSelectionChangedEvent) {
-				  updateSelection(phenotypeSelectionChangedEvent.getAlgorithmData());
+                    @Override
+                    public void onPhenotypeSelectionChanged(
+                            PhenotypeSelectionChangedEvent phenotypeSelectionChangedEvent) {
+                        updateSelection(phenotypeSelectionChangedEvent.getAlgorithmData());
 
-			  }
-		  });
-	}
+                    }
+                });
+    }
 
-	/**
-	 * Create a handler to change Logged in/out button based on the log in state
-	 */
-	private void createLoggedInEventHandler() {
-		Htp.EVENT_BUS.addHandler(LoggedInEvent.TYPE, new LoggedInEventHandler() {
+    /**
+     * Create a handler to change Logged in/out button based on the log in state
+     */
+    private void createLoggedInEventHandler() {
+        Htp.EVENT_BUS.addHandler(LoggedInEvent.TYPE, new LoggedInEventHandler() {
 
-			@Override
-			public void onLoggedIn(LoggedInEvent loggedInEvent) {
+            @Override
+            public void onLoggedIn(LoggedInEvent loggedInEvent) {
 
-				// only update if the user has previously selected an algorithm
-				if (i_algorithmData != null) {
-					updateSelection(i_algorithmData);
-				}
-			}
-		});
-	}
+                // only update if the user has previously selected an algorithm
+                if (i_algorithmData != null) {
+                    updateSelection(i_algorithmData);
+                }
+            }
+        });
+    }
+
 }

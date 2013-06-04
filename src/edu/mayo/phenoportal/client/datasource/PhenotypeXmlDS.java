@@ -65,8 +65,8 @@ public class PhenotypeXmlDS extends DataSource {
         DataSourceTextField algoVersionField = new DataSourceTextField("AlgoVersion", "AlgoVersion");
         DataSourceTextField algoUserField = new DataSourceTextField("AlgoUser", "AlgoUser");
         DataSourceTextField algoDescField = new DataSourceTextField("AlgoDesc", "AlgoDesc");
-	    DataSourceIntegerField algoIdField = new DataSourceIntegerField("AlgoId", "AlgoId");
-	    algoIdField.setHidden(true);
+        DataSourceIntegerField algoIdField = new DataSourceIntegerField("AlgoId", "AlgoId");
+        algoIdField.setHidden(true);
 
         DataSourceBooleanField isFolderField = new DataSourceBooleanField("isFolder", "isFolder");
         isFolderField.setHidden(true);
@@ -125,19 +125,22 @@ public class PhenotypeXmlDS extends DataSource {
 
                         Object results = XMLTools.selectNodes(result, "/List/phenotype");
 
-                        Record[] fetchRecords = recordsFromXML(results);
+                        if (results != null) {
+                            Record[] fetchRecords = recordsFromXML(results);
 
-                        if (fetchRecords != null) {
-                            // add each record
-                            for (Record record : fetchRecords) {
+                            if (fetchRecords != null) {
+                                // add each record
+                                for (Record record : fetchRecords) {
 
-                                // set the "isFolder" attribute to false so the
-                                // "+" sign doesn't show for algorithm.
-                                if (record.getAttributeAsInt("Level") == 4) {
-                                    record.setAttribute("isFolder", "false");
+                                    // set the "isFolder" attribute to false so
+                                    // the
+                                    // "+" sign doesn't show for algorithm.
+                                    if (record.getAttributeAsInt("Level") == 4) {
+                                        record.setAttribute("isFolder", "false");
+                                    }
+
+                                    addData(record);
                                 }
-
-                                addData(record);
                             }
                         }
 

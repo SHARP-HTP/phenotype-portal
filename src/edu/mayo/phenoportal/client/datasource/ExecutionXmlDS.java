@@ -1,5 +1,7 @@
 package edu.mayo.phenoportal.client.datasource;
 
+import mayo.edu.cts2.editor.client.utils.RandomString;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.DSRequest;
@@ -16,6 +18,10 @@ import edu.mayo.phenoportal.shared.database.ExecutionColumns;
 public class ExecutionXmlDS extends DataSource {
 
     private static final String RECORD_X_PATH = "/Executions/Execution";
+    private static final String PRIMARY_KEY_ID = "primaryKey";
+
+    private RandomString i_randomString;
+
     private static ExecutionXmlDS instance = null;
 
     public static ExecutionXmlDS getInstance() {
@@ -30,9 +36,11 @@ public class ExecutionXmlDS extends DataSource {
         setID(id);
         setRecordXPath(RECORD_X_PATH);
 
+        DataSourceTextField primaryKeyField = new DataSourceTextField(PRIMARY_KEY_ID);
+        primaryKeyField.setPrimaryKey(true);
+
         DataSourceTextField uploaderField = new DataSourceTextField(
                 ExecutionColumns.USER_NAME.colName());
-        uploaderField.setPrimaryKey(true);
         DataSourceTextField algorithmField = new DataSourceTextField(
                 ExecutionColumns.ALG_NAME.colName());
         DataSourceTextField versionField = new DataSourceTextField(
@@ -47,8 +55,8 @@ public class ExecutionXmlDS extends DataSource {
         DataSourceTextField elapsedField = new DataSourceTextField(
                 ExecutionColumns.ELAPSED_TIME.colName());
 
-        setFields(uploaderField, algorithmField, versionField, categoryField, startDateField,
-                endDateField, elapsedField, statusField);
+        setFields(primaryKeyField, uploaderField, algorithmField, versionField, categoryField,
+                startDateField, endDateField, elapsedField, statusField);
 
         setClientOnly(true);
     }
@@ -97,7 +105,11 @@ public class ExecutionXmlDS extends DataSource {
                 if (fetchRecords != null) {
                     // add each record
                     for (Record record : fetchRecords) {
-                        addData(record);
+                        if (record != null) {
+                            // generate our own primary key
+                            record.setAttribute(PRIMARY_KEY_ID, nextPrimaryKey());
+                            addData(record);
+                        }
                     }
                 }
             }
@@ -110,6 +122,13 @@ public class ExecutionXmlDS extends DataSource {
             }
         });
 
+    }
+
+    public String nextPrimaryKey() {
+        if (i_randomString == null) {
+            i_randomString = new RandomString(20);
+        }
+        return i_randomString.nextString();
     }
 
 }

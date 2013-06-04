@@ -1,77 +1,44 @@
 package edu.mayo.phenoportal.client.phenotype.report;
 
-import java.util.List;
-
-import mayo.edu.cts2.editor.client.Cts2Editor;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 
 import edu.mayo.phenoportal.client.core.AlgorithmData;
-import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
-import edu.mayo.phenoportal.client.phenotype.PhenotypeServiceAsync;
 
 /**
  * Tab for displaying the Criteria info for the selected phenotype.
  */
 public class CriteriaTab extends Tab implements ReportTab {
 
-    private static final String TITLE_CRITERIA = "Population Criteria";
-    private static final String TITLE_DATA_CRITERIA = "Data criteria";
-    private static final String TITLE_SUPPLEMENTAL_DATA_ELEMENTS = "Supplemental Data Elements";
-
-    private AlgorithmData i_algoAlgorithmData;
-    private HTMLPane i_htmlPane;
-
-    private SectionStack i_criteriaSectionStack;
-    private SectionStackSection i_criteriaSection;
-    private SectionStackSection i_dataCriteriaSection;
-    private SectionStackSection i_supplementalDataElementsSection;
+    private AlgorithmData i_algorithmData;
+    private final VLayout i_criteriaLayout;
+    private CriteriaPanel i_criteriaPanel;
+    private Label i_newWindowLink;
 
     public CriteriaTab(String title) {
         super(title);
+
+        // overall layout that holds everything in the criteria tab.
+        i_criteriaLayout = new VLayout();
 
         createStack();
     }
 
     private void createStack() {
 
-        i_criteriaSectionStack = null;
-        i_criteriaSection = null;
-        i_dataCriteriaSection = null;
-        i_criteriaSectionStack = null;
-        i_htmlPane = null;
+        i_criteriaPanel = null;
+        i_criteriaPanel = new CriteriaPanel();
 
-        // create the SectionStack
-        i_criteriaSectionStack = new SectionStack();
-        i_criteriaSectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        i_criteriaSectionStack.setWidth100();
-        i_criteriaSectionStack.setHeight100();
+        i_newWindowLink = getLink("Show in new window");
+        i_criteriaLayout.addMember(i_newWindowLink);
 
-        // create the SectionStackSections
-        i_criteriaSection = new SectionStackSection(TITLE_CRITERIA);
-        i_criteriaSection.setExpanded(true);
-        i_htmlPane = new HTMLPane();
-        i_htmlPane.setWidth100();
-        i_htmlPane.setHeight100();
-        i_criteriaSection.addItem(i_htmlPane);
+        i_criteriaPanel.createStack();
+        i_criteriaLayout.addMember(i_criteriaPanel);
 
-        i_dataCriteriaSection = new SectionStackSection(TITLE_DATA_CRITERIA);
-        i_supplementalDataElementsSection = new SectionStackSection(
-                TITLE_SUPPLEMENTAL_DATA_ELEMENTS);
-
-        // add the SectionStackSections to the SectionStack
-        i_criteriaSectionStack.addSection(i_criteriaSection);
-        i_criteriaSectionStack.addSection(i_dataCriteriaSection);
-        i_criteriaSectionStack.addSection(i_supplementalDataElementsSection);
-
-        // add the SectionStack to the Tab
-        setPane(i_criteriaSectionStack);
+        setPane(i_criteriaLayout);
     }
 
     /**
@@ -80,56 +47,66 @@ public class CriteriaTab extends Tab implements ReportTab {
      * @param algorithmData
      */
     public void updateSelection(AlgorithmData algorithmData) {
-        i_algoAlgorithmData = algorithmData;
-        setCriteriaInfo();
-    }
-
-    protected void setCriteriaInfo() {
-
-        createStack();
-
-        PhenotypeServiceAsync async = (PhenotypeServiceAsync) GWT.create(PhenotypeService.class);
-
-        async.getPopulationCriteria(i_algoAlgorithmData, new AsyncCallback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                i_htmlPane.setContents(result);
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-                GWT.log("Error getting criteria: " + caught);
-            }
-        });
-        async.getDataCriteriaOids(i_algoAlgorithmData, new AsyncCallback<List<String>>() {
-            @Override
-            public void onSuccess(List<String> result) {
-                Cts2Editor editor = new Cts2Editor();
-                i_dataCriteriaSection.addItem(editor.getMainLayout(result));
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-                GWT.log("Error getting criteria: " + caught);
-            }
-        });
-        async.getSupplementalCriteriaOids(i_algoAlgorithmData, new AsyncCallback<List<String>>() {
-            @Override
-            public void onSuccess(List<String> result) {
-                Cts2Editor editor = new Cts2Editor();
-                i_supplementalDataElementsSection.addItem(editor.getMainLayout(result));
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-                GWT.log("Error getting criteria: " + caught);
-            }
-        });
+        i_algorithmData = algorithmData;
+        i_criteriaPanel.updateSelection(i_algorithmData);
     }
 
     @Override
     public void clearTab() {
-        i_htmlPane.setContents("");
+        i_criteriaPanel.getHtmlPane().setContents("");
     }
 
+    /**
+     * Create the new window link.
+     * 
+     * @param message
+     * @return
+     */
+    private Label getLink(String message) {
+        Label link = new Label(message);
+        link.setWidth(150);
+        link.setHeight(20);
+
+        link.addStyleName("htpClickable");
+        link.setAlign(Alignment.CENTER);
+
+        link.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+            @Override
+            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+                Window window = getWindow();
+                window.centerInPage();
+                window.show();
+            }
+        });
+
+        return link;
+    }
+
+    /**
+     * Show criteria info in a new window.
+     * 
+     * @return
+     */
+    private Window getWindow() {
+
+        Window window = new Window();
+
+        window.setTitle("Criteria");
+        window.setWidth("95%");
+        window.setHeight("95%");
+
+        window.setModalMaskOpacity(90);
+
+        window.setCanDragReposition(false);
+        window.setCanDragResize(true);
+        window.setAnimateMinimize(true);
+
+        CriteriaPanel criteriaPanel = new CriteriaPanel();
+        criteriaPanel.updateSelection(i_algorithmData);
+
+        window.addItem(criteriaPanel);
+
+        return window;
+    }
 }

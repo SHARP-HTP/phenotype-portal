@@ -1,5 +1,7 @@
 package edu.mayo.phenoportal.client.datasource;
 
+import mayo.edu.cts2.editor.client.utils.RandomString;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.DSRequest;
@@ -16,6 +18,10 @@ import edu.mayo.phenoportal.shared.database.UploadColumns;
 public class UploadersXmlDS extends DataSource {
 
     private static final String RECORD_X_PATH = "/Uploaders/Uploader";
+    private static final String PRIMARY_KEY_ID = "primaryKey";
+
+    private RandomString i_randomString;
+
     private static UploadersXmlDS instance = null;
 
     public static UploadersXmlDS getInstance() {
@@ -30,14 +36,17 @@ public class UploadersXmlDS extends DataSource {
         setID(id);
         setRecordXPath(RECORD_X_PATH);
 
+        DataSourceTextField primaryKeyField = new DataSourceTextField(PRIMARY_KEY_ID);
+        primaryKeyField.setPrimaryKey(true);
+
         DataSourceTextField uploaderField = new DataSourceTextField(UploadColumns.USER.colName());
         DataSourceTextField algorithmField = new DataSourceTextField(UploadColumns.NAME.colName());
         DataSourceTextField versionField = new DataSourceTextField(UploadColumns.VERSION.colName());
-	    DataSourceTextField typeField = new DataSourceTextField(UploadColumns.TYPE.colName());
-        DataSourceTextField categoryField = new DataSourceTextField(UploadColumns.PARENT_ID.colName());
+        DataSourceTextField categoryField = new DataSourceTextField(UploadColumns.ID.colName());
         DataSourceTextField dateField = new DataSourceTextField(UploadColumns.UPLOAD_DATE.colName());
 
-        setFields(uploaderField, algorithmField, versionField, typeField, categoryField, dateField);
+        setFields(primaryKeyField, uploaderField, algorithmField, versionField, categoryField,
+                dateField);
 
         setClientOnly(true);
     }
@@ -86,7 +95,12 @@ public class UploadersXmlDS extends DataSource {
                 if (fetchRecords != null) {
                     // add each record
                     for (Record record : fetchRecords) {
-                        addData(record);
+                        if (record != null) {
+                            // generate our own primary key
+                            record.setAttribute(PRIMARY_KEY_ID, nextPrimaryKey());
+                            addData(record);
+                        }
+
                     }
                 }
             }
@@ -99,6 +113,13 @@ public class UploadersXmlDS extends DataSource {
             }
         });
 
+    }
+
+    public String nextPrimaryKey() {
+        if (i_randomString == null) {
+            i_randomString = new RandomString(20);
+        }
+        return i_randomString.nextString();
     }
 
 }
