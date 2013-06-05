@@ -13,6 +13,7 @@ import edu.mayo.phenoportal.shared.News;
 import edu.mayo.phenoportal.shared.SharpNews;
 import edu.mayo.phenoportal.shared.User;
 import edu.mayo.phenoportal.shared.UserRoleRequest;
+import edu.mayo.phenoportal.shared.ValueSet;
 
 public interface PhenotypeServiceAsync {
 
@@ -92,4 +93,6 @@ public interface PhenotypeServiceAsync {
 	void getMatEditorUrl(User user, AsyncCallback<String> async);
 
 	void getMatImport(String tokenId, AsyncCallback<MatImport> async);
+
+	void getExecutionValueSets(String executionId, AsyncCallback<List<ValueSet>> async);
 }

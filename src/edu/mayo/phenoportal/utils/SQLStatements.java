@@ -17,6 +17,7 @@ import edu.mayo.phenoportal.shared.UserRoleRequest;
 import edu.mayo.phenoportal.shared.database.CategoryColumns;
 import edu.mayo.phenoportal.shared.database.DroolsColumns;
 import edu.mayo.phenoportal.shared.database.ExecutionColumns;
+import edu.mayo.phenoportal.shared.database.ExecutionValueSetColumns;
 import edu.mayo.phenoportal.shared.database.NewsColumns;
 import edu.mayo.phenoportal.shared.database.SharpNewsColumns;
 import edu.mayo.phenoportal.shared.database.UploadColumns;
@@ -80,9 +81,33 @@ public class SQLStatements {
 
     }
 
+	/**
+	 * Returns a string to create a prepared statement to insert execution value sets.
+	 * Parameter Order: executionId, valueSet, version
+	 *
+	 * @return SQL statement string
+	 */
+	public static String insertExecutionValueSetsStatement() {
+		return String.format("INSERT INTO ExecutionValueSet (%s, %s, %s) VALUES (?,?,?);",
+		  ExecutionValueSetColumns.EXECUTION_ID.getColumnName(),
+		  ExecutionValueSetColumns.VALUE_SET.getColumnName(),
+		  ExecutionValueSetColumns.VERSION.getColumnName());
+	}
+
+	/**
+	 * Returns a string to create a prepared statement to select execution value sets.
+	 * Parameter Order: executionId
+	 *
+	 * @return SQL statement string
+	 */
+	public static String getExecutionValueSets() {
+		return String.format("SELECT * FROM ExecutionValueSet where %s = ?;",
+		  ExecutionValueSetColumns.EXECUTION_ID.getColumnName());
+	}
+
     /**
-     * Returns string to create a prepared statement to insert upload items. Id,
-     * Parameter Order: Name, User, Version, Description, Institution,
+     * Returns string to create a prepared statement to insert upload items.
+     * Parameter Order: Id, Name, User, Version, Description, Institution,
      * CreateDate, Comment, Xml Path, Xls Path, Html Path, Zip Path, Word Path,
      * Status, AssocLink, AssocName, Upload Date
      * 

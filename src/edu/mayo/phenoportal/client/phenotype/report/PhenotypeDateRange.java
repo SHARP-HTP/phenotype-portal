@@ -265,6 +265,26 @@ public class PhenotypeDateRange extends VLayout {
     private void executePhenotype(AlgorithmData algorithmData, Date fromDate, Date toDate) {
 
         Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteStartedEvent());
+		/* TODO: get value sets from cts2Editor and add to algorithmData */
+
+	    /* TODO: REMOVE THIS TEST BLOCK *******************************************************************************/
+	    // diabetes data criteria
+	    algorithmData.addValueSet("2.16.840.1.113883.3.526.3.1240", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.560.100.4", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.103.12.1001", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1048", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.103.12.1010", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1016", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.526.3.1248", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1001", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1025", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1023", "20121025");
+		// diabetes supplemental data elements
+	    algorithmData.addValueSet("2.16.840.1.114222.4.11.837", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113762.1.4.1", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.114222.4.11.3591", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.114222.4.11.836", "20121025");
+	    /* END TEST BLOCK *********************************************************************************************/
 
         PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
         phenotypeService.executePhenotype(algorithmData, fromDate, toDate, Htp

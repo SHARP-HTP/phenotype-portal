@@ -1,6 +1,10 @@
 package edu.mayo.phenoportal.client.core;
 
+import edu.mayo.phenoportal.shared.ValueSet;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class to encapsulate a selected algorithm.
@@ -15,6 +19,7 @@ public class AlgorithmData implements Serializable {
 	private String i_algorithmUser;
 	private String i_algorithmDescription;
 	private String i_algorithmName;
+	private List<ValueSet> valueSets = new ArrayList<ValueSet>();
 	
 	public AlgorithmData() {
 		id = -1;
@@ -95,5 +100,23 @@ public class AlgorithmData implements Serializable {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public void addValueSet(ValueSet vs) {
+		if (!valueSets.contains(vs)) {
+			valueSets.add(vs);
+		}
+	}
+
+	public void addValueSet(String name, String version) {
+		addValueSet(new ValueSet(name, version));
+	}
+
+	public void setValueSets(List<ValueSet> valueSets) {
+		this.valueSets = valueSets;
+	}
+
+	public List<ValueSet> getValueSets() {
+		return this.valueSets;
 	}
 }

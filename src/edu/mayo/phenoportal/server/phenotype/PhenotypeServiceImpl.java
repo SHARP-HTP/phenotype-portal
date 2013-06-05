@@ -55,6 +55,8 @@ import javax.xml.xpath.XPathFactory;
 
 import edu.mayo.phenoportal.server.upload.ImportServlet;
 import edu.mayo.phenoportal.shared.MatImport;
+import edu.mayo.phenoportal.shared.ValueSet;
+import edu.mayo.phenoportal.shared.database.ExecutionValueSetColumns;
 import mayo.edu.cts2.editor.server.Cts2EditorServiceProperties;
 import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.util.Base64;
@@ -367,6 +369,8 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         long startExecution = System.currentTimeMillis();
 
         try {
+	        /* TODO: Send the selected value sets to the executor */
+
             // execute the algorithm. This will return immediately with an id to
             // the resource that is executing.
             locationUrl = RestExecuter.getInstance(getBasePath()).createExecution(zipFile,
@@ -425,8 +429,9 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                 exeItem.setRulesPath(execution.getRulesPath());
 
                 insertExecution(conn, exeItem);
+	            insertExecutionValueSets(conn, exeItem, algorithmData);
             } catch (Exception e) {
-                s_logger.log(Level.SEVERE, "Failed to insert Algorithm values", e);
+                s_logger.log(Level.SEVERE, "Failed to insert execution details.", e);
                 DBConnection.rollback(conn);
             } finally {
                 DBConnection.commit(conn);
@@ -982,9 +987,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
     /**
      * Get the zip file path from the db.
      * 
-     * @param fileName
-     * @param parentId
-     * @param version
+     * @param algorithmId
      * @return
      */
     private String getZipFile(int algorithmId) {
@@ -1501,6 +1504,27 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         }
     }
 
+	private void insertExecutionValueSets(Connection conn, Execution execution, AlgorithmData algorithmData) {
+		String query = SQLStatements.insertExecutionValueSetsStatement();
+		PreparedStatement ps = null;
+
+		try {
+			for (ValueSet vs : algorithmData.getValueSets()) {
+				ps = conn.prepareStatement(query);
+				ps.setString(1, execution.getId());
+				ps.setString(2, vs.name);
+				ps.setString(3, vs.version);
+				ps.execute();
+			}
+
+		} catch (SQLException sqle) {
+			System.out.println("Failed to insert ExecutionValueSets. Error: " + sqle.getMessage());
+		}
+		finally {
+			DBConnection.close(ps);
+		}
+	}
+
     // public String openEditor() {
     // DroolsMetadata droolsMd = new DroolsMetadata();
     // droolsMd.setBpmnPath(getBasePath() + "/data/Disease.bpmn");
@@ -1875,6 +1899,37 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
         return execution;
     }
+
+	@Override
+	public List<ValueSet> getExecutionValueSets(String executionId) {
+		if (executionId == null || executionId.trim().isEmpty()) {
+			throw new IllegalArgumentException("ExecutionId cannot be null or empty.");
+		}
+
+		List<ValueSet> valueSets = new ArrayList<ValueSet>();
+		String query = SQLStatements.getExecutionValueSets();
+		Connection connection = DBConnection.getDBConnection(getBasePath());
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+
+		try {
+			statement = connection.prepareStatement(query);
+			statement.setString(1, executionId);
+			resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				valueSets.add(new ValueSet(
+				  resultSet.getString(ExecutionValueSetColumns.VALUE_SET.getColumnName()),
+				  resultSet.getString(ExecutionValueSetColumns.VERSION.getColumnName())
+				));
+			}
+		} catch (SQLException sqle) {
+			s_logger.log(Level.WARNING, "Unable to get the value sets for execution "+executionId+".", sqle);
+		} finally {
+			DBConnection.closeConnection(connection, statement, resultSet);
+		}
+
+		return valueSets;
+	}
 
     private void sendRequestPersmissionUpgradeEmailAdmin(User user) {
         String host = getSmtpHost();

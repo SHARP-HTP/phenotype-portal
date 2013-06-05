@@ -14,6 +14,7 @@ import edu.mayo.phenoportal.shared.News;
 import edu.mayo.phenoportal.shared.SharpNews;
 import edu.mayo.phenoportal.shared.User;
 import edu.mayo.phenoportal.shared.UserRoleRequest;
+import edu.mayo.phenoportal.shared.ValueSet;
 
 @RemoteServiceRelativePath("RPCforPhenotypeCategories")
 public interface PhenotypeService extends RemoteService {
@@ -77,6 +78,8 @@ public interface PhenotypeService extends RemoteService {
 
     Execution getLatestExecution(String algorithmName, String algorithmVersion,
             String algorithmCategoryId, String algorithmUser);
+
+	List<ValueSet> getExecutionValueSets(String executionId) throws IllegalArgumentException;
 
     Execution getDbStats(String type) throws IllegalArgumentException;
 

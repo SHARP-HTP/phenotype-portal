@@ -57,7 +57,38 @@ CREATE TABLE `Execution` (
 		`bpmnPath` varchar(400) default NULL,
 		`rulesPath` varchar(400) default NULL,
 		`timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP,
-		PRIMARY KEY  (`user`,`algorithmName`,`version`,`categoryId`,`startDate`)
+		PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Table structure for table `ExecutionValueSet`
+--
+
+DROP TABLE IF EXISTS `ExecutionValueSet`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `ExecutionValueSet` (
+	`executionId` varchar(64) NOT NULL,
+	`valueSet` varchar(255),
+	`version` varchar(255),
+	INDEX (`executionId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Table structure for table `ExecutionValueSet`
+--
+
+DROP TABLE IF EXISTS `ExecutionValueSet`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `ExecutionValueSet` (
+		`id` varchar(64) NOT NULL,
+		`executionId` varchar(64) NOT NULL,
+		`name` varchar(100) NOT NULL,
+		`version` varchar(100),
+		PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
@@ -165,6 +196,17 @@ CREATE TABLE `UserRoleRequest` (
 		CONSTRAINT `usernameRelationship` FOREIGN KEY (`username`) REFERENCES `User` (`username`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
+
+--
+-- Constraints
+--
+
+ALTER TABLE `ExecutionValueSet`
+ ADD CONSTRAINT `fk_executionValueSet_executionId`
+ FOREIGN KEY (`executionId`) REFERENCES `Execution` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

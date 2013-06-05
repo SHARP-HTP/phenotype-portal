@@ -84,7 +84,8 @@ public class BasePhenoportalHttpServlet extends HttpServlet {
      * @return
      */
     private boolean isDevelopmentMode(HttpServletRequest request) {
-        return request.getHeader("Referer").contains("127.0.0.1");
+	    String referrer = request.getHeader("Referer");
+        return referrer != null && referrer.contains("127.0.0.1");
     }
 
 }
