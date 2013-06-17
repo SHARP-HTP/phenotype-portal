@@ -78,6 +78,12 @@ Section 2.08 Ischemic heart disease
 (b) Angina pectoris
 (c) Other forms of ischemic heart disease
 Section 2.09 Other diseases of circulatory system
+(a) Acute endocarditis
+(b) Acute pericarditis
+(c) Acute myocarditis
+(d) Cardiomyopathy
+(e) Heart Failure
+(f) Other complications of heart disease
 Article III. Diseases of the digestive system
 Section 3.01 Appendicitis
 (a) Acute appendicitis
@@ -213,7 +219,7 @@ Section 6.04 Hereditary and degenerative diseases of the central nervous system
 (d) Other cerebral degenerations
 (e) Other diseases of spinal cord
 (f) Other extrapyramidal disease
-(g) Parkinson's disease
+(g) Parkinson\'s disease
 (h) Spinocerebellar disease
 Section 6.05 Organic sleep disorders
 Section 6.06 Other disorders of the central nervous system
@@ -299,6 +305,16 @@ Section 9.04 Nutritional deficiencies
 (g) Vitamin A deficiency
 (h) Vitamin D deficiency
 Section 9.05 Other metabolic and immunity disorders
+(a) Disorders involving the immune mechanism
+(b) Disorders of amino-acid transport and metabolism
+(c) Disorders of carbohydrate transport and metabolism
+(d) Disorders of fluid electrolyte and acid-base balance
+(e) Disorders of lipoid metabolism
+(f) Disorders of mineral metabolism
+(g) Disorders of plasma protein metabolism
+(h) Gout
+(i) Other and unspecified disorders of metabolism
+(j) Overweight, obesity and other hyperalimentation
 Article X. Infectious and parasitic diseases
 Section 10.01 Arthropod-borne viral diseases
 (a) Arthropod-borne hemorrhagic fever
@@ -327,17 +343,37 @@ Section 10.05 Mycoses
 (e) Histoplasmosis
 (f) Other mycoses
 Section 10.06 Other bacterial diseases
-Section 10.07 Syphilis and other venereal diseases
+(a) Actinomycotic infections
+(b) Diphtheria
+(c) Erysipelas
+(d) Leprosy
+(e) Meningococcal infection
+(f) Other bacterial diseases
+(g) Septicemia
+(h) Streptococcal sore throat
+(i) Tetanus
+(j) Whooping cough
+
+Section 10.7 Other diseases due to viruses and chlamydiae
+(a) Infections mononucleosis
+(b) Mumps
+(c) Ornithosis
+(d) Other diseases of conjunctiva due to viruses and chlamydiae
+(e) Rabies
+(f) Trachoma
+(g) Viral hepatitis
+
+Section 10.08 Syphilis and other venereal diseases
 (a) Cardiovascular syphilis
 (b) Congenital syphilis
 (c) Early syphilis
 (d) Gonococcal infections
 (e) Neurosyphilis
 (f) Other and unspecified syphilis
-Section 10.08 Tuberculosis
+Section 10.09 Tuberculosis
 (a) Primary tuberculous infection
 (b) Pulmonary tuberculosis
-Section 10.09 Viral diseases
+Section 10.10 Viral diseases
 (a) Chickenpox
 (b) Cowpox and paravaccinia
 (c) Herpes simplex
@@ -346,7 +382,7 @@ Section 10.09 Viral diseases
 (f) Other viral diseases
 (g) Rubella
 (h) Smallpox
-Section 10.10 Zoonotic bacterial diseases
+Section 10.11 Zoonotic bacterial diseases
 (a) Anthrax
 (b) Brucellosis
 (c) Glanders
@@ -362,7 +398,12 @@ Section 11.02 Neurotic disorders
 (b) Adjustment reaction
 (c) Alcohol dependence syndrome
 (d) Anxiety
-(e) Drug dependence
+(e) Depressive disorder
+(f) Drug dependence
+(g) Hyperkinetic syndrome of childhood
+(h) Nondependent abuse of drugs
+(i) Personality disorders
+(j) Sexual and gender identity disorders
 Section 11.03 Psychoses
 (a) Alcohol-induced mental disorders
 (b) Dementias
@@ -371,6 +412,7 @@ Section 11.03 Psychoses
 (e) Other nonorganic psychoses
 (f) Paranoid states (Delusional disorders)
 (g) Schizophrenic disorders
+Section 11.04 Psychotic conditions
 Article XII. Neoplams
 Section 12.01 Benign neoplasms
 (a) Benign neoplasm of bone and articular cartilage
@@ -390,11 +432,17 @@ Section 12.01 Benign neoplasms
 (o) Lipoma
 (p) Other benign neoplasm
 Section 12.02 Carcinoma in situ
-(a) Carcinoma in situ of breast and genitourinary system
-(b) Carcinoma in situ of digestive organs
-(c) Carcinoma in situ of other and unspecified sites
-(d) Carcinoma in situ of respiratory system
-(e) Carcinoma in situ of skin 
+(a) Carcinoma in situ of bladder
+(b) Carcinoma in situ of breast
+(c) Carcinoma in situ of cervix uteri
+(d) Carcinoma in situ of digestive organs
+(e) Carcinoma in situ of other and unspecified sites
+(f) Carcinoma in situ of penis
+(g) Carcinoma in situ of prostate
+(h) Carcinoma in situ of respiratory system
+(i) Carcinoma in situ of skin
+(j) Carcinoma in situ of vagina
+(k) Carcinoma in situ of vulva
 Section 12.03 Malignant neoplasm of bone, connective tissue, skin, and breast
 (a) Kaposi?s sarcoma
 (b) Malignant melanoma of skin
@@ -435,7 +483,7 @@ Section 12.06 Malignant neoplasm of lip, oral cavity, and pharynx
 (h) Malignant neoplasm of other and unspecified parts of mouth
 (i) Malignant neoplasm of tongue
 Section 12.07 Malignant neoplasm of lymphatic and hematopoietic tissue
-(a) Hodgkin's disease
+(a) Hodgkin\'s disease
 (b) Lymphoid leukemia
 (c) Lymphosarcoma
 (d) Monocytic leukemia
@@ -443,6 +491,29 @@ Section 12.07 Malignant neoplasm of lymphatic and hematopoietic tissue
 (f) Myeloid leukemia
 (g) Other leukemia
 Section 12.08 Malignant neoplasm of other and unspecified sites
+(a) Malignant neoplasm of brain
+(b) Malignant neoplasm of endocrine glands
+(c) Malignant neoplasm of eye
+(d) Malignant neoplasm of nervous system
+(e) Malignant neoplasm of thyroid gland
+(f) Secondary malignant neoplasm of adrenal gland
+(g) Secondary malignant neoplasm of bone and bone marrow
+(h) Secondary malignant neoplasm of brain and spinal
+(i) Secondary malignant neoplasm of breast
+(j) Secondary malignant neoplasm of genital organs
+(k) Secondary malignant neoplasm of kidney
+(l) Secondary malignant neoplasm of large intestine and rectum,
+(m) Secondary malignant neoplasm of liver
+(n) Secondary malignant neoplasm of lung
+(o) Secondary malignant neoplasm of lymph nodes
+(p) Secondary malignant neoplasm of mediastinum
+(q) Secondary malignant neoplasm of other respiratory organs
+(r) Secondary malignant neoplasm of other urinary organs
+(s) Secondary malignant neoplasm of ovary
+(t) Secondary malignant neoplasm of pleura
+(u) Secondary malignant neoplasm of retroperitoneum and peritoneum
+(v) Secondary malignant neoplasm of skin
+(w) Secondary malignant neoplasm of small intestine
 Section 12.09 Malignant neoplasm of respiratory and intrathoracic organs
 (a) Malignant neoplasm of larynx
 (b) Malignant neoplasm of nasal cavities, middle ear, and accessory sinuses
