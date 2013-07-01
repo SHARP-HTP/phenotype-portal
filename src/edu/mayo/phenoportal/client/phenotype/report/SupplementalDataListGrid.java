@@ -1,6 +1,6 @@
 package edu.mayo.phenoportal.client.phenotype.report;
 
-import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -40,7 +40,7 @@ public class SupplementalDataListGrid extends ListGrid {
         ListGridField oidField = new ListGridField("oid", "OID", 280);
         ListGridField descriptionField = new ListGridField("description", "Description");
 
-        setFields(iconField, oidField, descriptionField);
+        setFields(iconField, descriptionField, oidField);
     }
 
     @Override
@@ -87,9 +87,9 @@ public class SupplementalDataListGrid extends ListGrid {
 
         PhenotypeServiceAsync async = (PhenotypeServiceAsync) GWT.create(PhenotypeService.class);
 
-        async.getSupplementalCriteriaOids(i_algorithmData, new AsyncCallback<List<String>>() {
+        async.getSupplementalCriteriaOids(i_algorithmData, new AsyncCallback<Map<String, String>>() {
             @Override
-            public void onSuccess(List<String> result) {
+            public void onSuccess(Map<String, String> result) {
                 setGridData(result);
             }
 
@@ -100,17 +100,18 @@ public class SupplementalDataListGrid extends ListGrid {
         });
     }
 
-    public void setGridData(List<String> oids) {
+	public void setGridData(Map<String, String> oids) {
 
-        int length = oids.size();
-        SupplementalDataRecord[] records = new SupplementalDataRecord[length];
+		int length = oids.size();
+		DataCriteriaRecord[] records = new DataCriteriaRecord[length];
 
-        for (int i = 0; i < records.length; i++) {
-            records[i] = new SupplementalDataRecord(oids.get(i), "TODO - add description here...");
-        }
+		int i = 0;
+		for (String key : oids.keySet()) {
+			records[i++] = new DataCriteriaRecord(key, oids.get(key));
+		}
 
-        setData(records);
-        redraw();
-    }
+		setData(records);
+		redraw();
+	}
 
 }

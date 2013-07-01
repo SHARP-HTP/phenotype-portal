@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -245,14 +246,14 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
     private final boolean cts2RestPropertiesSet = false;
 
     @Override
-    public List<String> getDataCriteriaOids(AlgorithmData algorithmData) {
+    public Map<String, String> getDataCriteriaOids(AlgorithmData algorithmData) {
         /* TODO: check for cached version */
         String html = getHtml(algorithmData);
 
         String startMatch = "href=\"#toc\">Data criteria (QDM Data Elements)</a></h3>";
         String endMatch = "</div>";
 
-        List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
+        Map<String, String> oids = getOidsWithDescription(getHtmlSnippet(html, startMatch, endMatch));
         /* TODO: cache result */
 
         synchronized (cts2ServerPropertiesLock) {
@@ -270,14 +271,14 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
     }
 
     @Override
-    public List<String> getSupplementalCriteriaOids(AlgorithmData algorithmData) {
+    public Map<String, String> getSupplementalCriteriaOids(AlgorithmData algorithmData) {
         /* TODO: check for cached version */
         String html = getHtml(algorithmData);
 
         String startMatch = "href=\"#toc\">Supplemental Data Elements</a></h3>";
         String endMatch = "</div>";
 
-        List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
+        Map<String, String> oids = getOidsWithDescription(getHtmlSnippet(html, startMatch, endMatch));
         /* TODO: cache result */
 
         synchronized (cts2ServerPropertiesLock) {
@@ -341,20 +342,24 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         return snippet.substring(0, idxEnd);
     }
 
-    private List<String> getOids(String html) {
-        List<String> oids = new ArrayList<String>();
-        Pattern pattern = Pattern.compile("\\((\\d+(\\.(?=\\d+))?)+\\)");
-        Matcher matcher = pattern.matcher(html);
-        while (matcher.find()) {
-            String oid = matcher.group(0);
-            oid = oid.substring(1, oid.length() - 1);
-            if (!oids.contains(oid)) {
-                oids.add(oid);
-            }
-        }
-
-        return oids;
-    }
+	private Map<String, String> getOidsWithDescription(String html) {
+		String oidRegex = "\\((\\d+(\\.(?=\\d+))?)+\\)";
+		Map<String, String> oids = new HashMap<String, String>();
+		Pattern linePattern = Pattern.compile("(?<=<li>)([^<]*)(?=</li>)");
+		Matcher lineMatcher = linePattern.matcher(html);
+		while (lineMatcher.find()) {
+			Pattern oidPattern = Pattern.compile(oidRegex);
+			String desc = lineMatcher.group(0).trim();
+			desc = desc.replaceAll("\"", "");
+			Matcher oidMatcher = oidPattern.matcher(desc);
+		    if (oidMatcher.find()) {
+			    String oid = oidMatcher.group(0);
+			    oid = oid.substring(1, oid.length() - 1);
+			    oids.put(oid, desc.replaceAll(oidRegex, "").trim());
+		    }
+		}
+		return oids;
+	}
 
     /**
      * Request to execute the phenotype. Will return List<Demographic> object

@@ -3,6 +3,7 @@ package edu.mayo.phenoportal.client.phenotype;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -23,9 +24,9 @@ public interface PhenotypeService extends RemoteService {
 
     String getPopulationCriteria(AlgorithmData algorithmData) throws IllegalArgumentException;
 
-    List<String> getDataCriteriaOids(AlgorithmData algorithmData) throws IllegalArgumentException;
+    Map<String, String> getDataCriteriaOids(AlgorithmData algorithmData) throws IllegalArgumentException;
 
-    List<String> getSupplementalCriteriaOids(AlgorithmData algorithmData)
+    Map<String, String> getSupplementalCriteriaOids(AlgorithmData algorithmData)
             throws IllegalArgumentException;
 
     Execution executePhenotype(AlgorithmData algorithmData, Date fromDate,

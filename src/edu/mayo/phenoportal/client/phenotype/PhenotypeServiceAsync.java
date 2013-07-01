@@ -3,6 +3,7 @@ package edu.mayo.phenoportal.client.phenotype;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -86,9 +87,9 @@ public interface PhenotypeServiceAsync {
 
     void getPopulationCriteria(AlgorithmData algorithmData, AsyncCallback<String> async);
 
-    void getDataCriteriaOids(AlgorithmData algorithmData, AsyncCallback<List<String>> async);
+    void getDataCriteriaOids(AlgorithmData algorithmData, AsyncCallback<Map<String, String>> async);
 
-    void getSupplementalCriteriaOids(AlgorithmData algorithmData, AsyncCallback<List<String>> async);
+    void getSupplementalCriteriaOids(AlgorithmData algorithmData, AsyncCallback<Map<String, String>> async);
 
 	void getMatEditorUrl(User user, AsyncCallback<String> async);
 

@@ -1,6 +1,8 @@
 package edu.mayo.phenoportal.client.phenotype.report;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import mayo.edu.cts2.editor.client.Cts2Editor;
 
@@ -102,11 +104,13 @@ public class CriteriaPanel extends VLayout {
                 GWT.log("Error getting criteria: " + caught);
             }
         });
-        async.getDataCriteriaOids(i_algorithmData, new AsyncCallback<List<String>>() {
+        async.getDataCriteriaOids(i_algorithmData, new AsyncCallback<Map<String, String>>() {
             @Override
-            public void onSuccess(List<String> result) {
+            public void onSuccess(Map<String, String> result) {
                 Cts2Editor editor = new Cts2Editor();
-                i_dataCriteriaSection.addItem(editor.getMainLayout(result));
+	            List<String> oids = new ArrayList(result.size());
+	            oids.addAll(result.keySet());
+                i_dataCriteriaSection.addItem(editor.getMainLayout(oids));
             }
 
             @Override
@@ -114,11 +118,13 @@ public class CriteriaPanel extends VLayout {
                 GWT.log("Error getting criteria: " + caught);
             }
         });
-        async.getSupplementalCriteriaOids(i_algorithmData, new AsyncCallback<List<String>>() {
+        async.getSupplementalCriteriaOids(i_algorithmData, new AsyncCallback<Map<String, String>>() {
             @Override
-            public void onSuccess(List<String> result) {
+            public void onSuccess(Map<String, String> result) {
                 Cts2Editor editor = new Cts2Editor();
-                i_supplementalDataElementsSection.addItem(editor.getMainLayout(result));
+	            List<String> oids = new ArrayList<String>(result.size());
+	            oids.addAll(result.keySet());
+                i_supplementalDataElementsSection.addItem(editor.getMainLayout(oids));
             }
 
             @Override
