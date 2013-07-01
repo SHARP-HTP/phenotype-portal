@@ -53,11 +53,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import edu.mayo.phenoportal.server.upload.ImportServlet;
-import edu.mayo.phenoportal.shared.MatImport;
-import edu.mayo.phenoportal.shared.ValueSet;
-import edu.mayo.phenoportal.shared.database.ExecutionValueSetColumns;
 import mayo.edu.cts2.editor.server.Cts2EditorServiceProperties;
+
 import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.util.Base64;
 import org.w3c.dom.Document;
@@ -68,6 +65,7 @@ import edu.mayo.phenoportal.client.Htp;
 import edu.mayo.phenoportal.client.core.AlgorithmData;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
 import edu.mayo.phenoportal.server.database.DBConnection;
+import edu.mayo.phenoportal.server.upload.ImportServlet;
 import edu.mayo.phenoportal.server.utils.DOMXmlParser;
 import edu.mayo.phenoportal.server.utils.DateConverter;
 import edu.mayo.phenoportal.server.utils.SmtpClient;
@@ -75,13 +73,16 @@ import edu.mayo.phenoportal.shared.Demographic;
 import edu.mayo.phenoportal.shared.Drools;
 import edu.mayo.phenoportal.shared.Execution;
 import edu.mayo.phenoportal.shared.Image;
+import edu.mayo.phenoportal.shared.MatImport;
 import edu.mayo.phenoportal.shared.News;
 import edu.mayo.phenoportal.shared.SharpNews;
 import edu.mayo.phenoportal.shared.User;
 import edu.mayo.phenoportal.shared.UserRoleRequest;
+import edu.mayo.phenoportal.shared.ValueSet;
 import edu.mayo.phenoportal.shared.database.CategoryColumns;
 import edu.mayo.phenoportal.shared.database.DroolsColumns;
 import edu.mayo.phenoportal.shared.database.ExecutionColumns;
+import edu.mayo.phenoportal.shared.database.ExecutionValueSetColumns;
 import edu.mayo.phenoportal.shared.database.NewsColumns;
 import edu.mayo.phenoportal.shared.database.SharpNewsColumns;
 import edu.mayo.phenoportal.shared.database.UploadColumns;
@@ -198,9 +199,9 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                     String algorithmVersion = rs.getString(4);
                     String algorithmUser = rs.getString(5);
 
-                    generator.createPhenotypeAlgorithmsDOMTree(algorithmId, categoryId + algorithmId,
-                            parentId, count, level, algorithmName, algorithmDesc, algorithmUser,
-                            algorithmVersion);
+                    generator.createPhenotypeAlgorithmsDOMTree(algorithmId, categoryId
+                            + algorithmId, parentId, count, level, algorithmName, algorithmDesc,
+                            algorithmUser, algorithmVersion);
                 }
 
             } catch (Exception ex) {
@@ -240,8 +241,8 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         return sb.toString();
     }
 
-	private Object cts2ServerPropertiesLock = new Object();
-	private boolean cts2RestPropertiesSet = false;
+    private final Object cts2ServerPropertiesLock = new Object();
+    private final boolean cts2RestPropertiesSet = false;
 
     @Override
     public List<String> getDataCriteriaOids(AlgorithmData algorithmData) {
@@ -254,14 +255,16 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
         /* TODO: cache result */
 
-	    synchronized (cts2ServerPropertiesLock) {
-		    if (!cts2RestPropertiesSet) {
-			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(getCts2RestUrl());
-			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(getCts2RestUser(), getCts2RestPassword());
-			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceEntitiesUrl(getCts2EntityRestUrl());
-			    Cts2EditorServiceProperties.setValueSetRestPageSize(getCts2RestPageSize());
-		    }
-	    }
+        synchronized (cts2ServerPropertiesLock) {
+            if (!cts2RestPropertiesSet) {
+                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(getCts2RestUrl());
+                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(
+                        getCts2RestUser(), getCts2RestPassword());
+                Cts2EditorServiceProperties
+                        .setValueSetDefinitionMaintenanceEntitiesUrl(getCts2EntityRestUrl());
+                Cts2EditorServiceProperties.setValueSetRestPageSize(getCts2RestPageSize());
+            }
+        }
 
         return oids;
     }
@@ -277,14 +280,16 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         List<String> oids = getOids(getHtmlSnippet(html, startMatch, endMatch));
         /* TODO: cache result */
 
-	    synchronized (cts2ServerPropertiesLock) {
-		    if (!cts2RestPropertiesSet) {
-			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(getCts2RestUrl());
-			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(getCts2RestUser(), getCts2RestPassword());
-			    Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceEntitiesUrl(getCts2EntityRestUrl());
-			    Cts2EditorServiceProperties.setValueSetRestPageSize(getCts2RestPageSize());
-		    }
-	    }
+        synchronized (cts2ServerPropertiesLock) {
+            if (!cts2RestPropertiesSet) {
+                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(getCts2RestUrl());
+                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(
+                        getCts2RestUser(), getCts2RestPassword());
+                Cts2EditorServiceProperties
+                        .setValueSetDefinitionMaintenanceEntitiesUrl(getCts2EntityRestUrl());
+                Cts2EditorServiceProperties.setValueSetRestPageSize(getCts2RestPageSize());
+            }
+        }
 
         return oids;
     }
@@ -299,7 +304,8 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
         if (conn != null) {
             try {
-                st = conn.prepareStatement(SQLStatements.selectCriteriaStatement(algorithmData.getId()));
+                st = conn.prepareStatement(SQLStatements.selectCriteriaStatement(algorithmData
+                        .getId()));
 
                 rs = st.executeQuery();
 
@@ -342,9 +348,9 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         while (matcher.find()) {
             String oid = matcher.group(0);
             oid = oid.substring(1, oid.length() - 1);
-	        if (!oids.contains(oid)) {
+            if (!oids.contains(oid)) {
                 oids.add(oid);
-	        }
+            }
         }
 
         return oids;
@@ -356,7 +362,8 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
      */
 
     @Override
-    public Execution executePhenotype(AlgorithmData algorithmData, Date fromDate, Date toDate, String userName) throws IllegalArgumentException {
+    public Execution executePhenotype(AlgorithmData algorithmData, Date fromDate, Date toDate,
+            String userName) throws IllegalArgumentException {
 
         String locationUrl;
         String executionStatus = "";
@@ -369,7 +376,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         long startExecution = System.currentTimeMillis();
 
         try {
-	        /* TODO: Send the selected value sets to the executor */
+            /* TODO: Send the selected value sets to the executor */
 
             // execute the algorithm. This will return immediately with an id to
             // the resource that is executing.
@@ -393,7 +400,8 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
             // continue if the status was successful
             if (executionStatus.equals(RestExecuter.STATUS_COMPLETE)) {
-                setFileName(algorithmData.getAlgorithmName(), algorithmData.getAlgorithmVersion(), algorithmData.getParentId());
+                setFileName(algorithmData.getAlgorithmName(), algorithmData.getAlgorithmVersion(),
+                        algorithmData.getParentId());
                 persistExecution(execution);
             }
 
@@ -429,7 +437,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                 exeItem.setRulesPath(execution.getRulesPath());
 
                 insertExecution(conn, exeItem);
-	            insertExecutionValueSets(conn, exeItem, algorithmData);
+                insertExecutionValueSets(conn, exeItem, algorithmData);
             } catch (Exception e) {
                 s_logger.log(Level.SEVERE, "Failed to insert execution details.", e);
                 DBConnection.rollback(conn);
@@ -1504,26 +1512,26 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         }
     }
 
-	private void insertExecutionValueSets(Connection conn, Execution execution, AlgorithmData algorithmData) {
-		String query = SQLStatements.insertExecutionValueSetsStatement();
-		PreparedStatement ps = null;
+    private void insertExecutionValueSets(Connection conn, Execution execution,
+            AlgorithmData algorithmData) {
+        String query = SQLStatements.insertExecutionValueSetsStatement();
+        PreparedStatement ps = null;
 
-		try {
-			for (ValueSet vs : algorithmData.getValueSets()) {
-				ps = conn.prepareStatement(query);
-				ps.setString(1, execution.getId());
-				ps.setString(2, vs.name);
-				ps.setString(3, vs.version);
-				ps.execute();
-			}
+        try {
+            for (ValueSet vs : algorithmData.getValueSets()) {
+                ps = conn.prepareStatement(query);
+                ps.setString(1, execution.getId());
+                ps.setString(2, vs.name);
+                ps.setString(3, vs.version);
+                ps.execute();
+            }
 
-		} catch (SQLException sqle) {
-			System.out.println("Failed to insert ExecutionValueSets. Error: " + sqle.getMessage());
-		}
-		finally {
-			DBConnection.close(ps);
-		}
-	}
+        } catch (SQLException sqle) {
+            System.out.println("Failed to insert ExecutionValueSets. Error: " + sqle.getMessage());
+        } finally {
+            DBConnection.close(ps);
+        }
+    }
 
     // public String openEditor() {
     // DroolsMetadata droolsMd = new DroolsMetadata();
@@ -1564,24 +1572,24 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         return editorUrl + droolsId;
     }
 
-	@Override
-	public String getMatEditorUrl(User user) {
-		String url = "";
-		if (user != null) {
-			url = super.getMatEditorUrl() + "/Login.html?userId="+user.getUserName()+"&htpId="+user.getPassword();
-		}
-		else {
-			url = super.getMatEditorUrl();
-		}
-		return url;
-	}
+    @Override
+    public String getMatEditorUrl(User user) {
+        String url = "";
+        if (user != null) {
+            url = super.getMatEditorUrl() + "/Login.html?userId=" + user.getUserName() + "&htpId="
+                    + user.getPassword();
+        } else {
+            url = super.getMatEditorUrl();
+        }
+        return url;
+    }
 
-	@Override
-	public MatImport getMatImport(String tokenId) throws IllegalArgumentException {
-		return ImportServlet.getMatImport(tokenId);
-	}
+    @Override
+    public MatImport getMatImport(String tokenId) throws IllegalArgumentException {
+        return ImportServlet.getMatImport(tokenId);
+    }
 
-	private void insertDrools(Connection connection, Drools droolsMetadata, String droolsId,
+    private void insertDrools(Connection connection, Drools droolsMetadata, String droolsId,
             String username, String algorithmName) {
         /* insert into drools table */
         PreparedStatement st = null;
@@ -1900,36 +1908,36 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         return execution;
     }
 
-	@Override
-	public List<ValueSet> getExecutionValueSets(String executionId) {
-		if (executionId == null || executionId.trim().isEmpty()) {
-			throw new IllegalArgumentException("ExecutionId cannot be null or empty.");
-		}
+    @Override
+    public List<ValueSet> getExecutionValueSets(String executionId) {
+        if (executionId == null || executionId.trim().isEmpty()) {
+            throw new IllegalArgumentException("ExecutionId cannot be null or empty.");
+        }
 
-		List<ValueSet> valueSets = new ArrayList<ValueSet>();
-		String query = SQLStatements.getExecutionValueSets();
-		Connection connection = DBConnection.getDBConnection(getBasePath());
-		PreparedStatement statement = null;
-		ResultSet resultSet = null;
+        List<ValueSet> valueSets = new ArrayList<ValueSet>();
+        String query = SQLStatements.getExecutionValueSets();
+        Connection connection = DBConnection.getDBConnection(getBasePath());
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
 
-		try {
-			statement = connection.prepareStatement(query);
-			statement.setString(1, executionId);
-			resultSet = statement.executeQuery();
-			while (resultSet.next()) {
-				valueSets.add(new ValueSet(
-				  resultSet.getString(ExecutionValueSetColumns.VALUE_SET.getColumnName()),
-				  resultSet.getString(ExecutionValueSetColumns.VERSION.getColumnName())
-				));
-			}
-		} catch (SQLException sqle) {
-			s_logger.log(Level.WARNING, "Unable to get the value sets for execution "+executionId+".", sqle);
-		} finally {
-			DBConnection.closeConnection(connection, statement, resultSet);
-		}
+        try {
+            statement = connection.prepareStatement(query);
+            statement.setString(1, executionId);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                valueSets.add(new ValueSet(resultSet.getString(ExecutionValueSetColumns.VALUE_SET
+                        .getColumnName()), resultSet.getString(ExecutionValueSetColumns.VERSION
+                        .getColumnName())));
+            }
+        } catch (SQLException sqle) {
+            s_logger.log(Level.WARNING, "Unable to get the value sets for execution " + executionId
+                    + ".", sqle);
+        } finally {
+            DBConnection.closeConnection(connection, statement, resultSet);
+        }
 
-		return valueSets;
-	}
+        return valueSets;
+    }
 
     private void sendRequestPersmissionUpgradeEmailAdmin(User user) {
         String host = getSmtpHost();

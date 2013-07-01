@@ -1,8 +1,7 @@
 package edu.mayo.phenoportal.client.phenotype.report;
 
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 
@@ -15,28 +14,31 @@ public class CriteriaTab extends Tab implements ReportTab {
 
     private AlgorithmData i_algorithmData;
     private final VLayout i_criteriaLayout;
-    private CriteriaPanel i_criteriaPanel;
-    private Label i_newWindowLink;
+    // private CriteriaPanel i_criteriaPanel;
+    private final CriteriaHTMLPage i_criteriaHTMLPage;
+    private final DataCriteriaListGrid i_dataCriteriaListGrid;
+    private final SupplementalDataListGrid i_supplementalDataListGrid;
 
     public CriteriaTab(String title) {
         super(title);
 
         // overall layout that holds everything in the criteria tab.
         i_criteriaLayout = new VLayout();
+        i_criteriaLayout.setWidth100();
+        i_criteriaLayout.setHeight100();
 
-        createStack();
-    }
+        i_criteriaHTMLPage = new CriteriaHTMLPage();
+        i_dataCriteriaListGrid = new DataCriteriaListGrid();
+        i_supplementalDataListGrid = new SupplementalDataListGrid();
 
-    private void createStack() {
+        HTMLPane dataCriteriaTitle = getHTMLTitle("Data criteria (QDM Data Elements)");
+        HTMLPane supplementalDataTitle = getHTMLTitle("Supplemental Data Elements");
 
-        i_criteriaPanel = null;
-        i_criteriaPanel = new CriteriaPanel();
-
-        i_newWindowLink = getLink("Show in new window");
-        i_criteriaLayout.addMember(i_newWindowLink);
-
-        i_criteriaPanel.createStack();
-        i_criteriaLayout.addMember(i_criteriaPanel);
+        i_criteriaLayout.addMember(i_criteriaHTMLPage);
+        i_criteriaLayout.addMember(dataCriteriaTitle);
+        i_criteriaLayout.addMember(i_dataCriteriaListGrid);
+        i_criteriaLayout.addMember(supplementalDataTitle);
+        i_criteriaLayout.addMember(i_supplementalDataListGrid);
 
         setPane(i_criteriaLayout);
     }
@@ -48,65 +50,23 @@ public class CriteriaTab extends Tab implements ReportTab {
      */
     public void updateSelection(AlgorithmData algorithmData) {
         i_algorithmData = algorithmData;
-        i_criteriaPanel.updateSelection(i_algorithmData);
+        i_criteriaHTMLPage.udpateHTMLPage(i_algorithmData);
+        i_dataCriteriaListGrid.update(i_algorithmData);
+        i_supplementalDataListGrid.update(i_algorithmData);
     }
 
     @Override
     public void clearTab() {
-        i_criteriaPanel.getHtmlPane().setContents("");
+        // i_criteriaPanel.getHtmlPane().setContents("");
     }
 
-    /**
-     * Create the new window link.
-     * 
-     * @param message
-     * @return
-     */
-    private Label getLink(String message) {
-        Label link = new Label(message);
-        link.setWidth(150);
-        link.setHeight(20);
+    private HTMLPane getHTMLTitle(String title) {
+        HTMLPane htmlTitle = new HTMLPane();
+        htmlTitle.setContents("</hr><div></br> <b>" + title + "<b></div>");
+        htmlTitle.setWidth100();
+        htmlTitle.setHeight100();
+        htmlTitle.setOverflow(Overflow.VISIBLE);
 
-        link.addStyleName("htpClickable");
-        link.setAlign(Alignment.CENTER);
-
-        link.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-            @Override
-            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-                Window window = getWindow();
-                window.centerInPage();
-                window.show();
-            }
-        });
-
-        return link;
-    }
-
-    /**
-     * Show criteria info in a new window.
-     * 
-     * @return
-     */
-    private Window getWindow() {
-
-        Window window = new Window();
-
-        window.setTitle("Criteria");
-        window.setWidth("95%");
-        window.setHeight("95%");
-
-        window.setModalMaskOpacity(90);
-
-        window.setCanDragReposition(false);
-        window.setCanDragResize(true);
-        window.setAnimateMinimize(true);
-
-        CriteriaPanel criteriaPanel = new CriteriaPanel();
-        criteriaPanel.updateSelection(i_algorithmData);
-
-        window.addItem(criteriaPanel);
-
-        return window;
+        return htmlTitle;
     }
 }
