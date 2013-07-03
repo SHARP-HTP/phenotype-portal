@@ -1127,8 +1127,13 @@ background:#A6ABB4 url(./images/cssButton/button_Over_stretch.png) repeat-x;
 		listGrid.sorterDefaults.titleStyle - headerTitle (in skin)
 
 ============================================================*/
+/* 2013.07.03 - Added headerTitle classes to override settings in
+ * Enterprise/skin_styles.css to prevent dual header titles from
+ * appearing in IE */
 
 /* ListGrid column header buttons */
+.headerTitle,
+.headerTitleSelected,
 .headerButton,
 .headerButtonSelected,
 .headerButtonDisabled,
