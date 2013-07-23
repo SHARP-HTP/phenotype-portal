@@ -4,6 +4,7 @@ public enum ExecutionValueSetColumns {
 
 	EXECUTION_ID("executionId", "Execution Id"),
 	VALUE_SET("valueSet", "Value Set"),
+	DESCRIPTION("description", "Description"),
 	VERSION("version", "Version");
 
 	private final String colName;

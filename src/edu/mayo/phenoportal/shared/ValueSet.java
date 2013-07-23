@@ -4,12 +4,14 @@ import java.io.Serializable;
 
 public class ValueSet implements Serializable {
 	public String name;
+	public String description;
 	public String version;
 
 	public ValueSet() { }
 
-	public ValueSet(String name, String version) {
+	public ValueSet(String name, String description, String version) {
 		this.name = name;
+		this.description = description;
 		this.version = version;
 	}
 
@@ -17,6 +19,7 @@ public class ValueSet implements Serializable {
 	public boolean equals(Object other) {
 		return other instanceof ValueSet &&
 		  ((ValueSet) other).name.equalsIgnoreCase(name) &&
+		  ((ValueSet) other).description.equalsIgnoreCase(description) &&
 		  ((ValueSet) other).version.equalsIgnoreCase(version);
 	}
 }

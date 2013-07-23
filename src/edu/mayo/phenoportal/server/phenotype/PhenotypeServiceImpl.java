@@ -1527,7 +1527,8 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                 ps = conn.prepareStatement(query);
                 ps.setString(1, execution.getId());
                 ps.setString(2, vs.name);
-                ps.setString(3, vs.version);
+                ps.setString(3, vs.description);
+                ps.setString(4, vs.version);
                 ps.execute();
             }
 
@@ -1889,7 +1890,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                 execution.setBpmnPath(resultSet.getString(ExecutionColumns.BPMN_PATH.colName()));
                 execution.setRulesPath(resultSet.getString(ExecutionColumns.RULES_PATH.colName()));
                 String imagePath = resultSet.getString(ExecutionColumns.IMAGE_PATH.colName());
-                if (imagePath != null)
+                if (imagePath != null && !imagePath.isEmpty())
                     execution.setImage(getImage(imagePath));
 
                 /* Demographics */
@@ -1919,7 +1920,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
             throw new IllegalArgumentException("ExecutionId cannot be null or empty.");
         }
 
-        List<ValueSet> valueSets = new ArrayList<ValueSet>();
+	    List<ValueSet> valueSets = new ArrayList<ValueSet>();
         String query = SQLStatements.getExecutionValueSets();
         Connection connection = DBConnection.getDBConnection(getBasePath());
         PreparedStatement statement = null;
@@ -1930,9 +1931,10 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
             statement.setString(1, executionId);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                valueSets.add(new ValueSet(resultSet.getString(ExecutionValueSetColumns.VALUE_SET
-                        .getColumnName()), resultSet.getString(ExecutionValueSetColumns.VERSION
-                        .getColumnName())));
+                valueSets.add(new ValueSet(
+                  resultSet.getString(ExecutionValueSetColumns.VALUE_SET.getColumnName()),
+                  resultSet.getString(ExecutionValueSetColumns.DESCRIPTION.getColumnName()),
+                  resultSet.getString(ExecutionValueSetColumns.VERSION.getColumnName())));
             }
         } catch (SQLException sqle) {
             s_logger.log(Level.WARNING, "Unable to get the value sets for execution " + executionId

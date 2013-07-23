@@ -8,11 +8,15 @@ import java.util.logging.Logger;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
+import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
+import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -35,17 +39,15 @@ import edu.mayo.phenoportal.shared.DemographicStat;
 import edu.mayo.phenoportal.shared.DemographicsCategory;
 import edu.mayo.phenoportal.shared.Execution;
 import edu.mayo.phenoportal.shared.User;
+import edu.mayo.phenoportal.shared.ValueSet;
 
 /**
  * Panel to select the from and to dates for executing a specific
  */
 public class PhenotypeDateRange extends VLayout {
 
-    private static final String BACKGROUND_COLOR_LABEL = "#d7d5ec";
-
     DynamicForm i_fromForm;
     DynamicForm i_toForm;
-    DynamicForm i_executeForm;
     IButton i_executeButton;
 
     private DateItem i_fromDate = new DateItem();
@@ -57,6 +59,7 @@ public class PhenotypeDateRange extends VLayout {
     private StaticTextItem executionTime;
     private StaticTextItem rangeFrom;
     private StaticTextItem rangeTo;
+	private Execution lastExecution;
     private final Logger logger = Logger.getLogger(PhenotypeDateRange.class.getName());
 
     public PhenotypeDateRange() {
@@ -90,25 +93,58 @@ public class PhenotypeDateRange extends VLayout {
         hLayout.setHeight100();
         hLayout.setAlign(Alignment.RIGHT);
 
-        execPanel = new DynamicForm();
-        execPanel.setGroupTitle("Latest Execution");
-        execPanel.setIsGroup(true);
-        execPanel.setWidth(350);
-        execPanel.setHeight100();
-        execPanel.setAlign(Alignment.RIGHT);
+	    execPanel = new DynamicForm();
+	    execPanel.setGroupTitle("Latest Execution");
+	    execPanel.setIsGroup(true);
+	    execPanel.setWidth(350);
+	    execPanel.setHeight100();
+	    execPanel.setAlign(Alignment.RIGHT);
 
         executionDate = createTextItem("Executed_on", "Executed on");
         executionTime = createTextItem("Elapsed_time", "Elapsed time");
         rangeFrom = createTextItem("Range_from", "Range from");
         rangeTo = createTextItem("Range_to", "Range to");
 
-        execPanel.setFields(executionDate, executionTime, rangeFrom, rangeTo);
+	    ButtonItem valueSetsBtn = new ButtonItem("valueSetsBtn", "Value Set Details");
+	    valueSetsBtn.setStartRow(false);
+	    valueSetsBtn.setEndRow(false);
+	    valueSetsBtn.setColSpan(2);
+	    valueSetsBtn.setAlign(Alignment.CENTER);
 
+	    valueSetsBtn.addClickHandler(new ClickHandler() {
+		    @Override
+		    public void onClick(ClickEvent clickEvent) {
+			    displayValueSets();
+		    }
+	    });
+
+	    execPanel.setFields(executionDate, executionTime, rangeFrom, rangeTo, valueSetsBtn);
         clearLastExecutionDetails();
 
         hLayout.addMember(execPanel);
         return hLayout;
     }
+
+	private void displayValueSets() {
+		if (lastExecution != null) {
+			PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
+			phenotypeService.getExecutionValueSets(lastExecution.getId(), new AsyncCallback<List<ValueSet>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					SC.warn("Failed to retrieve value sets for the last executed algorithm.");
+				}
+
+				@Override
+				public void onSuccess(List<ValueSet> result) {
+					LatestExecutionWindow latestExecutionWindow = new LatestExecutionWindow(result);
+					latestExecutionWindow.centerInPage();
+					latestExecutionWindow.show();
+					latestExecutionWindow.redraw();
+				}
+			});
+
+		}
+	}
 
     /**
      * Create a StaticTextItem with a common style.
@@ -158,6 +194,7 @@ public class PhenotypeDateRange extends VLayout {
     }
 
     public void updateLatestExecutionDetails(Execution execution) {
+	    lastExecution = execution;
         if (execution != null) {
             String date = execution.getStartDate();
             String time = execution.getElapsedTime();
@@ -184,7 +221,7 @@ public class PhenotypeDateRange extends VLayout {
                     rangeTo.show();
                 }
 
-                execPanel.show();
+	            execPanel.show();
             } else {
                 clearLastExecutionDetails();
             }
@@ -194,7 +231,7 @@ public class PhenotypeDateRange extends VLayout {
     }
 
     private void clearLastExecutionDetails() {
-        execPanel.hide();
+	    execPanel.hide();
         executionDate.hide();
         executionTime.hide();
         rangeFrom.hide();
@@ -269,21 +306,21 @@ public class PhenotypeDateRange extends VLayout {
 
 	    /* TODO: REMOVE THIS TEST BLOCK *******************************************************************************/
 	    // diabetes data criteria
-	    algorithmData.addValueSet("2.16.840.1.113883.3.526.3.1240", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.560.100.4", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.103.12.1001", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1048", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.103.12.1010", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1016", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.526.3.1248", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1001", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1025", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1023", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.526.3.1240", "Encounter, Performed: Annual Wellness Visit using Annual Wellness Visit Grouping Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.560.100.4", "Patient Characteristic Birthdate: birth date using birth date LOINC Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.103.12.1001", "Diagnosis, Active: Diabetes using Diabetes Grouping Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1048", "Encounter, Performed: Face-to-Face Interaction using Face-to-Face Interaction Grouping Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.103.12.1010", "Diagnosis, Active: Gestational Diabetes using Gestational Diabetes Grouping Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1016", "Encounter, Performed: Home Healthcare Services using Home Healthcare Services Grouping Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.526.3.1248", "Laboratory Test, Result: LDL-C Laboratory Test using LDL-C Laboratory Test Grouping Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1001", "Encounter, Performed: Office Visit using Office Visit Grouping Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1025", "Encounter, Performed: Preventive Care Services - Established Office Visit, 18 and Up using Preventive Care Services - Established Office Visit, 18 and Up Grouping Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1023", "Encounter, Performed: Preventive Care Services-Initial Office Visit, 18 and Up using Preventive Care Services-Initial Office Visit, 18 and Up Grouping Value Set ", "20121025");
 		// diabetes supplemental data elements
-	    algorithmData.addValueSet("2.16.840.1.114222.4.11.837", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113762.1.4.1", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.114222.4.11.3591", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.114222.4.11.836", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.114222.4.11.837", "Patient Characteristic Ethnicity: Ethnicity using Ethnicity CDC Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.113762.1.4.1", "Patient Characteristic Sex: ONC Administrative Sex using ONC Administrative Sex Administrative Sex Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.114222.4.11.3591", "Patient Characteristic Payer: Payer using Payer Source of Payment Typology Value Set", "20121025");
+	    algorithmData.addValueSet("2.16.840.1.114222.4.11.836", "Patient Characteristic Race: Race using Race CDC Value Set", "20121025");
 	    /* END TEST BLOCK *********************************************************************************************/
 
         PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
@@ -399,7 +436,7 @@ public class PhenotypeDateRange extends VLayout {
         i_fromDate.setDisabled(disabled);
         i_toForm.setDisabled(disabled);
         if (disabled)
-            execPanel.hide();
+	        execPanel.hide();
     }
 
     /**

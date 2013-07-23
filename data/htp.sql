@@ -71,6 +71,7 @@ SET character_set_client = utf8;
 CREATE TABLE `ExecutionValueSet` (
 	`executionId` varchar(64) NOT NULL,
 	`valueSet` varchar(255),
+	`description` varchar(400),
 	`version` varchar(255),
 	INDEX (`executionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

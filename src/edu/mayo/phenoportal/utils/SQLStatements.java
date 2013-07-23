@@ -69,7 +69,7 @@ public class SQLStatements {
             ps.setString(11, execution.getDateRangeFrom());
             ps.setString(12, execution.getDateRangeTo());
             ps.setString(13, execution.getXmlPath());
-            ps.setString(14, execution.getImage().getImagePath());
+            ps.setString(14, execution.getImage() != null ? execution.getImage().getImagePath() : "");
             ps.setString(15, execution.getBpmnPath());
             ps.setString(16, execution.getRulesPath());
 
@@ -88,9 +88,10 @@ public class SQLStatements {
 	 * @return SQL statement string
 	 */
 	public static String insertExecutionValueSetsStatement() {
-		return String.format("INSERT INTO ExecutionValueSet (%s, %s, %s) VALUES (?,?,?);",
+		return String.format("INSERT INTO ExecutionValueSet (%s, %s, %s, %s) VALUES (?,?,?,?);",
 		  ExecutionValueSetColumns.EXECUTION_ID.getColumnName(),
 		  ExecutionValueSetColumns.VALUE_SET.getColumnName(),
+		  ExecutionValueSetColumns.DESCRIPTION.getColumnName(),
 		  ExecutionValueSetColumns.VERSION.getColumnName());
 	}
 
