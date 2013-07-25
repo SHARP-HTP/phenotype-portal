@@ -21,9 +21,8 @@ public interface PhenotypeServiceAsync {
     void getPhenotypeCategories(String categoryId, AsyncCallback<String> callback)
             throws IllegalArgumentException;
 
-    void executePhenotype(AlgorithmData algorithmData, Date fromDate,
-            Date toDate, String userName, AsyncCallback<Execution> callback)
-            throws IllegalArgumentException;
+    void executePhenotype(AlgorithmData algorithmData, Date fromDate, Date toDate, String userName,
+            AsyncCallback<Execution> callback) throws IllegalArgumentException;
 
     void getExecutions(AsyncCallback<String> callback) throws IllegalArgumentException;
 
@@ -89,11 +88,12 @@ public interface PhenotypeServiceAsync {
 
     void getDataCriteriaOids(AlgorithmData algorithmData, AsyncCallback<Map<String, String>> async);
 
-    void getSupplementalCriteriaOids(AlgorithmData algorithmData, AsyncCallback<Map<String, String>> async);
+    void getSupplementalCriteriaOids(AlgorithmData algorithmData,
+            AsyncCallback<Map<String, String>> async);
 
-	void getMatEditorUrl(User user, AsyncCallback<String> async);
+    void getMatEditorUrl(User user, AsyncCallback<String> async);
 
-	void getMatImport(String tokenId, AsyncCallback<MatImport> async);
+    void getMatImport(String tokenId, AsyncCallback<MatImport> async);
 
-	void getExecutionValueSets(String executionId, AsyncCallback<List<ValueSet>> async);
+    void getExecutionValueSets(String executionId, AsyncCallback<List<ValueSet>> async);
 }

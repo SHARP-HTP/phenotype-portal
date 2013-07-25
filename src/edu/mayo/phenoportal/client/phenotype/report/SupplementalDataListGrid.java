@@ -87,31 +87,32 @@ public class SupplementalDataListGrid extends ListGrid {
 
         PhenotypeServiceAsync async = (PhenotypeServiceAsync) GWT.create(PhenotypeService.class);
 
-        async.getSupplementalCriteriaOids(i_algorithmData, new AsyncCallback<Map<String, String>>() {
-            @Override
-            public void onSuccess(Map<String, String> result) {
-                setGridData(result);
-            }
+        async.getSupplementalCriteriaOids(i_algorithmData,
+                new AsyncCallback<Map<String, String>>() {
+                    @Override
+                    public void onSuccess(Map<String, String> result) {
+                        setGridData(result);
+                    }
 
-            @Override
-            public void onFailure(Throwable caught) {
-                GWT.log("Error getting supplemental criteria: " + caught);
-            }
-        });
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        GWT.log("Error getting supplemental criteria: " + caught);
+                    }
+                });
     }
 
-	public void setGridData(Map<String, String> oids) {
+    public void setGridData(Map<String, String> oids) {
 
-		int length = oids.size();
-		DataCriteriaRecord[] records = new DataCriteriaRecord[length];
+        int length = oids.size();
+        DataCriteriaRecord[] records = new DataCriteriaRecord[length];
 
-		int i = 0;
-		for (String key : oids.keySet()) {
-			records[i++] = new DataCriteriaRecord(key, oids.get(key));
-		}
+        int i = 0;
+        for (String key : oids.keySet()) {
+            records[i++] = new DataCriteriaRecord(key, oids.get(key), "");
+        }
 
-		setData(records);
-		redraw();
-	}
+        setData(records);
+        redraw();
+    }
 
 }

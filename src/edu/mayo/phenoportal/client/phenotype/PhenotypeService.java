@@ -24,13 +24,14 @@ public interface PhenotypeService extends RemoteService {
 
     String getPopulationCriteria(AlgorithmData algorithmData) throws IllegalArgumentException;
 
-    Map<String, String> getDataCriteriaOids(AlgorithmData algorithmData) throws IllegalArgumentException;
+    Map<String, String> getDataCriteriaOids(AlgorithmData algorithmData)
+            throws IllegalArgumentException;
 
     Map<String, String> getSupplementalCriteriaOids(AlgorithmData algorithmData)
             throws IllegalArgumentException;
 
-    Execution executePhenotype(AlgorithmData algorithmData, Date fromDate,
-            Date toDate, String userName) throws IllegalArgumentException;
+    Execution executePhenotype(AlgorithmData algorithmData, Date fromDate, Date toDate,
+            String userName) throws IllegalArgumentException;
 
     String getExecutions() throws IllegalArgumentException;
 
@@ -80,14 +81,14 @@ public interface PhenotypeService extends RemoteService {
     Execution getLatestExecution(String algorithmName, String algorithmVersion,
             String algorithmCategoryId, String algorithmUser);
 
-	List<ValueSet> getExecutionValueSets(String executionId) throws IllegalArgumentException;
+    List<ValueSet> getExecutionValueSets(String executionId) throws IllegalArgumentException;
 
     Execution getDbStats(String type) throws IllegalArgumentException;
 
     String openEditor(Execution execution) throws IllegalArgumentException;
 
-	String getMatEditorUrl(User user) throws IllegalArgumentException;
+    String getMatEditorUrl(User user) throws IllegalArgumentException;
 
-	MatImport getMatImport(String tokenId) throws IllegalArgumentException;
+    MatImport getMatImport(String tokenId) throws IllegalArgumentException;
 
 }

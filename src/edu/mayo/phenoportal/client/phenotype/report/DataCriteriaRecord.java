@@ -9,12 +9,12 @@ public class DataCriteriaRecord extends ListGridRecord {
 
     }
 
-    public DataCriteriaRecord(String oid, String description) {
+    public DataCriteriaRecord(String oid, String description, String version) {
         super();
 
         setOid(oid);
         setDescription(description);
-
+        setVersion(version);
     }
 
     public void setOid(String oid) {
@@ -33,4 +33,11 @@ public class DataCriteriaRecord extends ListGridRecord {
         return getAttributeAsString("description");
     }
 
+    public void setVersion(String version) {
+        setAttribute("version", version);
+    }
+
+    public String getVersion() {
+        return getAttributeAsString("version");
+    }
 }
