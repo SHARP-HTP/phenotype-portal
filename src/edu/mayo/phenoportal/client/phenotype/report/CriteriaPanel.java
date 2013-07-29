@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import edu.mayo.phenoportal.client.Htp;
 import mayo.edu.cts2.editor.client.Cts2Editor;
 
 import com.google.gwt.core.client.GWT;
@@ -108,6 +109,7 @@ public class CriteriaPanel extends VLayout {
             @Override
             public void onSuccess(Map<String, String> result) {
                 Cts2Editor editor = new Cts2Editor();
+	            Cts2Editor.setUser(Htp.getLoggedInUser().getUserName());
 	            List<String> oids = new ArrayList(result.size());
 	            oids.addAll(result.keySet());
                 i_dataCriteriaSection.addItem(editor.getMainLayout(oids));
@@ -122,6 +124,7 @@ public class CriteriaPanel extends VLayout {
             @Override
             public void onSuccess(Map<String, String> result) {
                 Cts2Editor editor = new Cts2Editor();
+	            Cts2Editor.setUser(Htp.getLoggedInUser().getUserName());
 	            List<String> oids = new ArrayList<String>(result.size());
 	            oids.addAll(result.keySet());
                 i_supplementalDataElementsSection.addItem(editor.getMainLayout(oids));

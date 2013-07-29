@@ -2,6 +2,7 @@ package edu.mayo.phenoportal.client.phenotype.report;
 
 import java.util.ArrayList;
 
+import edu.mayo.phenoportal.client.Htp;
 import mayo.edu.cts2.editor.client.Cts2Editor;
 
 import com.smartgwt.client.types.Alignment;
@@ -45,6 +46,7 @@ public class ValueSetEditorWindow extends Window {
         oidList.add(i_oid);
 
         Cts2Editor editor = new Cts2Editor();
+	    Cts2Editor.setUser(Htp.getLoggedInUser().getUserName());
         addItem(editor.getMainLayout(oidList));
     }
 
