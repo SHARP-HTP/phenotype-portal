@@ -23,6 +23,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 
+import edu.mayo.phenoportal.client.Htp;
 import edu.mayo.phenoportal.client.core.AlgorithmData;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeServiceAsync;
@@ -124,14 +125,19 @@ public class DataCriteriaListGrid extends ListGrid {
                     // ** Set Editor to select the version.
                     // ********************************************
 
-                    String userName = Cts2Editor.getUserName();
-                    String valueSetId = record
-                            .getAttribute(BaseValueSetsListGrid.ID_VALUE_SET_NAME);
+                    String userName = "";
+
+                    if (Htp.getLoggedInUser() != null) {
+                        userName = Htp.getLoggedInUser().getUserName();
+                    }
+
+                    String valueSetId = record.getAttribute("oid");
 
                     Criteria criteria = new Criteria();
-                    criteria.setAttribute(BaseValueSetsListGrid.ID_VALUE_SET_NAME, "Value Set Name");
-                    criteria.setAttribute(BaseValueSetsListGrid.ID_FORMAL_NAME, "Formal Name");
-                    criteria.setAttribute(BaseValueSetsListGrid.ID_URI, "URI");
+                    criteria.setAttribute(BaseValueSetsListGrid.ID_VALUE_SET_NAME, valueSetId);
+                    criteria.setAttribute(BaseValueSetsListGrid.ID_FORMAL_NAME,
+                            getAttribute("description"));
+                    criteria.setAttribute(BaseValueSetsListGrid.ID_URI, "1");
                     criteria.setAttribute(BaseValueSetsListGrid.ID_COMMENT, "Comment");
                     criteria.setAttribute("userName", userName);
 
@@ -205,17 +211,71 @@ public class DataCriteriaListGrid extends ListGrid {
                         String changeSetId = event.getChangeSetUri();
                         String documentUri = event.getDocumentUri();
 
+                        if (comment != null && comment.equals("Initial Version")) {
+                            comment = INITIAL_VERSION;
+                        }
+
                         // find the record to update and update it.
                         // ListGridRecord recordToUpdate =
-                        // findRecord(valueSetId);
-                        //
-                        // if (recordToUpdate != null) {
-                        // i_valueSetsListGrid.updateRecord(recordToUpdate,
-                        // valueSetId, versionId, comment, changeSetId,
-                        // documentUri);
-                        // }
+                        ListGridRecord recordToUpdate = findRecord(valueSetId);
+
+                        if (recordToUpdate != null) {
+                            updateRecord(recordToUpdate, valueSetId, versionId, comment,
+                                    changeSetId, documentUri);
+                        }
                     }
                 });
+    }
+
+    /**
+     * Find the record with the matching oid/value set id.
+     * 
+     * @param oid
+     * @return
+     */
+    private ListGridRecord findRecord(String oid) {
+
+        ListGridRecord[] records = getRecords();
+        for (ListGridRecord record : records) {
+            if (record.getAttribute("oid").equals(oid)) {
+                return record;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Update the version of an existing value set record.
+     * 
+     * @param recordToUpdate
+     * @param vsIdentifier
+     * @param versionId
+     * @param comment
+     * @param changeSetId
+     */
+    public void updateRecord(ListGridRecord recordToUpdate, String vsIdentifier, String versionId,
+            String comment, String changeSetId, String documentUri) {
+
+        if (versionId != null) {
+
+            recordToUpdate.setAttribute("oid", vsIdentifier);
+            recordToUpdate.setAttribute("version", comment);
+
+            // TODO : May need to add "hidden" values to this list grid for the
+            // versionID, changeSetId, documentUri.
+            // These parameters could then be sent to the execution call, if
+            // needed. listGridField.setHidden(true);
+
+            // recordToUpdate.setAttribute(ID_CHANGE_SET_URI, changeSetId);
+            // recordToUpdate.setAttribute(ID_DOCUMENT_URI, documentUri);
+            // recordToUpdate.setAttribute(ID_URI, versionId);
+            // recordToUpdate.setAttribute(ID_CURRENT_VERSION,
+            // getVersion(versionId, comment));
+        }
+
+        updateData(recordToUpdate);
+        markForRedraw();
     }
 
 }

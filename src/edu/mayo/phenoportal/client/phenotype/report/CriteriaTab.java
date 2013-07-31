@@ -31,7 +31,7 @@ public class CriteriaTab extends Tab implements ReportTab {
         i_dataCriteriaListGrid = new DataCriteriaListGrid();
         i_supplementalDataListGrid = new SupplementalDataListGrid();
 
-        HTMLPane dataCriteriaTitle = getHTMLTitle("Data criteria (QDM Data Elements)");
+        HTMLPane dataCriteriaTitle = getHTMLTitle("Data Criteria (QDM Data Elements)");
         HTMLPane supplementalDataTitle = getHTMLTitle("Supplemental Data Elements");
 
         i_criteriaLayout.addMember(i_criteriaHTMLPage);
