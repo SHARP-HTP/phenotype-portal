@@ -73,6 +73,7 @@ CREATE TABLE `ExecutionValueSet` (
 	`valueSet` varchar(255),
 	`description` varchar(400),
 	`version` varchar(255),
+	`comment` varchar(400),
 	INDEX (`executionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;

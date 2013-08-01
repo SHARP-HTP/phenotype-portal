@@ -85,7 +85,7 @@ public class LatestExecutionWindow extends Window {
 			for (ValueSet vs : valueSetList) {
 				Record record = new Record();
 				record.setAttribute("desc", vs.description != null ? vs.description : "");
-				record.setAttribute("version", vs.version);
+				record.setAttribute("version", vs.comment);
 				records[i++] = record;
 			}
 			setData(records);

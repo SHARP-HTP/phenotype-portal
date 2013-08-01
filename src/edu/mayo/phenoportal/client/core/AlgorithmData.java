@@ -110,7 +110,7 @@ public class AlgorithmData implements Serializable {
 	}
 
 	public void addValueSet(String name, String desc, String version) {
-		addValueSet(new ValueSet(name, desc, version));
+		addValueSet(new ValueSet(name, desc, version, ""));
 	}
 
 	public void setValueSets(List<ValueSet> valueSets) {

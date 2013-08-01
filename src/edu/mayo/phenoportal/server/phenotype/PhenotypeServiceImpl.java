@@ -1372,6 +1372,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                 ps.setString(2, vs.name);
                 ps.setString(3, vs.description);
                 ps.setString(4, vs.version);
+                ps.setString(5, vs.comment);
                 ps.execute();
             }
 
@@ -1777,7 +1778,8 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                 valueSets.add(new ValueSet(
                   resultSet.getString(ExecutionValueSetColumns.VALUE_SET.getColumnName()),
                   resultSet.getString(ExecutionValueSetColumns.DESCRIPTION.getColumnName()),
-                  resultSet.getString(ExecutionValueSetColumns.VERSION.getColumnName())));
+                  resultSet.getString(ExecutionValueSetColumns.VERSION.getColumnName()),
+                  resultSet.getString(ExecutionValueSetColumns.COMMENT.getColumnName())));
             }
         } catch (SQLException sqle) {
             s_logger.log(Level.WARNING, "Unable to get the value sets for execution " + executionId

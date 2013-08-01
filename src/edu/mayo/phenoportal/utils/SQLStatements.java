@@ -88,11 +88,12 @@ public class SQLStatements {
 	 * @return SQL statement string
 	 */
 	public static String insertExecutionValueSetsStatement() {
-		return String.format("INSERT INTO ExecutionValueSet (%s, %s, %s, %s) VALUES (?,?,?,?);",
+		return String.format("INSERT INTO ExecutionValueSet (%s, %s, %s, %s, %s) VALUES (?,?,?,?,?);",
 		  ExecutionValueSetColumns.EXECUTION_ID.getColumnName(),
 		  ExecutionValueSetColumns.VALUE_SET.getColumnName(),
 		  ExecutionValueSetColumns.DESCRIPTION.getColumnName(),
-		  ExecutionValueSetColumns.VERSION.getColumnName());
+		  ExecutionValueSetColumns.VERSION.getColumnName(),
+		  ExecutionValueSetColumns.COMMENT.getColumnName());
 	}
 
 	/**

@@ -167,8 +167,7 @@ public class DataCriteriaListGrid extends ListGrid {
             @Override
             public void onSuccess(Map<String, String> result) {
 	            for (String oid : result.keySet()) {
-		            ValueSet vs = new ValueSet(oid, result.get(oid), "1");
-		            vs.comment = INITIAL_VERSION;
+		            ValueSet vs = new ValueSet(oid, result.get(oid), "1", INITIAL_VERSION);
 		            i_algorithmData.addValueSet(vs);
 	            }
                 setGridData(result);
@@ -284,10 +283,9 @@ public class DataCriteriaListGrid extends ListGrid {
             recordToUpdate.setAttribute("version", comment);
 
 	        if (i_algorithmData != null) {
-		        ValueSet vs = new ValueSet(vsIdentifier, recordToUpdate.getAttribute("description"), versionId);
+		        ValueSet vs = new ValueSet(vsIdentifier, recordToUpdate.getAttribute("description"), versionId, comment);
 		        vs.changeSetId = changeSetId;
 		        vs.documentUri = documentUri;
-		        vs.comment = comment;
 	            i_algorithmData.addValueSet(vs);
 	        }
         }

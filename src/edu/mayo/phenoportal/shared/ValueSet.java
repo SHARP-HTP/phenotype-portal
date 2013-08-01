@@ -12,10 +12,11 @@ public class ValueSet implements Serializable {
 
 	public ValueSet() { }
 
-	public ValueSet(String name, String description, String version) {
+	public ValueSet(String name, String description, String version, String comment) {
 		this.name = name;
 		this.description = description;
 		this.version = version;
+		this.comment = comment;
 	}
 
 	@Override
