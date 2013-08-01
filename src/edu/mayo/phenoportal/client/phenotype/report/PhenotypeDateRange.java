@@ -29,14 +29,11 @@ import edu.mayo.phenoportal.client.events.LoggedOutEvent;
 import edu.mayo.phenoportal.client.events.LoggedOutEventHandler;
 import edu.mayo.phenoportal.client.events.PhenotypeExecuteCompletedEvent;
 import edu.mayo.phenoportal.client.events.PhenotypeExecuteCompletedEventHandler;
-import edu.mayo.phenoportal.client.events.PhenotypeExecuteStartedEvent;
+import edu.mayo.phenoportal.client.events.PhenotypeExecuteSetupEvent;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeServiceAsync;
 import edu.mayo.phenoportal.client.utils.MessageWindow;
 import edu.mayo.phenoportal.client.utils.UiHelper;
-import edu.mayo.phenoportal.shared.Demographic;
-import edu.mayo.phenoportal.shared.DemographicStat;
-import edu.mayo.phenoportal.shared.DemographicsCategory;
 import edu.mayo.phenoportal.shared.Execution;
 import edu.mayo.phenoportal.shared.User;
 import edu.mayo.phenoportal.shared.ValueSet;
@@ -81,7 +78,6 @@ public class PhenotypeDateRange extends VLayout {
         createLoggedInEventHandler();
         createLoggedOutEventHandler();
         createPhenotypeExecuteCompletedEventHandler();
-        // createPhenotypeSelectionChangedEventHandler();
 
         // initially set the form to false until a user logs in.
         setDateFormDisabled(true);
@@ -230,6 +226,14 @@ public class PhenotypeDateRange extends VLayout {
         }
     }
 
+	public Date getFromDate() {
+		return this.i_fromDate.getValueAsDate();
+	}
+
+	public Date getToDate() {
+		return this.i_toDate.getValueAsDate();
+	}
+
     private void clearLastExecutionDetails() {
 	    execPanel.hide();
         executionDate.hide();
@@ -267,7 +271,7 @@ public class PhenotypeDateRange extends VLayout {
         HLayout buttonLayout = new HLayout();
         buttonLayout.setWidth100();
         buttonLayout.setAlign(Alignment.CENTER);
-        i_executeButton = new IButton("Execute");
+        i_executeButton = new IButton("Execute...");
 
         i_executeButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
@@ -283,8 +287,7 @@ public class PhenotypeDateRange extends VLayout {
                     MessageWindow messageWindow = new MessageWindow(title, message);
                     messageWindow.show();
                 } else {
-                    executePhenotype(i_algorithmData,
-                            fromDate, toDate);
+	                Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteSetupEvent());
                 }
             }
         });
@@ -293,70 +296,6 @@ public class PhenotypeDateRange extends VLayout {
         dateLayout.addMember(buttonLayout);
 
         return dateLayout;
-    }
-
-    /**
-     * Execute the phenotype with the selected dates On Success, It will return
-     * the List<Demographic> object
-     */
-    private void executePhenotype(AlgorithmData algorithmData, Date fromDate, Date toDate) {
-
-        Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteStartedEvent());
-		/* TODO: get value sets from cts2Editor and add to algorithmData */
-
-	    /* TODO: REMOVE THIS TEST BLOCK *******************************************************************************/
-	    // diabetes data criteria
-	    algorithmData.addValueSet("2.16.840.1.113883.3.526.3.1240", "Encounter, Performed: Annual Wellness Visit using Annual Wellness Visit Grouping Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.560.100.4", "Patient Characteristic Birthdate: birth date using birth date LOINC Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.103.12.1001", "Diagnosis, Active: Diabetes using Diabetes Grouping Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1048", "Encounter, Performed: Face-to-Face Interaction using Face-to-Face Interaction Grouping Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.103.12.1010", "Diagnosis, Active: Gestational Diabetes using Gestational Diabetes Grouping Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1016", "Encounter, Performed: Home Healthcare Services using Home Healthcare Services Grouping Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.526.3.1248", "Laboratory Test, Result: LDL-C Laboratory Test using LDL-C Laboratory Test Grouping Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1001", "Encounter, Performed: Office Visit using Office Visit Grouping Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1025", "Encounter, Performed: Preventive Care Services - Established Office Visit, 18 and Up using Preventive Care Services - Established Office Visit, 18 and Up Grouping Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113883.3.464.1003.101.12.1023", "Encounter, Performed: Preventive Care Services-Initial Office Visit, 18 and Up using Preventive Care Services-Initial Office Visit, 18 and Up Grouping Value Set ", "20121025");
-		// diabetes supplemental data elements
-	    algorithmData.addValueSet("2.16.840.1.114222.4.11.837", "Patient Characteristic Ethnicity: Ethnicity using Ethnicity CDC Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.113762.1.4.1", "Patient Characteristic Sex: ONC Administrative Sex using ONC Administrative Sex Administrative Sex Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.114222.4.11.3591", "Patient Characteristic Payer: Payer using Payer Source of Payment Typology Value Set", "20121025");
-	    algorithmData.addValueSet("2.16.840.1.114222.4.11.836", "Patient Characteristic Race: Race using Race CDC Value Set", "20121025");
-	    /* END TEST BLOCK *********************************************************************************************/
-
-        PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
-        phenotypeService.executePhenotype(algorithmData, fromDate, toDate, Htp
-                .getLoggedInUser().getUserName(), new AsyncCallback<Execution>() {
-
-            @Override
-            public void onSuccess(Execution result) {
-
-                boolean printDebug = false;
-                if (printDebug) {
-                    printExecutionResults(result);
-                }
-
-                String title = "Phenotype Execution Complete";
-                String message = "The Phenotype execution is complete.  You can view the results in the Summary, Demographics and WorkFlow tabs.";
-                MessageWindow messageWindow = new MessageWindow(title, message);
-                messageWindow.show();
-
-                Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteCompletedEvent(true, result));
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-                logger.log(Level.WARNING, "Phenotype execution has failed.", caught);
-
-                String title = "Phenotype Execution Failed";
-                String message = "The Phenotype execution has failed. If this continues, please contact support.";
-                MessageWindow messageWindow = new MessageWindow(title, message);
-                messageWindow.show();
-
-                Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteCompletedEvent(false));
-            }
-
-        });
-
     }
 
     /**
@@ -408,19 +347,6 @@ public class PhenotypeDateRange extends VLayout {
                 });
     }
 
-    // private void createPhenotypeSelectionChangedEventHandler() {
-    // Htp.EVENT_BUS.addHandler(PhenotypeSelectionChangedEvent.TYPE,
-    // new PhenotypeSelectionChangedEventHandler() {
-    //
-    // @Override
-    // public void onPhenotypeSelectionChanged(
-    // PhenotypeSelectionChangedEvent phenotypeSelectionChangedEvent) {
-    // updateSelection(phenotypeSelectionChangedEvent.getAlgorithmData());
-    //
-    // }
-    // });
-    // }
-
     private void setEnablementBasedOnUser(User user) {
         // Admin = 1, Execute = 2
         if (user != null && user.getRole() <= 2) {
@@ -459,39 +385,6 @@ public class PhenotypeDateRange extends VLayout {
             return time;
         }
         return seconds + " Seconds";
-    }
-
-    /**
-     * Display the results returned from the server.
-     * 
-     * @param result
-     */
-    private void printExecutionResults(Execution result) {
-        if (result != null) {
-            List<Demographic> demographics = result.getDemographics();
-            if (demographics != null) {
-                for (int i = 0; i < demographics.size(); i++) {
-
-                    Demographic demoIterate = demographics.get(i);
-                    System.out.println("Type:" + demoIterate.getType());
-                    for (int k = 0; k < demoIterate.getDemoCategoryList().size(); k++) {
-                        DemographicsCategory category1 = demoIterate.getDemoCategoryList().get(k); // System.out.println("Name:"
-                                                                                                   // +
-                        // category1.getName());
-                        ;
-                        List<DemographicStat> statlist1 = category1.getDemoStatList();
-
-                        for (int l = 0; l < statlist1.size(); l++) {
-                            DemographicStat statValue = statlist1.get(l);
-                            System.out.println("Label" + statValue.getLabel());
-                            System.out.println("Value" + statValue.getValue());
-                        }
-
-                    }
-                }
-            }
-
-        }
     }
 
 }

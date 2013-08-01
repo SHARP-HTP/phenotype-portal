@@ -6,6 +6,9 @@ public class ValueSet implements Serializable {
 	public String name;
 	public String description;
 	public String version;
+	public String comment;
+	public String changeSetId;
+	public String documentUri;
 
 	public ValueSet() { }
 
@@ -19,7 +22,7 @@ public class ValueSet implements Serializable {
 	public boolean equals(Object other) {
 		return other instanceof ValueSet &&
 		  ((ValueSet) other).name.equalsIgnoreCase(name) &&
-		  ((ValueSet) other).description.equalsIgnoreCase(description) &&
 		  ((ValueSet) other).version.equalsIgnoreCase(version);
 	}
+
 }

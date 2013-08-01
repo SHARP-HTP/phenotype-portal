@@ -76,16 +76,12 @@ public interface PhenotypeService extends RemoteService {
 
     Boolean removeSharpNews(SharpNews news) throws IllegalArgumentException;
 
-    Boolean saveJbpm(String uuid, String jbpm, String title, String comment);
-
     Execution getLatestExecution(String algorithmName, String algorithmVersion,
             String algorithmCategoryId, String algorithmUser);
 
     List<ValueSet> getExecutionValueSets(String executionId) throws IllegalArgumentException;
 
     Execution getDbStats(String type) throws IllegalArgumentException;
-
-    String openEditor(Execution execution) throws IllegalArgumentException;
 
     String getMatEditorUrl(User user) throws IllegalArgumentException;
 

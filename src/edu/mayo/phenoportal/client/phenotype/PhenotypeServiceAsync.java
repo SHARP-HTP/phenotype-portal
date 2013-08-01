@@ -74,15 +74,10 @@ public interface PhenotypeServiceAsync {
     void removeSharpNews(SharpNews news, AsyncCallback<Boolean> callback)
             throws IllegalArgumentException;
 
-    void saveJbpm(String uuid, String jbpm, String title, String comment,
-            AsyncCallback<Boolean> callback);
-
     void getLatestExecution(String algorithmName, String algorithmVersion,
             String algorithmCategoryId, String algorithmUser, AsyncCallback<Execution> callback);
 
     void getDbStats(String type, AsyncCallback<Execution> callback) throws IllegalArgumentException;
-
-    void openEditor(Execution execution, AsyncCallback<String> callback);
 
     void getPopulationCriteria(AlgorithmData algorithmData, AsyncCallback<String> async);
 

@@ -4,7 +4,10 @@ import edu.mayo.phenoportal.shared.ValueSet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class to encapsulate a selected algorithm.
@@ -19,7 +22,7 @@ public class AlgorithmData implements Serializable {
 	private String i_algorithmUser;
 	private String i_algorithmDescription;
 	private String i_algorithmName;
-	private List<ValueSet> valueSets = new ArrayList<ValueSet>();
+	private Map<String, ValueSet> valueSets = new HashMap<String, ValueSet>();
 	
 	public AlgorithmData() {
 		id = -1;
@@ -103,9 +106,7 @@ public class AlgorithmData implements Serializable {
 	}
 
 	public void addValueSet(ValueSet vs) {
-		if (!valueSets.contains(vs)) {
-			valueSets.add(vs);
-		}
+		valueSets.put(vs.name, vs);
 	}
 
 	public void addValueSet(String name, String desc, String version) {
@@ -113,10 +114,12 @@ public class AlgorithmData implements Serializable {
 	}
 
 	public void setValueSets(List<ValueSet> valueSets) {
-		this.valueSets = valueSets;
+		for (ValueSet vs : valueSets) {
+			this.valueSets.put(vs.name, vs);
+		}
 	}
 
-	public List<ValueSet> getValueSets() {
-		return this.valueSets;
+	public Collection<ValueSet> getValueSets() {
+		return this.valueSets.values();
 	}
 }

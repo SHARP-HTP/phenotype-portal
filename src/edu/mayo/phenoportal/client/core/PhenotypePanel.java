@@ -9,11 +9,15 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import edu.mayo.phenoportal.client.Htp;
 import edu.mayo.phenoportal.client.events.LoggedInEvent;
 import edu.mayo.phenoportal.client.events.LoggedInEventHandler;
+import edu.mayo.phenoportal.client.events.PhenotypeExecuteSetupEvent;
+import edu.mayo.phenoportal.client.events.PhenotypeExecuteSetupEventHandler;
 import edu.mayo.phenoportal.client.events.PhenotypeSelectionChangedEvent;
 import edu.mayo.phenoportal.client.events.PhenotypeSelectionChangedEventHandler;
 import edu.mayo.phenoportal.client.navigation.NavigationPane;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeServiceAsync;
+import edu.mayo.phenoportal.client.phenotype.report.DataCriteriaListGrid;
+import edu.mayo.phenoportal.client.phenotype.report.ExecuteWindow;
 import edu.mayo.phenoportal.client.phenotype.report.PhenotypeDateRange;
 import edu.mayo.phenoportal.client.phenotype.report.PhenotypeReportTabSet;
 import edu.mayo.phenoportal.client.utils.UiHelper;
@@ -63,6 +67,7 @@ public class PhenotypePanel extends HLayout {
 
         createPhenotypeSelectionChangedEventHandler();
         createLoggedInEventHandler();
+	    createExecutionSetupEventHandler();
     }
 
     public void refreshTreeNavigation() {
@@ -127,5 +132,17 @@ public class PhenotypePanel extends HLayout {
             }
         });
     }
+
+	private void createExecutionSetupEventHandler() {
+		Htp.EVENT_BUS.addHandler(PhenotypeExecuteSetupEvent.TYPE, new PhenotypeExecuteSetupEventHandler() {
+			@Override
+			public void onExecuteSetup(PhenotypeExecuteSetupEvent event) {
+				ExecuteWindow executeWindow = new ExecuteWindow(i_algorithmData, i_inputRange.getFromDate(), i_inputRange.getToDate());
+				executeWindow.centerInPage();
+				executeWindow.show();
+				executeWindow.redraw();
+			}
+		});
+	}
 
 }

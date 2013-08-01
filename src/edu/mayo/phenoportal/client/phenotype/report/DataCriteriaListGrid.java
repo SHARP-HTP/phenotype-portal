@@ -2,6 +2,7 @@ package edu.mayo.phenoportal.client.phenotype.report;
 
 import java.util.Map;
 
+import edu.mayo.phenoportal.shared.ValueSet;
 import mayo.edu.cts2.editor.client.Cts2Editor;
 import mayo.edu.cts2.editor.client.events.UpdateValueSetVersionEvent;
 import mayo.edu.cts2.editor.client.events.UpdateValueSetVersionEventHandler;
@@ -165,6 +166,11 @@ public class DataCriteriaListGrid extends ListGrid {
         async.getDataCriteriaOids(i_algorithmData, new AsyncCallback<Map<String, String>>() {
             @Override
             public void onSuccess(Map<String, String> result) {
+	            for (String oid : result.keySet()) {
+		            ValueSet vs = new ValueSet(oid, result.get(oid), "1");
+		            vs.comment = INITIAL_VERSION;
+		            i_algorithmData.addValueSet(vs);
+	            }
                 setGridData(result);
             }
 
@@ -175,7 +181,7 @@ public class DataCriteriaListGrid extends ListGrid {
         });
     }
 
-    public void setGridData(Map<String, String> oids) {
+    private void setGridData(Map<String, String> oids) {
 
         int length = oids.size();
         DataCriteriaRecord[] records = new DataCriteriaRecord[length];
@@ -188,6 +194,21 @@ public class DataCriteriaListGrid extends ListGrid {
         setData(records);
         redraw();
     }
+
+	public void setGridData(AlgorithmData data) {
+		i_algorithmData = data;
+
+		int length = data.getValueSets().size();
+		DataCriteriaRecord[] records = new DataCriteriaRecord[length];
+
+		int i = 0;
+		for (ValueSet vs : data.getValueSets()) {
+			records[i++] = new DataCriteriaRecord(vs.name, vs.description, vs.comment);
+		}
+
+		setData(records);
+		redraw();
+	}
 
     /**
      * Listen for when a value set version has been updated.
@@ -262,16 +283,13 @@ public class DataCriteriaListGrid extends ListGrid {
             recordToUpdate.setAttribute("oid", vsIdentifier);
             recordToUpdate.setAttribute("version", comment);
 
-            // TODO : May need to add "hidden" values to this list grid for the
-            // versionID, changeSetId, documentUri.
-            // These parameters could then be sent to the execution call, if
-            // needed. listGridField.setHidden(true);
-
-            // recordToUpdate.setAttribute(ID_CHANGE_SET_URI, changeSetId);
-            // recordToUpdate.setAttribute(ID_DOCUMENT_URI, documentUri);
-            // recordToUpdate.setAttribute(ID_URI, versionId);
-            // recordToUpdate.setAttribute(ID_CURRENT_VERSION,
-            // getVersion(versionId, comment));
+	        if (i_algorithmData != null) {
+		        ValueSet vs = new ValueSet(vsIdentifier, recordToUpdate.getAttribute("description"), versionId);
+		        vs.changeSetId = changeSetId;
+		        vs.documentUri = documentUri;
+		        vs.comment = comment;
+	            i_algorithmData.addValueSet(vs);
+	        }
         }
 
         updateData(recordToUpdate);
