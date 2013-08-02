@@ -23,7 +23,8 @@ public class AlgorithmData implements Serializable {
 	private String i_algorithmDescription;
 	private String i_algorithmName;
 	private Map<String, ValueSet> valueSets = new HashMap<String, ValueSet>();
-	
+	private Map<String, ValueSet> supplementalValueSets = new HashMap<String, ValueSet>();
+
 	public AlgorithmData() {
 		id = -1;
 		i_categoryId = "";
@@ -121,5 +122,23 @@ public class AlgorithmData implements Serializable {
 
 	public Collection<ValueSet> getValueSets() {
 		return this.valueSets.values();
+	}
+
+	public void addSupplementalValueSet(ValueSet vs) {
+		supplementalValueSets.put(vs.name, vs);
+	}
+
+	public void addSupplementalValueSet(String name, String desc, String version) {
+		addSupplementalValueSet(new ValueSet(name, desc, version, ""));
+	}
+
+	public void setSupplementalValueSets(List<ValueSet> valueSets) {
+		for (ValueSet vs : valueSets) {
+			this.supplementalValueSets.put(vs.name, vs);
+		}
+	}
+
+	public Collection<ValueSet> getSupplementalValueSets() {
+		return this.supplementalValueSets.values();
 	}
 }

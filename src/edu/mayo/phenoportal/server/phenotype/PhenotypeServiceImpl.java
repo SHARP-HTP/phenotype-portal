@@ -1344,6 +1344,15 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                 ps.setString(5, vs.comment);
                 ps.execute();
             }
+	        for (ValueSet vs : algorithmData.getSupplementalValueSets()) {
+		        ps = conn.prepareStatement(query);
+		        ps.setString(1, execution.getId());
+		        ps.setString(2, vs.name);
+		        ps.setString(3, vs.description);
+		        ps.setString(4, vs.version);
+		        ps.setString(5, vs.comment);
+		        ps.execute();
+	        }
 
         } catch (SQLException sqle) {
             System.out.println("Failed to insert ExecutionValueSets. Error: " + sqle.getMessage());

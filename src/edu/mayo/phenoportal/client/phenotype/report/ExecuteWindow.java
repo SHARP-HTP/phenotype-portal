@@ -35,7 +35,7 @@ public class ExecuteWindow extends Window {
 		super();
 		setTitle("Value Set Version Selection For Execution");
 		setWidth(800);
-		setHeight(525);
+		setHeight("95%");
 		setModalMaskOpacity(90);
 		setAlign(Alignment.CENTER);
 
@@ -43,7 +43,7 @@ public class ExecuteWindow extends Window {
 		setCanDragResize(true);
 		setAnimateMinimize(true);
 
-		HTMLPanel header = new HTMLPanel("<b>Select the version of each value set for execution.</b>");
+		HTMLPanel header = new HTMLPanel("<a style='text-align:center;'><b>Select the version of each value set for execution.</b></a>");
 		header.setWidth("100%");
 		HLayout headerLayout = new HLayout();
 		headerLayout.setWidth100();
@@ -52,8 +52,29 @@ public class ExecuteWindow extends Window {
 		headerLayout.setAlign(VerticalAlignment.CENTER);
 		headerLayout.addMember(header);
 
+		HTMLPanel dataCriteria = new HTMLPanel("<b>Data Criteria (QDM Data Elements)</b>");
+		dataCriteria.setWidth("100%");
+		HLayout dataCriteriaLayout = new HLayout();
+		dataCriteriaLayout.setWidth100();
+		dataCriteriaLayout.setHeight(25);
+		dataCriteriaLayout.setLayoutAlign(Alignment.LEFT);
+		dataCriteriaLayout.setAlign(VerticalAlignment.CENTER);
+		dataCriteriaLayout.setLayoutTopMargin(20);
+		dataCriteriaLayout.addMember(dataCriteria);
 		DataCriteriaListGrid dataCriteriaListGrid = new DataCriteriaListGrid();
 		dataCriteriaListGrid.setGridData(algorithmData);
+
+		HTMLPanel suppDataCriteria = new HTMLPanel("<b>Supplemental Data Elements</b>");
+		suppDataCriteria.setWidth("100%");
+		HLayout suppDataCriteriaLayout = new HLayout();
+		suppDataCriteriaLayout.setWidth100();
+		suppDataCriteriaLayout.setHeight(25);
+		suppDataCriteriaLayout.setLayoutAlign(Alignment.LEFT);
+		suppDataCriteriaLayout.setAlign(VerticalAlignment.CENTER);
+		suppDataCriteriaLayout.setLayoutTopMargin(20);
+		suppDataCriteriaLayout.addMember(suppDataCriteria);
+		SupplementalDataListGrid supplementalDataListGrid = new SupplementalDataListGrid();
+		supplementalDataListGrid.setGridData(algorithmData);
 
 		Button cancelButton = new Button("Cancel");
 		cancelButton.addClickHandler(new ClickHandler() {
@@ -74,12 +95,16 @@ public class ExecuteWindow extends Window {
 		HLayout buttonLayout = new HLayout(5);
 		buttonLayout.setHeight(25);
 		buttonLayout.setMargin(10);
+		buttonLayout.setLayoutTopMargin(20);
 		buttonLayout.setAlign(Alignment.CENTER);
 		buttonLayout.addMember(executeButton);
 		buttonLayout.addMember(cancelButton);
 
 		addItem(headerLayout);
+		addItem(dataCriteriaLayout);
 		addItem(dataCriteriaListGrid);
+		addItem(suppDataCriteriaLayout);
+		addItem(supplementalDataListGrid);
 		addItem(buttonLayout);
 	}
 
