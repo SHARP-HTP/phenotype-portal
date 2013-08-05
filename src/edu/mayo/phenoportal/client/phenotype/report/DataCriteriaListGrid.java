@@ -34,6 +34,7 @@ public class DataCriteriaListGrid extends ListGrid {
     private static final String INITIAL_VERSION = "1 (Initial Version)";
 
     private AlgorithmData i_algorithmData;
+	private boolean userPermitted = false;
 
     public DataCriteriaListGrid() {
         super();
@@ -49,7 +50,10 @@ public class DataCriteriaListGrid extends ListGrid {
         setShowAllRecords(true);
         setHoverWidth(400);
 
+	    userPermitted = Htp.getLoggedInUser() != null && Htp.getLoggedInUser().getRole() <= 2;
+
         ListGridField iconField = new ListGridField("iconField", "Edit", 40);
+	    iconField.setHidden(!userPermitted);
         ListGridField oidField = new ListGridField("oid", "OID", 280);
         ListGridField descriptionField = new ListGridField("description", "Description");
         descriptionField.setShowHover(true);
@@ -64,7 +68,7 @@ public class DataCriteriaListGrid extends ListGrid {
             }
         });
 
-        ListGridField versionField = new ListGridField("version", "Change Version", 150);
+        ListGridField versionField = new ListGridField("version", userPermitted ? "Change Version" : "Version", 150);
 
         setFields(iconField, descriptionField, /* oidField, */versionField);
 
@@ -74,86 +78,85 @@ public class DataCriteriaListGrid extends ListGrid {
     @Override
     protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
 
-        String fieldName = this.getFieldName(colNum);
+	    if (userPermitted) {
+            String fieldName = this.getFieldName(colNum);
 
-        if (fieldName.equals("iconField")) {
-            HLayout recordCanvas = new HLayout(1);
-            recordCanvas.setHeight(22);
-            recordCanvas.setWidth(20);
-            recordCanvas.setAlign(Alignment.CENTER);
-            ImgButton editImg = new ImgButton();
-            editImg.setShowDown(false);
-            editImg.setShowRollOver(false);
-            editImg.setLayoutAlign(Alignment.CENTER);
-            editImg.setSrc("edit.png");
-            editImg.setPrompt("Edit Value Set");
-            editImg.setHeight(16);
-            editImg.setWidth(16);
-            editImg.addClickHandler(new ClickHandler() {
+	        if (fieldName.equals("iconField")) {
+	            HLayout recordCanvas = new HLayout(1);
+	            recordCanvas.setHeight(22);
+	            recordCanvas.setWidth(20);
+	            recordCanvas.setAlign(Alignment.CENTER);
+	            ImgButton editImg = new ImgButton();
+	            editImg.setShowDown(false);
+	            editImg.setShowRollOver(false);
+	            editImg.setLayoutAlign(Alignment.CENTER);
+	            editImg.setSrc("edit.png");
+	            editImg.setPrompt("Edit Value Set");
+	            editImg.setHeight(16);
+	            editImg.setWidth(16);
+	            editImg.addClickHandler(new ClickHandler() {
 
-                @Override
-                public void onClick(ClickEvent event) {
-                    ValueSetEditorWindow vsWindow = new ValueSetEditorWindow(record
-                            .getAttribute("oid"));
-                    vsWindow.centerInPage();
-                    vsWindow.show();
-                }
-            });
+	                @Override
+	                public void onClick(ClickEvent event) {
+	                    ValueSetEditorWindow vsWindow = new ValueSetEditorWindow(record
+	                            .getAttribute("oid"));
+	                    vsWindow.centerInPage();
+	                    vsWindow.show();
+	                }
+	            });
 
-            recordCanvas.addMember(editImg);
-            return recordCanvas;
-        } else if (fieldName.equals("version")) {
-            HLayout recordCanvas = new HLayout(1);
-            recordCanvas.setHeight(22);
-            recordCanvas.setWidth100();
-            recordCanvas.setAlign(Alignment.RIGHT);
-            ImgButton versionImg = new ImgButton();
-            versionImg.setShowDown(false);
-            versionImg.setShowRollOver(false);
-            versionImg.setLayoutAlign(Alignment.RIGHT);
-            versionImg.setSrc("version.png");
-            versionImg.setPrompt("Change Version");
-            versionImg.setHeight(16);
-            versionImg.setWidth(16);
+	            recordCanvas.addMember(editImg);
+	            return recordCanvas;
+	        } else if (fieldName.equals("version")) {
+	            HLayout recordCanvas = new HLayout(1);
+	            recordCanvas.setHeight(22);
+	            recordCanvas.setWidth100();
+	            recordCanvas.setAlign(Alignment.RIGHT);
+	            ImgButton versionImg = new ImgButton();
+	            versionImg.setShowDown(false);
+	            versionImg.setShowRollOver(false);
+	            versionImg.setLayoutAlign(Alignment.RIGHT);
+	            versionImg.setSrc("version.png");
+	            versionImg.setPrompt("Change Version");
+	            versionImg.setHeight(16);
+	            versionImg.setWidth(16);
 
-            versionImg.addClickHandler(new ClickHandler() {
+	            versionImg.addClickHandler(new ClickHandler() {
 
-                @Override
-                public void onClick(ClickEvent event) {
+	                @Override
+	                public void onClick(ClickEvent event) {
 
-                    // ********************************************
-                    // ** Open up the version window from the Value
-                    // ** Set Editor to select the version.
-                    // ********************************************
+	                    // ********************************************
+	                    // ** Open up the version window from the Value
+	                    // ** Set Editor to select the version.
+	                    // ********************************************
 
-                    String userName = "";
+	                    String userName = "";
 
-                    if (Htp.getLoggedInUser() != null) {
-                        userName = Htp.getLoggedInUser().getUserName();
-                    }
+	                    if (Htp.getLoggedInUser() != null) {
+	                        userName = Htp.getLoggedInUser().getUserName();
+	                    }
 
-                    String valueSetId = record.getAttribute("oid");
+	                    String valueSetId = record.getAttribute("oid");
 
-                    Criteria criteria = new Criteria();
-                    criteria.setAttribute(BaseValueSetsListGrid.ID_VALUE_SET_NAME, valueSetId);
-                    criteria.setAttribute(BaseValueSetsListGrid.ID_FORMAL_NAME,
-                            getAttribute("description"));
-                    criteria.setAttribute(BaseValueSetsListGrid.ID_URI, "1");
-                    criteria.setAttribute(BaseValueSetsListGrid.ID_COMMENT, "Comment");
-                    criteria.setAttribute("userName", userName);
+	                    Criteria criteria = new Criteria();
+	                    criteria.setAttribute(BaseValueSetsListGrid.ID_VALUE_SET_NAME, valueSetId);
+	                    criteria.setAttribute(BaseValueSetsListGrid.ID_FORMAL_NAME,
+	                            getAttribute("description"));
+	                    criteria.setAttribute(BaseValueSetsListGrid.ID_URI, "1");
+	                    criteria.setAttribute(BaseValueSetsListGrid.ID_COMMENT, "Comment");
+	                    criteria.setAttribute("userName", userName);
 
-                    VersionWindow versionWindow = new VersionWindow(criteria);
-                    versionWindow.show();
-                }
-            });
+	                    VersionWindow versionWindow = new VersionWindow(criteria);
+	                    versionWindow.show();
+	                }
+	            });
 
-            recordCanvas.addMember(versionImg);
-            return recordCanvas;
-        }
-
-        else {
-            return null;
-        }
+	            recordCanvas.addMember(versionImg);
+	            return recordCanvas;
+	        }
+	    }
+        return null;
 
     }
 
