@@ -164,8 +164,12 @@ public class SQLStatements {
     public static String selectZipFileStatement(int algorithmId) {
         return "SELECT " + UploadColumns.ZIP_FILE.colName() + " FROM Upload WHERE "
                 + UploadColumns.ID.colName() + "= " + algorithmId + ";";
-
     }
+
+	public static String selectXmlFileStatement(int algorithmId) {
+		return "SELECT " + UploadColumns.XML_FILE.colName() + " FROM Upload WHERE "
+		  + UploadColumns.ID.colName() + "= " + algorithmId + ";";
+	}
 
     public static String selectCriteriaStatement(int algorithmId) {
         return "SELECT " + UploadColumns.NAME.colName() + ", " + UploadColumns.PARENT_ID.colName() + ", "

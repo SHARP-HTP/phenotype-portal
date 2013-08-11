@@ -79,7 +79,7 @@ public class RestExecuter extends BasePhenoportalServlet {
     /*
      * Execute an algorithm and get the location.
      */
-    public String createExecution(File zipFile, String startDate, String endDate) throws Exception {
+    public String createExecution(File xmlFile, String startDate, String endDate) throws Exception {
         String charset = "UTF-8";
 
         String location = "";
@@ -124,13 +124,13 @@ public class RestExecuter extends BasePhenoportalServlet {
             writer.append("--" + boundary).append(CRLF);
             writer.append(
                     "Content-Disposition: form-data; name=\"file\"; filename=\""
-                            + zipFile.getName() + "\"").append(CRLF);
-            writer.append("Content-Type: application/zip").append(CRLF);
+                            + xmlFile.getName() + "\"").append(CRLF);
+            writer.append("Content-Type: application/xml").append(CRLF);
             writer.append("Content-Transfer-Encoding: binary").append(CRLF);
             writer.append(CRLF).flush();
             InputStream input = null;
             try {
-                input = new FileInputStream(zipFile);
+                input = new FileInputStream(xmlFile);
                 byte[] buffer = new byte[1024];
                 for (int length = 0; (length = input.read(buffer)) > 0;) {
                     output.write(buffer, 0, length);
@@ -151,7 +151,8 @@ public class RestExecuter extends BasePhenoportalServlet {
 
             location = headerfields.get("Location").get(0);
             location = s_restUrl + "/" + location;
-
+        } catch (Exception e) {
+		    logger.warning("There was an error when attempting to execute the algorithm. Error: " + e.getMessage());
         } finally {
             if (writer != null) {
                 writer.close();

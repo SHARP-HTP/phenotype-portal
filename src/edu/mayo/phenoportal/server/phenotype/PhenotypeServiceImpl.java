@@ -326,9 +326,9 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         String locationUrl;
         String executionStatus = "";
         Execution execution = new Execution();
-        String zipPathInfo = getZipFile(algorithmData.getId());
-        String zipPath = getPathFromStartupPropertiesFile() + '/' + zipPathInfo;
-        File zipFile = new File(zipPath);
+	    String xmlPathInfo = getXmlFile(algorithmData.getId());
+        String xmlPath = getPathFromStartupPropertiesFile() + '/' + xmlPathInfo;
+        File xmlFile = new File(xmlPath);
         String executionDateRangeFrom = DateConverter.getDateString(fromDate);
         String executionDateRangeTo = DateConverter.getDateString(toDate);
         long startExecution = System.currentTimeMillis();
@@ -336,38 +336,40 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         try {
             /* TODO: Send the selected value sets to the executor */
 
-	        // TODO: Remove the line below and uncomment the following lines once the translator is complete
-	        executionStatus = RestExecuter.STATUS_COMPLETE;
             // execute the algorithm. This will return immediately with an id to
             // the resource that is executing.
-//            locationUrl = RestExecuter.getInstance(getBasePath()).createExecution(zipFile,
-//                    executionDateRangeFrom, executionDateRangeTo);
-//            execution.setUrl(locationUrl);
+            locationUrl = RestExecuter.getInstance(getBasePath()).createExecution(xmlFile,
+                    executionDateRangeFrom, executionDateRangeTo);
+            execution.setUrl(locationUrl);
 
-            // poll on the status until it is complete
-//            try {
-//                while (!executionStatus.equals(RestExecuter.STATUS_COMPLETE)
-//                        && !executionStatus.equals(RestExecuter.STATUS_FAILED)) {
-//                    Thread.sleep(500);
-//                    executionStatus = RestExecuter.getInstance(getBasePath()).pollStatus(
-//                            locationUrl);
-//                }
-//            } catch (InterruptedException ie) {
-//                executionStatus = RestExecuter.STATUS_ERROR;
-//                s_logger.log(Level.SEVERE, "Rest execution not complete or failed.", ie);
-//
-//            }
+//            poll on the status until it is complete
+            try {
+                while (!executionStatus.equals(RestExecuter.STATUS_COMPLETE)
+                        && !executionStatus.equals(RestExecuter.STATUS_FAILED)) {
+                    Thread.sleep(500);
+                    executionStatus = RestExecuter.getInstance(getBasePath()).pollStatus(
+                            locationUrl);
+                }
+            } catch (InterruptedException ie) {
+                executionStatus = RestExecuter.STATUS_ERROR;
+                s_logger.log(Level.SEVERE, "Rest execution not complete or failed.", ie);
+
+            }
 
             // continue if the status was successful
             if (executionStatus.equals(RestExecuter.STATUS_COMPLETE)) {
                 setFileName(algorithmData.getAlgorithmName(), algorithmData.getAlgorithmVersion(),
                         algorithmData.getParentId());
                 persistExecution(execution);
-            }
+            } else if (executionStatus.equals(RestExecuter.STATUS_FAILED)) {
+	            execution.setError(true);
+		        s_logger.log(Level.SEVERE, "Rest execution failed.");
+	        }
 
         } catch (Exception e) {
             s_logger.log(Level.SEVERE, "execution failed", e);
             executionStatus = RestExecuter.STATUS_ERROR;
+	        execution.setError(true);
         } finally {
             Connection conn = DBConnection.getDBConnection(getBasePath());
             try {
@@ -923,6 +925,29 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         }
         return zipPath;
     }
+
+	private String getXmlFile(int algorithmId) {
+		String xmlPath = null;
+
+		Connection conn = DBConnection.getDBConnection(getBasePath());
+		PreparedStatement st = null;
+		ResultSet rs = null;
+
+		if (conn != null) {
+			try {
+				st = conn.prepareStatement(SQLStatements.selectXmlFileStatement(algorithmId));
+				rs = st.executeQuery();
+				if (rs.next()) {
+					xmlPath = rs.getString(1);
+				}
+			} catch (Exception ex) {
+				s_logger.log(Level.SEVERE, "Failed to fetch xml file" + ex.getMessage(), ex);
+			} finally {
+				DBConnection.closeConnection(conn, st, rs);
+			}
+		}
+		return xmlPath;
+	}
 
     private List<Demographic> getDemographics(String xml) {
         List<Demographic> demographics = new ArrayList<Demographic>();

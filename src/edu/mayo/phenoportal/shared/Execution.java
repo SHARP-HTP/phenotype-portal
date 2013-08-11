@@ -25,6 +25,15 @@ public class Execution implements Serializable {
 	private String dateRangeTo;
 	private Image image;
 	private List<Demographic> demographics;
+	private boolean error = false;
+
+	public boolean isError() {
+		return error;
+	}
+
+	public void setError(boolean error) {
+		this.error = error;
+	}
 
 	public String getId() {
 		return id;

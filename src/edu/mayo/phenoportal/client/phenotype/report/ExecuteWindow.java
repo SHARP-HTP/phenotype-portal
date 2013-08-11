@@ -5,6 +5,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.VerticalAlignment;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -119,15 +120,19 @@ public class ExecuteWindow extends Window {
 			@Override
 			public void onSuccess(Execution result) {
 
-				boolean printDebug = false;
+				boolean printDebug = true;
 				if (printDebug) {
 					printExecutionResults(result);
 				}
 
-				String title = "Phenotype Execution Complete";
-				String message = "The Phenotype execution is complete.  You can view the results in the Summary, Demographics and WorkFlow tabs.";
-				MessageWindow messageWindow = new MessageWindow(title, message);
-				messageWindow.show();
+				if (result.isError()) {
+					SC.warn("An error occurred while executing the algorithm.");
+				} else {
+					String title = "Phenotype Execution Complete";
+					String message = "The Phenotype execution is complete.  You can view the results in the Summary, Demographics and WorkFlow tabs.";
+					MessageWindow messageWindow = new MessageWindow(title, message);
+					messageWindow.show();
+				}
 
 				Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteCompletedEvent(true, result));
 			}
