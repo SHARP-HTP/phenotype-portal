@@ -58,21 +58,22 @@ public class AlgorithmPanel extends VLayout {
             @Override
             public void onClick(ClickEvent event) {
 	            /* TODO: Implement with actual users creds */
-	            PhenotypeServiceAsync service = GWT.create(PhenotypeService.class);
-	            service.getMatEditorUrl(Htp.getLoggedInUser(), new AsyncCallback<String>() {
-		            @Override
-		            public void onFailure(Throwable caught) {
-			            String title = "Login Failed";
-			            String message = "Failed to login to the Measure Authoring Tool.<br/>&nbsp;Invalid Id/Password. Please try again.";
-			            MessageWindow messageWindow = new MessageWindow(title, message);
-			            messageWindow.show();
-		            }
-
-		            @Override
-		            public void onSuccess(String result) {
-			            Window.open(result, "mat", null);
-		            }
-	            });
+//	            PhenotypeServiceAsync service = GWT.create(PhenotypeService.class);
+//	            service.getMatEditorUrl(Htp.getLoggedInUser(), new AsyncCallback<String>() {
+//		            @Override
+//		            public void onFailure(Throwable caught) {
+//			            String title = "Login Failed";
+//			            String message = "Failed to login to the Measure Authoring Tool.<br/>&nbsp;Invalid Id/Password. Please try again.";
+//			            MessageWindow messageWindow = new MessageWindow(title, message);
+//			            messageWindow.show();
+//		            }
+//
+//		            @Override
+//		            public void onSuccess(String result) {
+////			            Window.open(result, "mat", null);
+//		            }
+//	            });
+			    Window.open(CREATE_URL, "mat", null);
             }
         });
 
