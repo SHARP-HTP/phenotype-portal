@@ -37,8 +37,7 @@ public class DashboardTabSet extends TabSet {
     protected void getStatsData() {
         PhenotypeServiceAsync service = GWT.create(PhenotypeService.class);
 
-        // TODO change API to not send Title
-        service.getDbStats("", new AsyncCallback<Execution>() {
+        service.getStaticDbStats(new AsyncCallback<Execution>() {
 
             @Override
             public void onSuccess(Execution result) {
@@ -64,7 +63,7 @@ public class DashboardTabSet extends TabSet {
                         Number[] yAxisValues = ChartUtils.getYAxisValues(stats);
 
                         DashboardTab dashboardTab = new DashboardTab(categoryType, xAxisValues,
-                                yAxisValues, i_showChartLegend);
+                          yAxisValues, i_showChartLegend);
                         addTab(dashboardTab);
                     }
 
@@ -79,5 +78,48 @@ public class DashboardTabSet extends TabSet {
                 SC.warn("Unable to retrieve DB statistics");
             }
         });
+
+        // TODO change API to not send Title
+//        service.getDbStats("", new AsyncCallback<Execution>() {
+//
+//            @Override
+//            public void onSuccess(Execution result) {
+//                // System.out.println("get the DB Stats reultls for " + title);
+//
+//                List<Demographic> demographics = result.getDemographics();
+//
+//                // go through the demographics - numberartor, demominator,
+//                // patient population (use the first one)
+//                for (Demographic demographic : demographics) {
+//
+//                    String demographicType = demographic.getType();
+//                    List<DemographicsCategory> categories = demographic.getDemoCategoryList();
+//
+//                    // go through the categories - gender, ethnicity, age,
+//                    // gender - and create a tab with a chart for each
+//                    for (DemographicsCategory category : categories) {
+//
+//                        String categoryType = category.getName();
+//                        List<DemographicStat> stats = category.getDemoStatList();
+//
+//                        String[] xAxisValues = ChartUtils.getXAxisValues(stats);
+//                        Number[] yAxisValues = ChartUtils.getYAxisValues(stats);
+//
+//                        DashboardTab dashboardTab = new DashboardTab(categoryType, xAxisValues,
+//                                yAxisValues, i_showChartLegend);
+//                        addTab(dashboardTab);
+//                    }
+//
+//                    // TODO CME - change when we get real db stats...
+//                    // Just loop through once. This is not real data!
+//                    break;
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Throwable caught) {
+//                SC.warn("Unable to retrieve DB statistics");
+//            }
+//        });
     }
 }

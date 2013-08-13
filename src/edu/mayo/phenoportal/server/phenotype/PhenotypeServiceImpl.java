@@ -963,8 +963,8 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
             }
             in.close();
         } catch (Exception e) {// Catch exception if any
-            s_logger.log(Level.INFO, "Error reading the file:" + e.getMessage());
-            return errorString;
+            s_logger.log(Level.SEVERE, "Error reading the file:" + e.getMessage());
+            return errorString + "<b/>" + e.getMessage();
         }
         return sb.toString();
     }
@@ -982,8 +982,8 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
 			}
 			in.close();
 		} catch (Exception e) {// Catch exception if any
-			s_logger.log(Level.INFO, "Error reading the file:" + e.getMessage());
-			return errorString;
+			s_logger.log(Level.SEVERE, "Error reading the file:" + e.getMessage());
+			return errorString + "<br/>" + e.getMessage();
 		}
 		return sb.toString();
 	}
@@ -1275,16 +1275,79 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
         return success;
     }
 
+    private static final String DB_STATS = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+      "<Demographics>\n"+
+      "\t<DemographicType>\n"+
+      "\t\t<type>Initial Patient Population</type>\n"+
+      "\t\t<DemographicCategory>\n"+
+      "\t\t\t<name>gender</name>\n"+
+      "\t\t\t<DemographicStat>\n"+
+      "\t\t\t\t<label>female</label>\n"+
+      "\t\t\t\t<value>18</value>\n"+
+      "\t\t\t</DemographicStat>\n"+
+      "\t\t\t<DemographicStat>\n"+
+      "\t\t\t\t<label>male</label>\n"+
+      "\t\t\t\t<value>18</value>\n"+
+      "\t\t\t</DemographicStat>\n"+
+      "\t\t</DemographicCategory>\n"+
+      "\t\t<DemographicCategory>\n"+
+      "\t\t\t<name>age</name>\n"+
+      "\t\t\t<DemographicStat>\n"+
+      "\t\t\t\t<label>(0,18)</label>\n"+
+      "\t\t\t\t<value>12</value>\n"+
+      "\t\t\t</DemographicStat>\n"+
+      "\t\t\t<DemographicStat>\n"+
+      "\t\t\t\t<label>(19,30)</label>\n"+
+      "\t\t\t\t<value>9</value>\n"+
+      "\t\t\t</DemographicStat>\n"+
+      "\t\t\t<DemographicStat>\n"+
+      "\t\t\t\t<label>(30,60)</label>\n"+
+      "\t\t\t\t<value>8</value>\n"+
+      "\t\t\t</DemographicStat>\n"+
+      "\t\t\t<DemographicStat>\n"+
+      "\t\t\t\t<label>(60,75)</label>\n"+
+      "\t\t\t\t<value>6</value>\n"+
+      "\t\t\t</DemographicStat>\n"+
+      "\t\t\t<DemographicStat>\n"+
+      "\t\t\t\t<label>(75,above)</label>\n"+
+      "\t\t\t\t<value>1</value>\n"+
+      "\t\t\t</DemographicStat>\n"+
+      "\t\t</DemographicCategory>\n"+
+      "\t\t<DemographicCategory>\n"+
+      "\t\t\t<name>race</name>\n"+
+      "\t\t\t<DemographicStat>\n"+
+      "\t\t\t\t<label>American Indian</label>\n"+
+      "\t\t\t\t<value>36</value>\n"+
+      "\t\t\t</DemographicStat>\n"+
+      "\t\t</DemographicCategory>\n"+
+      "\t\t<DemographicCategory>\n"+
+      "\t\t\t<name>ethnicity</name>\n"+
+      "\t\t\t<DemographicStat>\n"+
+      "\t\t\t\t<label>Non Hispanic or Latio</label>\n"+
+      "\t\t\t\t<value>36</value>\n"+
+      "\t\t\t</DemographicStat>\n"+
+      "\t\t</DemographicCategory>\n"+
+      "\t</DemographicType>\n"+
+      "</Demographics>";
+
     @Override
     public Execution getDbStats(String type) throws IllegalArgumentException {
         // TODO - This is getting execution results from a file...
         // We need to make a REST call to get the actual data in the future.
-	    String xml = readFile(this.getClass().getResourceAsStream("diseaseData.xml"), "Error reading DB stats file.");
+//	    String xml = readFile(PhenotypeServiceImpl.class.getResourceAsStream("diseaseData.xml"), "Error reading DB stats file.");
 
-        List<Demographic> demographics = getDemographics(xml);
+        List<Demographic> demographics = getDemographics(DB_STATS);
         Execution executionResults = new Execution();
         executionResults.setDemographics(demographics);
 
+        return executionResults;
+    }
+
+    @Override
+    public Execution getStaticDbStats() throws IllegalArgumentException {
+        List<Demographic> demographics = getDemographics(DB_STATS);
+        Execution executionResults = new Execution();
+        executionResults.setDemographics(demographics);
         return executionResults;
     }
 

@@ -91,4 +91,6 @@ public interface PhenotypeServiceAsync {
     void getMatImport(String tokenId, AsyncCallback<MatImport> async);
 
     void getExecutionValueSets(String executionId, AsyncCallback<List<ValueSet>> async);
+
+    void getStaticDbStats(AsyncCallback<Execution> async);
 }

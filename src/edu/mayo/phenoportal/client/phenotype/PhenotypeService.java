@@ -87,4 +87,6 @@ public interface PhenotypeService extends RemoteService {
 
     MatImport getMatImport(String tokenId) throws IllegalArgumentException;
 
+    Execution getStaticDbStats() throws IllegalArgumentException;
+
 }
