@@ -3,6 +3,7 @@
 
 	<property file="build.properties" />
 	<property name="compile.dir" location="war/WEB-INF/classes" />
+	<property name="deploy.dir" location="war/WEB-INF/deploy" />
 	<property name="lib.dir" location="lib" />
 	<property name="dist.dir" location="dist" />
 	<property name="dist.name" value="htp.war" />
@@ -110,9 +111,11 @@
 	</target>
 
 	<target name="clean" description="Cleans this project">
-		<delete dir="${compile.dir}" failonerror="false" />
-		<delete dir="war/htp" failonerror="false" />
 		<delete dir="${dist.dir}" failonerror="false" />
+		<delete dir="${compile.dir}" failonerror="false" />
+		<delete dir="${deploy.dir}" failonerror="false" />
+		<delete dir="gwt-unitCache" failonerror="false" />
+		<delete dir="war/htp" failonerror="false" />
 	</target>
 
 	<target name="deploy-tomcat" depends="war" description="Deploys war to Tomcat">
