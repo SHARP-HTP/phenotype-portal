@@ -1,12 +1,11 @@
 package edu.mayo.phenoportal.server.upload;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import edu.mayo.phenoportal.client.upload.ClientUploadItems;
 import edu.mayo.phenoportal.client.upload.FileService;
 import edu.mayo.phenoportal.server.database.DBConnection;
 import edu.mayo.phenoportal.shared.AlgorithmType;
-import edu.mayo.phenoportal.shared.database.UploadColumns;
 import edu.mayo.phenoportal.utils.SQLStatements;
-import edu.mayo.phenotype.server.BasePhenoportalServlet;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +13,7 @@ import java.sql.ResultSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class FileServiceImpl extends BasePhenoportalServlet implements FileService {
+public class FileServiceImpl extends RemoteServiceServlet implements FileService {
 
     private static final long serialVersionUID = 1L;
     static final Logger lgr = Logger.getLogger(FileServiceImpl.class.getName());
@@ -26,7 +25,7 @@ public class FileServiceImpl extends BasePhenoportalServlet implements FileServi
         PreparedStatement st = null;
         ResultSet rs = null;
         ClientUploadItems clientUploadItems = new ClientUploadItems();
-        conn = DBConnection.getDBConnection(getBasePath());
+        conn = DBConnection.getDBConnection();
 
         if (conn != null) {
             try {

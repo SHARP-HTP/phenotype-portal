@@ -4,8 +4,8 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -26,10 +25,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import edu.mayo.phenoportal.utils.ServletUtils;
 import mayo.edu.cts2.editor.server.Cts2EditorServiceProperties;
 
 import org.apache.commons.io.FileUtils;
@@ -43,7 +40,6 @@ import edu.mayo.phenoportal.server.utils.DateConverter;
 import edu.mayo.phenoportal.server.utils.SmtpClient;
 import edu.mayo.phenoportal.shared.Demographic;
 import edu.mayo.phenoportal.shared.Execution;
-import edu.mayo.phenoportal.shared.Image;
 import edu.mayo.phenoportal.shared.MatImport;
 import edu.mayo.phenoportal.shared.News;
 import edu.mayo.phenoportal.shared.SharpNews;
@@ -59,9 +55,8 @@ import edu.mayo.phenoportal.shared.database.UploadColumns;
 import edu.mayo.phenoportal.shared.database.UserColumns;
 import edu.mayo.phenoportal.shared.database.UserRoleRequestColumns;
 import edu.mayo.phenoportal.utils.SQLStatements;
-import edu.mayo.phenotype.server.BasePhenoportalServlet;
 
-public class PhenotypeServiceImpl extends BasePhenoportalServlet implements PhenotypeService {
+public class PhenotypeServiceImpl extends RemoteServiceServlet implements PhenotypeService {
 
     private static Logger s_logger = Logger.getLogger(PhenotypeServiceImpl.class.getName());
     private static final long serialVersionUID = 1L;
@@ -69,7 +64,8 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
     // XML Settings
     public static final String ROOT = "List";
-
+	private static String i_fileName = "";
+	
     @Override
     /*
      * Make database connection and queries Mysql to generate the PhenotypeTree
@@ -97,7 +93,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
     // Get the categories and create the Xml
     private void getCategoriesFromDB(CategoryXmlGenerator generator, String categoryId) {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -130,7 +126,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
     private void getAlgorithmsFromDB(CategoryXmlGenerator generator, String categoryId)
             throws IllegalArgumentException {
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -209,12 +205,12 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
         synchronized (cts2ServerPropertiesLock) {
             if (!cts2RestPropertiesSet) {
-                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(getCts2RestUrl());
+                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(ServletUtils.getCts2RestUrl());
                 Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(
-                        getCts2RestUser(), getCts2RestPassword());
+                  ServletUtils.getCts2RestUser(), ServletUtils.getCts2RestPassword());
                 Cts2EditorServiceProperties
-                        .setValueSetDefinitionMaintenanceEntitiesUrl(getCts2EntityRestUrl());
-                Cts2EditorServiceProperties.setValueSetRestPageSize(getCts2RestPageSize());
+                        .setValueSetDefinitionMaintenanceEntitiesUrl(ServletUtils.getCts2EntityRestUrl());
+                Cts2EditorServiceProperties.setValueSetRestPageSize(ServletUtils.getCts2RestPageSize());
 	            cts2RestPropertiesSet = true;
             }
         }
@@ -235,12 +231,12 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
         synchronized (cts2ServerPropertiesLock) {
             if (!cts2RestPropertiesSet) {
-                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(getCts2RestUrl());
+                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(ServletUtils.getCts2RestUrl());
                 Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(
-                        getCts2RestUser(), getCts2RestPassword());
+                  ServletUtils.getCts2RestUser(), ServletUtils.getCts2RestPassword());
                 Cts2EditorServiceProperties
-                        .setValueSetDefinitionMaintenanceEntitiesUrl(getCts2EntityRestUrl());
-                Cts2EditorServiceProperties.setValueSetRestPageSize(getCts2RestPageSize());
+                        .setValueSetDefinitionMaintenanceEntitiesUrl(ServletUtils.getCts2EntityRestUrl());
+                Cts2EditorServiceProperties.setValueSetRestPageSize(ServletUtils.getCts2RestPageSize());
 	            cts2RestPropertiesSet = true;
             }
         }
@@ -251,10 +247,9 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
     private String getHtml(AlgorithmData algorithmData) {
         String completeHtml = null;
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st;
         ResultSet rs;
-        s_logger.fine("Basepath:" + getBasePath());
 
         if (conn != null) {
             try {
@@ -265,7 +260,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
                 while (rs.next()) {
                     String location = rs.getString(4);
-                    String criteriaFileLocation = getPathFromStartupPropertiesFile();
+                    String criteriaFileLocation = ServletUtils.getAlgorithmPath();
 
                     s_logger.fine("criteriaFileLocation:" + criteriaFileLocation);
 
@@ -327,7 +322,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         String executionStatus = "";
         Execution execution = new Execution();
 	    String xmlPathInfo = getXmlFile(algorithmData.getId());
-        String xmlPath = getPathFromStartupPropertiesFile() + '/' + xmlPathInfo;
+        String xmlPath = ServletUtils.getAlgorithmPath() + '/' + xmlPathInfo;
         File xmlFile = new File(xmlPath);
         String executionDateRangeFrom = DateConverter.getDateString(fromDate);
         String executionDateRangeTo = DateConverter.getDateString(toDate);
@@ -338,7 +333,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
             // execute the algorithm. This will return immediately with an id to
             // the resource that is executing.
-            locationUrl = RestExecuter.getInstance(getBasePath()).createExecution(xmlFile,
+            locationUrl = RestExecuter.getInstance().createExecution(xmlFile,
                     executionDateRangeFrom, executionDateRangeTo);
             execution.setUrl(locationUrl);
 
@@ -347,7 +342,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                 while (!executionStatus.equals(RestExecuter.STATUS_COMPLETE)
                         && !executionStatus.equals(RestExecuter.STATUS_FAILED)) {
                     Thread.sleep(500);
-                    executionStatus = RestExecuter.getInstance(getBasePath()).pollStatus(
+                    executionStatus = RestExecuter.getInstance().pollStatus(
                             locationUrl);
                 }
             } catch (InterruptedException ie) {
@@ -371,7 +366,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
             executionStatus = RestExecuter.STATUS_ERROR;
 	        execution.setError(true);
         } finally {
-            Connection conn = DBConnection.getDBConnection(getBasePath());
+            Connection conn = DBConnection.getDBConnection();
             try {
                 long endExecution = System.currentTimeMillis();
                 long elapsedTime = endExecution - startExecution;
@@ -411,17 +406,24 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         return execution;
     }
 
+	public void setFileName(String fileName, String version, String category) {
+		this.i_fileName = fileName + "_" + version + "_" + category;
+	}
+
+	public String getFileName() {
+		return i_fileName;
+	}
+	
     private void persistExecution(Execution executionResults) throws Exception {
         String locationUrl = executionResults.getUrl();
-        String basePath = getBasePath();
         executionResults.setId(UUID.randomUUID().toString());
 
         /* Save the execution results to the file system */
         String relativePath = executionResults.getId() + File.separator;
-        String executionResultsPath = getExecutionResultsPath() + File.separator + relativePath;
+        String executionResultsPath = ServletUtils.getExecutionResultsPath() + File.separator + relativePath;
 
         /* Demographics */
-        String returnedXml = RestExecuter.getInstance(getBasePath()).getXml(locationUrl + "/xml");
+        String returnedXml = RestExecuter.getInstance().getXml(locationUrl + "/xml");
         String demographicsFileName = "demographics.xml";
         File xmlFile = new File(executionResultsPath + demographicsFileName);
         FileUtils.writeStringToFile(xmlFile, returnedXml, "utf-8");
@@ -430,56 +432,43 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         executionResults.setXmlPath(relativePath + demographicsFileName);
 
         /* Drools workflow Image */
-        String returnedImage = RestExecuter.getImage(locationUrl + "/image", basePath + "images/",
-                getFileName());
-        String imageFileName = "workflow.png";
-        File imageFile = new File(executionResultsPath + imageFileName);
-        FileUtils.copyFile(new File(basePath + "images/" + returnedImage), imageFile);
-        executionResults.setImage(getImage(relativePath + imageFileName));
-
-        /* Drools workflow bpmn */
-        /* TODO: get/set Drools bpmn file. */
-        // String returnedBpmn = RestExecuter.getBpmn(locationUrl + "/bpmn",
-        // basePath + "bpmn/",
-        // getFileName());
-        // String bpmnFileName = "workflow.bpmn";
-        // File bpmnFile = new File(executionResultsPath + bpmnFileName);
-        // FileUtils.copyFile(new File(basePath + "bpmn/" + returnedBpmn),
-        // bpmnFile);
-        // executionResults.setBpmnPath(relativePath + bpmnFileName);
-
-        /* Drools rules */
-        /* TODO: get/set Drools rules. */
+	    /* TODO: Renable workflow image? */
+//        String returnedImage = RestExecuter.getImage(locationUrl + "/image", basePath + "images/",
+//                getFileName());
+//        String imageFileName = "workflow.png";
+//        File imageFile = new File(executionResultsPath + imageFileName);
+//        FileUtils.copyFile(new File(basePath + "images/" + returnedImage), imageFile);
+//        executionResults.setImage(getImage(relativePath + imageFileName));
     }
 
-    private Image getImage(String imagePath) throws IOException {
-        String basePath = getExecutionResultsPath();
-        File imageFile = new File(basePath + File.separator + imagePath);
-        Image image = new Image();
-        image.setImagePath(imagePath);
-        ImageInputStream in = ImageIO.createImageInputStream(imageFile);
-        try {
-            final Iterator<?> readers = ImageIO.getImageReaders(in);
-            if (readers.hasNext()) {
-                ImageReader reader = (ImageReader) readers.next();
-                try {
-                    reader.setInput(in);
-                    image.setWidth(reader.getWidth(0));
-                    image.setHeight(reader.getHeight(0));
-                } finally {
-                    reader.dispose();
-                }
-            }
-        } finally {
-            if (in != null)
-                in.close();
-        }
-
-        return image;
-    }
+//    private Image getImage(String imagePath) throws IOException {
+//        String basePath = getExecutionResultsPath();
+//        File imageFile = new File(basePath + File.separator + imagePath);
+//        Image image = new Image();
+//        image.setImagePath(imagePath);
+//        ImageInputStream in = ImageIO.createImageInputStream(imageFile);
+//        try {
+//            final Iterator<?> readers = ImageIO.getImageReaders(in);
+//            if (readers.hasNext()) {
+//                ImageReader reader = (ImageReader) readers.next();
+//                try {
+//                    reader.setInput(in);
+//                    image.setWidth(reader.getWidth(0));
+//                    image.setHeight(reader.getHeight(0));
+//                } finally {
+//                    reader.dispose();
+//                }
+//            }
+//        } finally {
+//            if (in != null)
+//                in.close();
+//        }
+//
+//        return image;
+//    }
 
     public String getCategoryPath(String parentId) {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st;
         ResultSet rs;
 
@@ -524,7 +513,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         // Create the root element
         xmlGenerator.createDocumentAndRootElement(ExecutionsXmlGenerator.EXECUTIONS);
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -562,7 +551,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         // Create the root element
         xmlGenerator.createDocumentAndRootElement(UploadersXmlGenerator.UPLOADERS);
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -591,7 +580,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
     @Override
     public User getUser(String userId) throws IllegalArgumentException {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -637,7 +626,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         // Create the root element
         xmlGenerator.createDocumentAndRootElement(UsersXmlGenerator.USERS);
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -677,7 +666,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
     @Override
     public Boolean updateUser(User user) throws IllegalArgumentException {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -700,7 +689,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
     @Override
     public Boolean removeUser(User user) throws IllegalArgumentException {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -724,7 +713,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
     @Override
     public Boolean requestPermissionUpgrade(User user) throws IllegalArgumentException {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -757,7 +746,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
     @Override
     public UserRoleRequest getUserRoleRequest(User user) throws IllegalArgumentException {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -806,7 +795,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         // Create the root element
         xmlGenerator.createDocumentAndRootElement(UserRoleRequestXmlGenerator.USER_ROLE_REQUESTS);
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -840,7 +829,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
     public Boolean updateUserRoleRequest(UserRoleRequest userRoleRequest)
             throws IllegalArgumentException {
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -890,7 +879,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
             String fileTitle = it.next();
             String fileName = fileInfo.get(fileTitle);
 
-            String fileData = readFile(getBasePath() + fileName, errorHtml);
+            String fileData = readFile(getServletContext().getContextPath() + File.pathSeparator + fileName, errorHtml);
             fileContents.put(fileTitle, fileData);
 
         }
@@ -906,7 +895,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
     private String getZipFile(int algorithmId) {
         String zipPath = null;
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -929,7 +918,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 	private String getXmlFile(int algorithmId) {
 		String xmlPath = null;
 
-		Connection conn = DBConnection.getDBConnection(getBasePath());
+		Connection conn = DBConnection.getDBConnection();
 		PreparedStatement st = null;
 		ResultSet rs = null;
 
@@ -980,23 +969,32 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         return sb.toString();
     }
 
+	private String readFile(InputStream inStream, String errorString) {
+
+		StringBuilder sb = new StringBuilder();
+		try {
+			DataInputStream in = new DataInputStream(inStream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+			String strLine;
+			while ((strLine = br.readLine()) != null) {
+				sb.append(strLine);
+			}
+			in.close();
+		} catch (Exception e) {// Catch exception if any
+			s_logger.log(Level.INFO, "Error reading the file:" + e.getMessage());
+			return errorString;
+		}
+		return sb.toString();
+	}
+
     /**
      * Method to read the logging properties
      */
 
     @Override
     public void initializeLogging() throws IllegalArgumentException {
-        try {
-            FileInputStream fileInput = new FileInputStream(getBasePath()
-                    + "data/LogProperties.properties");
-
-            LogManager.getLogManager().readConfiguration(fileInput);
-
-            fileInput.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+	    ServletUtils.initializeLogging();
     }
 
     /**
@@ -1011,14 +1009,14 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         // Create the root element
         xmlGenerator.createDocumentAndRootElement(AlgorithmXmlGenerator.ALGORITHMS);
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
 
         if (conn != null) {
             try {
-                int limit = getAlgorithmLimitFromStartupPropertiesFile();
+                int limit = ServletUtils.getRecentlyUploadedLimit();
 
                 // get the latest algorithms based on uploaded date.
                 st = conn.prepareStatement(SQLStatements.selectRecentlyUploadedAlgorithms(limit));
@@ -1061,7 +1059,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         // Create the root element
         xmlGenerator.createDocumentAndRootElement(NewsXmlGenerator.NEW_ITEMS);
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -1091,7 +1089,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
      */
     @Override
     public Boolean addNews(News news) throws IllegalArgumentException {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -1117,7 +1115,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
      */
     @Override
     public Boolean updateNews(News news) throws IllegalArgumentException {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -1140,7 +1138,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
     @Override
     public Boolean removeNews(News news) throws IllegalArgumentException {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -1175,7 +1173,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         // Create the root element
         xmlGenerator.createDocumentAndRootElement(SharpNewsXmlGenerator.SHARP_NEWS_ITEMS);
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -1207,7 +1205,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
     @Override
     public Boolean addSharpNews(SharpNews news) throws IllegalArgumentException {
 
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -1230,7 +1228,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
     @Override
     public Boolean updateSharpNews(SharpNews news) throws IllegalArgumentException {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -1256,7 +1254,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
     @Override
     public Boolean removeSharpNews(SharpNews news) throws IllegalArgumentException {
-        Connection conn = DBConnection.getDBConnection(getBasePath());
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -1277,64 +1275,11 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         return success;
     }
 
-    /**
-     * Read in the startup properties.
-     *
-     * @return Properties
-     */
-    private Properties getStartupPropertiesFile() {
-        FileInputStream in = null;
-        Properties starupProps = new Properties();
-
-        try {
-            in = new FileInputStream(getBasePath() + "data/Startup.properties");
-            starupProps.load(in);
-
-        } catch (FileNotFoundException ex) {
-            s_logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IOException ex) {
-            s_logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ex) {
-                s_logger.log(Level.SEVERE, ex.getMessage(), ex);
-            }
-        }
-        return starupProps;
-    }
-
-    // Read the path from startup properties
-    private String getPathFromStartupPropertiesFile() {
-        Properties starupProps = getStartupPropertiesFile();
-        return starupProps.getProperty("algorithmPath");
-    }
-
-    // Read the recently.uploaded.algorithms value from startup properties
-    private int getAlgorithmLimitFromStartupPropertiesFile() {
-        int limit = 5; // default
-
-        Properties starupProps = getStartupPropertiesFile();
-        String algorithmLimit = starupProps.getProperty("recently.uploaded.algorithms");
-
-        try {
-            limit = Integer.parseInt(algorithmLimit);
-        } catch (NumberFormatException nfe) {
-            s_logger.log(Level.SEVERE, "Error reading recently.uploaded.algorithms property. "
-                    + nfe.getMessage(), nfe);
-        }
-        return limit;
-    }
-
     @Override
     public Execution getDbStats(String type) throws IllegalArgumentException {
         // TODO - This is getting execution results from a file...
         // We need to make a REST call to get the actual data in the future.
-
-        String xml = readFile(getBasePath() + "data/diseaseData.xml",
-                "Error reading DB stats file.");
+	    String xml = readFile(this.getClass().getResourceAsStream("diseaseData.xml"), "Error reading DB stats file.");
 
         List<Demographic> demographics = getDemographics(xml);
         Execution executionResults = new Execution();
@@ -1386,53 +1331,14 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         }
     }
 
-    // public String openEditor() {
-    // DroolsMetadata droolsMd = new DroolsMetadata();
-    // droolsMd.setBpmnPath(getBasePath() + "/data/Disease.bpmn");
-    // insertGuvnor(droolsMd);
-    // s_logger.log(Level.INFO, "id: " + droolsMd.getGuvnorId());
-    //
-    // String id = droolsMd.getGuvnorId() != null ? droolsMd.getGuvnorId() :
-    // "1234";
-    // return getDesignerUrl() + "?profile=jbpm&uuid=" + id;
-    // }
-
-//    @Override
-//    public String openEditor(Execution execution) {
-//        String editorUrl = getDesignerUrl() + "/designer/editor?profile=jbpm&uuid=";
-//
-//        /* Copy from execution to drools */
-//        Drools droolsMetadata = new Drools();
-//        String droolsId = UUID.randomUUID().toString();
-//
-//        /* TODO: copy rules files */
-//
-//        try {
-//            String droolsPath = getDroolsFilesPath();
-//            File bpmnFile = new File(droolsPath + "workflow.bpmn");
-//            FileUtils.copyFile(new File(execution.getBpmnPath()), bpmnFile);
-//            droolsMetadata.setBpmnPath(bpmnFile.getPath());
-//            droolsMetadata.setId(droolsId);
-//        } catch (IOException ioe) {
-//            s_logger.log(Level.WARNING,
-//                    "Unable to copy the execution bpmn file to the drools directory.", ioe);
-//        }
-//
-//        /* insert into guvnor/drools */
-//        insertGuvnor(droolsMetadata);
-//        insertDrools(null, droolsMetadata, droolsId, Htp.getLoggedInUser().getUserName(), "test");
-//
-//        return editorUrl + droolsId;
-//    }
-
     @Override
     public String getMatEditorUrl(User user) {
         String url;
         if (user != null) {
-            url = super.getMatEditorUrl() + "/Login.html?userId=" + user.getUserName() + "&htpId="
+            url = ServletUtils.getMatEditorUrl() + "/Login.html?userId=" + user.getUserName() + "&htpId="
                     + user.getPassword();
         } else {
-            url = super.getMatEditorUrl();
+            url = ServletUtils.getMatEditorUrl();
         }
         return url;
     }
@@ -1442,272 +1348,10 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
         return ImportServlet.getMatImport(tokenId);
     }
 
-//    private void insertDrools(Connection connection, Drools droolsMetadata, String droolsId,
-//            String username, String algorithmName) {
-//        /* insert into drools table */
-//        PreparedStatement st = null;
-//        try {
-//            st = SQLStatements.insertDroolsStatement(connection, droolsMetadata);
-//            if (st != null) {
-//                st.execute();
-//            }
-//        } catch (SQLException sqle) {
-//            s_logger.log(Level.WARNING,
-//                    "Unable to insert the drools files into the guvnor repository.", sqle);
-//        } finally {
-//            DBConnection.close(st);
-//        }
-//    }
-
-//    private void insertGuvnor(Drools droolsMetadata) {
-//        s_logger.log(Level.INFO, "inserting guvnor...");
-//        File bpmnFile = new File(droolsMetadata.getBpmnPath());
-//        String addAssetUrl = getGuvnorUrl() + "/rest/packages/defaultPackage/assets";
-//
-//        s_logger.log(Level.INFO, "file: " + bpmnFile.getPath());
-//        s_logger.log(Level.INFO, "addAssetUrl: " + addAssetUrl);
-//
-//        String charset = "UTF-8";
-//        String CRLF = "\r\n"; // Line separator required by multipart/form-data.
-//
-//        try {
-//            URL url = new URL(addAssetUrl);
-//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//
-//            connection.setConnectTimeout(0);
-//            connection.setDoOutput(true);
-//            connection.setInstanceFollowRedirects(false);
-//            connection.setRequestProperty("Accept", "application/atom+xml");
-//            String authHeader = "Basic "
-//                    + Base64.encodeBytes((getGuvnorUser() + ":" + getGuvnorPass()).getBytes());
-//            connection.setRequestProperty("Authorization", authHeader);
-//            connection.setRequestMethod("POST");
-//            PrintWriter writer = null;
-//            try {
-//                OutputStream output = connection.getOutputStream();
-//                // true = autoFlush,important!
-//                writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
-//
-//                // Send binary file.
-//                writer.append("Content-Type: application/octet-stream").append(CRLF);
-//                // writer.append("Content-Transfer-Encoding: binary").append(CRLF);
-//                writer.append(
-//                        "Content-Disposition: form-data; name=\"Slug\"; filename=\""
-//                                + bpmnFile.getName() + "\"").append(CRLF);
-//
-//                writer.append(CRLF).flush();
-//                InputStream input = null;
-//                try {
-//                    input = new FileInputStream(bpmnFile);
-//                    byte[] buffer = new byte[1024];
-//                    for (int length = 0; (length = input.read(buffer)) > 0;) {
-//                        output.write(buffer, 0, length);
-//                    }
-//                    output.flush(); // Important! Output cannot be closed. Close
-//                                    // of
-//                    // writer will close output as well.
-//                } finally {
-//                    if (input != null) {
-//                        input.close();
-//                    }
-//                }
-//                writer.append(CRLF).flush(); // CRLF is important! It indicates
-//                                             // end
-//                // of binary boundary.
-//                // End of multipart/form-data.
-//
-//            } finally {
-//                if (writer != null) {
-//                    writer.close();
-//                }
-//                try {
-//                    s_logger.log(Level.INFO, "Getting response...");
-//                    connection.getContent();
-//                    InputStream in = connection.getInputStream();
-//                    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-//                    DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-//                    Document doc = docBuilder.parse(in);
-//
-//                    TransformerFactory transFactory = TransformerFactory.newInstance();
-//                    Transformer trans = transFactory.newTransformer();
-//                    trans.setOutputProperty(OutputKeys.METHOD, "xml");
-//                    trans.setOutputProperty(OutputKeys.INDENT, "yes");
-//
-//                    StringWriter sw = new StringWriter();
-//                    StreamResult result = new StreamResult(sw);
-//                    DOMSource source = new DOMSource(doc.getDocumentElement());
-//
-//                    trans.transform(source, result);
-//
-//                    s_logger.log(Level.INFO, "sw: " + sw.toString());
-//                    s_logger.log(Level.INFO, "result: " + result.toString());
-//
-//                    droolsMetadata.setGuvnorId(getGuvnorUuid(sw.toString()));
-//                } catch (IOException ioe) {
-//                    s_logger.log(Level.WARNING, connection.getErrorStream().toString(), ioe);
-//                } catch (Exception e) {
-//                    s_logger.log(Level.WARNING, "An error has occurred.", e);
-//
-//                }
-//                connection.disconnect();
-//            }
-//
-//        } catch (MalformedURLException e) {
-//            s_logger.log(Level.WARNING, "", e);
-//        } catch (IOException e) {
-//            s_logger.log(Level.WARNING, "", e);
-//        }
-
-        // if (bpmnFile.exists()) {
-        // try {
-        // String authHeader = "Basic "
-        // + Base64.encodeBytes((getGuvnorUser() + ":" +
-        // getGuvnorPass()).getBytes());
-        //
-        // GuvnorClient guvnorClient = null;
-        // try {
-        // guvnorClient = ProxyFactory.create(GuvnorClient.class,
-        // guvnorRestUrl);
-        // } catch (Exception e) { s_logger.log(Level.INFO, "error: ", e);}
-        //
-        // if (guvnorClient != null) {
-        // s_logger.log(Level.INFO, "adding asset to guvnor");
-        // String xmlResponse = guvnorClient.addAsset("defaultPackage",
-        // authHeader, UUID.randomUUID()
-        // .toString() + ".bpmn", FileUtils.readFileToByteArray(bpmnFile));
-        // droolsMetadata.setGuvnorId(getGuvnorUuid(xmlResponse));
-        // }
-        // }
-        // catch (IOException ioe) {
-        // s_logger.log(Level.WARNING,
-        // "Unable to insert bpmn into Guvnor repository.", ioe);
-        // }
-        // }
-        // else {
-        // s_logger.log(Level.WARNING, "The BPMN_PATH file '" +
-        // bpmnFile.getAbsolutePath()
-        // + "' did not exist");
-        // }
-//    }
-
-//    private String getGuvnorUuid(String xmlString) {
-//        s_logger.log(Level.INFO, "Guvnor Response: " + xmlString);
-//        String uuidString = null;
-//
-//        if (xmlString != null) {
-//            try {
-//                Document document;
-//                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-//                        .newInstance();
-//                DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-//                document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(xmlString
-//                        .getBytes("utf-8"))));
-//                document.getDocumentElement().normalize();
-//
-//                XPath xpath = XPathFactory.newInstance().newXPath();
-//                String xtractUUID = "/entry/metadata/uuid/value";
-//                XPathExpression expression = xpath.compile(xtractUUID);
-//                uuidString = expression.evaluate(document);
-//                s_logger.log(Level.INFO, "Extracted UUID: " + uuidString);
-//            } catch (ParserConfigurationException pce) {
-//                s_logger.log(Level.WARNING, "Error parsing the xml string.", pce);
-//            } catch (SAXException saxe) {
-//                s_logger.log(Level.WARNING, "Error building the xml document.", saxe);
-//            } catch (IOException ioe) {
-//                s_logger.log(Level.WARNING, "Error parsing the xml string.", ioe);
-//            } catch (XPathExpressionException xpee) {
-//                s_logger.log(Level.WARNING, "Unable to compile xpath expression.", xpee);
-//            }
-//        }
-//
-//        return uuidString;
-//    }
-
-//    /**
-//     *
-//     */
-//    @Override
-//    public Boolean saveJbpm(String uuid, String bpmn, String title, String comment) {
-//        Boolean success = new Boolean(false);
-//        Connection conn = DBConnection.getDBConnection(getBasePath());
-//        PreparedStatement st = null;
-//        ResultSet rs = null;
-//
-//        Drools parent = new Drools();
-//        try {
-//            st = SQLStatements.selectDroolsStatement(conn, uuid);
-//
-//            rs = st.executeQuery();
-//            boolean editable = false;
-//            if (rs.next()) {
-//                editable = rs.getBoolean(DroolsColumns.EDITABLE.getColName());
-//                parent.setId(rs.getString(DroolsColumns.ID.getColName()));
-//                parent.setParentId(rs.getString(DroolsColumns.PARENT_ID.getColName()));
-//                parent.setBpmnPath(rs.getString(DroolsColumns.BPMN_PATH.getColName()));
-//                parent.setImagePath(rs.getString(DroolsColumns.IMAGE_PATH.getColName()));
-//                parent.setRulesPath(rs.getString(DroolsColumns.RULES_PATH.getColName()));
-//                parent.setTitle(rs.getString(DroolsColumns.TITLE.getColName()));
-//                parent.setComment(rs.getString(DroolsColumns.COMMENT.getColName()));
-//                parent.setUsername(rs.getString(DroolsColumns.USERNAME.getColName()));
-//                parent.setEditable(editable);
-//            }
-//
-//            String droolsFilesPath = getDroolsFilesPath();
-//
-//            if (editable) {
-//                /* TODO: Update file */
-//                /* TODO: backup original file in case sql fails */
-//
-//                /* Update Drools in database */
-//                st = SQLStatements.updateDroolsStatement(conn, uuid, bpmn, title, comment);
-//                success = st.execute();
-//
-//            } else {
-//                /* Create new file */
-//                String droolsId = UUID.randomUUID().toString();
-//                File bpmnFile = new File(droolsFilesPath + File.separator + droolsId
-//                        + File.separator + "workflow.bpmn");
-//                FileUtils.writeStringToFile(bpmnFile, bpmn, "utf-8");
-//
-//                /* Copy drools rules from parent */
-//                // String rulesPath = droolsFilesPath + File.separator + "%s" +
-//                // File.separator + "rules";
-//                // File parentRulesDir = new File(String.format(rulesPath,
-//                // parent.getId()));
-//                // File rulesDir = new File(String.format(rulesPath, droolsId));
-//                // FileUtils.copyDirectory(parentRulesDir, rulesDir);
-//
-//                /* Insert new Drools into database */
-//                Drools drools = parent.clone();
-//                drools.setId(droolsId);
-//                drools.setParentId(uuid);
-//                drools.setBpmnPath(bpmnFile.getPath());
-//                drools.setTitle(title);
-//                drools.setComment(comment);
-//                drools.setEditable(true);
-//                st = SQLStatements.insertDroolsStatement(conn, drools);
-//                success = st.execute();
-//            }
-//        } catch (SQLException sqle) {
-//            s_logger.log(Level.WARNING, "Unable to save the edited bpmn file.", sqle);
-//            /* TODO: clean up file system - remove the new files. */
-//            // FileUtils.deleteDirectory();
-//            // FileUtils.deleteQuietly();
-//        } catch (IOException ioe) {
-//            s_logger.log(Level.WARNING, "Unable to save the edited bpmn file.", ioe);
-//        } finally {
-//            DBConnection.closeConnection(conn, st, rs);
-//            /* TODO: remove backup bpmn file */
-//        }
-//
-//        return success;
-//
-//    }
-
     @Override
     public Execution getLatestExecution(String algorithmName, String algorithmVersion,
             String algorithmCategoryId, String algorithmUser) {
-        Connection connection = DBConnection.getDBConnection(getBasePath());
+        Connection connection = DBConnection.getDBConnection();
         PreparedStatement statement = null;
         ResultSet resultSet = null;
 
@@ -1737,12 +1381,13 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
                 execution.setBpmnPath(resultSet.getString(ExecutionColumns.BPMN_PATH.colName()));
                 execution.setRulesPath(resultSet.getString(ExecutionColumns.RULES_PATH.colName()));
                 String imagePath = resultSet.getString(ExecutionColumns.IMAGE_PATH.colName());
-                if (imagePath != null && !imagePath.isEmpty())
-                    execution.setImage(getImage(imagePath));
+	            /* TODO: re-enable workflow image? */
+//                if (imagePath != null && !imagePath.isEmpty())
+//                    execution.setImage(getImage(imagePath));
 
                 /* Demographics */
                 if (execution.getXmlPath() != null) {
-                    File xmlFile = new File(getExecutionResultsPath() + File.separator
+                    File xmlFile = new File(ServletUtils.getExecutionResultsPath() + File.separator
                             + execution.getXmlPath());
                     String xmlString = FileUtils.readFileToString(xmlFile);
                     List<Demographic> demographics = getDemographics(xmlString);
@@ -1769,7 +1414,7 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
 
 	    List<ValueSet> valueSets = new ArrayList<ValueSet>();
         String query = SQLStatements.getExecutionValueSets();
-        Connection connection = DBConnection.getDBConnection(getBasePath());
+        Connection connection = DBConnection.getDBConnection();
         PreparedStatement statement = null;
         ResultSet resultSet = null;
 
@@ -1795,32 +1440,32 @@ public class PhenotypeServiceImpl extends BasePhenoportalServlet implements Phen
     }
 
     private void sendRequestPersmissionUpgradeEmailAdmin(User user) {
-        String host = getSmtpHost();
-        String from = getSmtpFromAddress();
-        String messageText = getEmailContentsUserRoleRequestAdmin();
-        String port = getSmtpPort();
-        String pw = getSmtpPassword();
+        String host = ServletUtils.getSmtpHost();
+        String from = ServletUtils.getSmtpFromAddress();
+        String messageText = ServletUtils.getEmailContentsUserRoleRequestAdmin();
+        String port = ServletUtils.getSmtpPort();
+        String pw = ServletUtils.getSmtpPassword();
 
         SmtpClient.sendRequestPersmissionUpgradeEmailAdmin(host, from, pw, port, messageText, user);
     }
 
     private void sendRequestPersmissionUpgradeEmailUser(User user) {
-        String host = getSmtpHost();
-        String from = getSmtpFromAddress();
-        String messageText = getEmailContentsUserRoleRequestUser();
-        String port = getSmtpPort();
-        String pw = getSmtpPassword();
+        String host = ServletUtils.getSmtpHost();
+        String from = ServletUtils.getSmtpFromAddress();
+        String messageText = ServletUtils.getEmailContentsUserRoleRequestUser();
+        String port = ServletUtils.getSmtpPort();
+        String pw = ServletUtils.getSmtpPassword();
 
         SmtpClient.sendRequestPersmissionUpgradeEmailUser(host, from, pw, port, messageText, user);
     }
 
     private void sendResponsePersmissionUpgradeEmail(User user, boolean granted) {
-        String host = getSmtpHost();
-        String from = getSmtpFromAddress();
-        String messageText = granted ? getEmailContentsUserRoleReplyGranted()
-                : getEmailContentsUserRoleReplyDenied();
-        String port = getSmtpPort();
-        String pw = getSmtpPassword();
+        String host = ServletUtils.getSmtpHost();
+        String from = ServletUtils.getSmtpFromAddress();
+        String messageText = granted ? ServletUtils.getEmailContentsUserRoleReplyGranted()
+                : ServletUtils.getEmailContentsUserRoleReplyDenied();
+        String port = ServletUtils.getSmtpPort();
+        String pw = ServletUtils.getSmtpPassword();
 
         SmtpClient.sendResponsePersmissionUpgradeEmail(host, from, pw, port, messageText, user);
     }

@@ -8,7 +8,7 @@ import edu.mayo.phenoportal.server.utils.MimeUtils;
 import edu.mayo.phenoportal.shared.AlgorithmType;
 import edu.mayo.phenoportal.shared.database.UploadColumns;
 import edu.mayo.phenoportal.utils.SQLStatements;
-import edu.mayo.phenotype.server.BasePhenoportalHttpServlet;
+import edu.mayo.phenoportal.utils.ServletUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
@@ -32,6 +32,7 @@ import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -57,7 +58,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class UploadServlet extends BasePhenoportalHttpServlet {
+public class UploadServlet extends HttpServlet {
 
     private static final long serialVersionUID = 3457906406134591884L;
     private static String ALGORITHM_PATH = null;
@@ -90,7 +91,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
         UploadItems uploadItems = new UploadItems();
 
         if (ALGORITHM_PATH == null) {
-            ALGORITHM_PATH = getAlgorithmPath(request);
+            ALGORITHM_PATH = ServletUtils.getAlgorithmPath();
         }
 
         try {
@@ -449,7 +450,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
 	            }
 
                 /* Add metadata to database. */
-                success = insertUploadMetadata(request, uploadItems);
+                success = insertUploadMetadata(uploadItems);
 	            /* If value sets spreadsheet is present add value sets to CTS2 service */
 	            if (success && uploadItems.getXlsFile() != null) {
 		            success = insertValueSets(uploadItems, request);
@@ -468,13 +469,13 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
 
     }
 
-    public boolean insertUploadMetadata(HttpServletRequest request, UploadItems uploadItems) {
+    public boolean insertUploadMetadata(UploadItems uploadItems) {
 
         Connection conn = null;
         PreparedStatement st = null;
         ResultSet rs = null;
         boolean isSuccessful = false;
-        conn = DBConnection.getDBConnection(getBasePath(request));
+        conn = DBConnection.getDBConnection();
         int numSibs = -1;
 
         if (conn != null) {
@@ -562,7 +563,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
 	private boolean insertValueSets(UploadItems uploadItems, HttpServletRequest request) throws IOException {
 		boolean success;
 		File zipFile = uploadItems.getZipFile();
-		String url = getValueSetServiceUrl(request) + MAT_UPLOAD_PATH;
+		String url = ServletUtils.getCts2RestUrl() + MAT_UPLOAD_PATH;
 		HttpClient client = new DefaultHttpClient();
 		client.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION,
 		  HttpVersion.HTTP_1_1);
@@ -570,7 +571,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
 		credsProvider.setCredentials(
 		  AuthScope.ANY,
-		  new UsernamePasswordCredentials(getValueSetServiceUser(request), getValueSetServicePassword(request)));
+		  new UsernamePasswordCredentials(ServletUtils.getCts2RestUser(), ServletUtils.getCts2RestPassword()));
 		context.setAttribute(ClientContext.CREDS_PROVIDER, credsProvider);
 		int status = -1;
 		HttpResponse response = null;
@@ -605,7 +606,7 @@ public class UploadServlet extends BasePhenoportalHttpServlet {
         String zipPath = request.getParameter("ZipFilePath");
 	    String fileName = request.getParameter("FileName");
 
-        File algorithmFile = new File(getAlgorithmPath(request) + "/" + zipPath);
+        File algorithmFile = new File(ServletUtils.getAlgorithmPath() + "/" + zipPath);
         logger.info("Download requested: " + algorithmFile.getAbsolutePath());
 
         if (algorithmFile.exists()) {

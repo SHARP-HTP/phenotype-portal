@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpSession;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import edu.mayo.phenoportal.client.authentication.AuthenticationService;
 import edu.mayo.phenoportal.server.database.DBConnection;
 import edu.mayo.phenoportal.server.utils.DateConverter;
@@ -24,9 +25,9 @@ import edu.mayo.phenoportal.shared.MatImport;
 import edu.mayo.phenoportal.shared.User;
 import edu.mayo.phenoportal.shared.database.UserColumns;
 import edu.mayo.phenoportal.utils.SQLStatements;
-import edu.mayo.phenotype.server.BasePhenoportalServlet;
+import edu.mayo.phenoportal.utils.ServletUtils;
 
-public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
+public class AuthenticationServiceImpl extends RemoteServiceServlet implements
         AuthenticationService {
 
     private static Logger s_logger = Logger.getLogger(AuthenticationServiceImpl.class.getName());
@@ -137,7 +138,7 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
         Connection conn = null;
         PreparedStatement st = null;
         ResultSet rs = null;
-        conn = DBConnection.getDBConnection(getBasePath());
+        conn = DBConnection.getDBConnection();
 
         boolean success = false;
 
@@ -179,7 +180,7 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
         PreparedStatement st = null;
         ResultSet rs = null;
         User user = null;
-        conn = DBConnection.getDBConnection(getBasePath());
+        conn = DBConnection.getDBConnection();
 
         if (conn != null) {
             try {
@@ -221,7 +222,7 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
         Connection conn = null;
         PreparedStatement st = null;
         ResultSet rs = null;
-        conn = DBConnection.getDBConnection(getBasePath());
+        conn = DBConnection.getDBConnection();
         boolean isSuccessful = false;
 
         if (conn != null) {
@@ -246,11 +247,11 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
     }
 
     private void sendRegistrationEmail(User user) {
-        String host = getSmtpHost();
-        String from = getSmtpFromAddress();
-        String messageText = getEmailContentsUserRegistration();
-        String port = getSmtpPort();
-        String pw = getSmtpPassword();
+        String host = ServletUtils.getSmtpHost();
+        String from = ServletUtils.getSmtpFromAddress();
+        String messageText = ServletUtils.getEmailContentsUserRegistration();
+        String port = ServletUtils.getSmtpPort();
+        String pw = ServletUtils.getSmtpPassword();
 
         SmtpClient.sendRegistrationSuccessEmail(host, from, pw, port, messageText, user);
     }
@@ -258,7 +259,7 @@ public class AuthenticationServiceImpl extends BasePhenoportalServlet implements
 	private boolean registerMatUser(User user) {
 		boolean result = false;
 		String charset = "UTF-8";
-		String url = getMatEditorUrlInternal() + "/createUser";
+		String url = ServletUtils.getMatEditorUrlInternal() + "/createUser";
 		OutputStream output = null;
 		InputStream response = null;
 

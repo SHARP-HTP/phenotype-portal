@@ -33,7 +33,7 @@ public class CategoryTableCreator extends RemoteServiceServlet {
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
-        conn = DBConnection.getDBConnection("war/");
+        conn = DBConnection.getDBConnection();
 
         try {
             conn.setAutoCommit(false);

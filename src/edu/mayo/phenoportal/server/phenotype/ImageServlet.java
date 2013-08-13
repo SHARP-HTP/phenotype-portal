@@ -30,7 +30,7 @@ public class ImageServlet extends HttpServlet {
 
         try {
             OutputStream out = response.getOutputStream();
-            Files.copy(new File(ServletUtils.getExecutionResultsPath(request) + File.separator
+            Files.copy(new File(ServletUtils.getExecutionResultsPath() + File.separator
                     + imageId), out);
             out.flush();
             out.close();

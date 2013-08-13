@@ -5,7 +5,6 @@ import edu.mayo.phenoportal.shared.MatImport;
 import edu.mayo.phenoportal.shared.User;
 import edu.mayo.phenoportal.shared.database.UserColumns;
 import edu.mayo.phenoportal.utils.SQLStatements;
-import edu.mayo.phenotype.server.BasePhenoportalHttpServlet;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
@@ -13,6 +12,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -30,7 +30,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ImportServlet extends BasePhenoportalHttpServlet implements HttpSessionListener {
+public class ImportServlet extends HttpServlet implements HttpSessionListener {
 
 	private static final long serialVersionUID = 543451297123974157L;
 	private Logger logger = Logger.getLogger(ImportServlet.class.getName());
@@ -63,7 +63,7 @@ public class ImportServlet extends BasePhenoportalHttpServlet implements HttpSes
 				}
 
 				String userName = valueMap.get("userId");
-				User user = getUser(userName, request);
+				User user = getUser(userName);
 
 				if (user != null) {
 					String password = valueMap.get("password");
@@ -145,12 +145,12 @@ public class ImportServlet extends BasePhenoportalHttpServlet implements HttpSes
 		}
 	}
 
-	private User getUser(String name, HttpServletRequest request) {
+	private User getUser(String name) {
 		Connection conn = null;
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		User user = null;
-		conn = DBConnection.getDBConnection(getBasePath(request));
+		conn = DBConnection.getDBConnection();
 
 		if (conn != null) {
 			try {

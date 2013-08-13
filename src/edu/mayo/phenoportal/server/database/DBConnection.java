@@ -1,8 +1,12 @@
 package edu.mayo.phenoportal.server.database;
 
+import edu.mayo.phenoportal.utils.ServletUtils;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -21,61 +25,12 @@ import java.util.logging.Logger;
 public class DBConnection {
 
     static Logger logger = Logger.getLogger(DBConnection.class.getName());
+	static String url = ServletUtils.getDatabaseUrl();
+	static String user = ServletUtils.getDatabaseUser();
+	static String passwd = ServletUtils.getDatabasePassword();
 
-    /**
-     * This method should only be used internally in dev. Use
-     * getDBConnection(String path) to pass in the correct path to the
-     * properties file based on the current app server.
-     * 
-     * @return
-     */
     public static Connection getDBConnection() {
-        return getDBConnection("");
-    }
-
-    public static Connection getDBConnection(String path) {
-
         Connection con = null;
-        FileInputStream in = null;
-        FileInputStream startupIn = null;
-
-        Properties dbProps = new Properties();
-        Properties startupProps = new Properties();
-
-        try {
-
-            in = new FileInputStream(path + "data/database.properties");
-            startupIn = new FileInputStream(path + "data/Startup.properties");
-
-            dbProps.load(in);
-            startupProps.load(startupIn);
-
-        } catch (FileNotFoundException ex) {
-
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-
-        } catch (IOException ex) {
-
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-
-        } finally {
-
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ex) {
-
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            }
-        }
-
-        String mode = startupProps.getProperty("Mode");
-
-        String url = dbProps.getProperty(mode + "." + "db.url");
-        String user = dbProps.getProperty(mode + "." + "db.user");
-        String passwd = dbProps.getProperty(mode + "." + "db.passwd");
-
         try {
             // registering the jdbc driver here.
             // need to register the jdbc driver with the java application for
@@ -86,10 +41,9 @@ public class DBConnection {
             con = DriverManager.getConnection(url, user, passwd);
 
         } catch (Exception ex) {
-
             logger.log(Level.SEVERE, ex.getMessage(), ex);
-
         }
+
         return con;
     }
 

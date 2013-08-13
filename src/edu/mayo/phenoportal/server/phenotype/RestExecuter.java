@@ -1,6 +1,6 @@
 package edu.mayo.phenoportal.server.phenotype;
 
-import edu.mayo.phenotype.server.BasePhenoportalServlet;
+import edu.mayo.phenoportal.utils.ServletUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXParseException;
@@ -21,9 +21,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -35,18 +33,15 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class RestExecuter extends BasePhenoportalServlet {
-
-    private static final long serialVersionUID = 1L;
+public class RestExecuter {
 
     private static RestExecuter s_restExecuter;
-    private static String s_restUserId;
-    private static String s_restPw;
-    private static String s_restUrl;
+	private static String s_restUserId = ServletUtils.getRestUserId();
+	private static String s_restPw = ServletUtils.getRestPassword();
+	private static String s_restUrl = ServletUtils.getRestUrl();
     private static Logger logger = Logger.getLogger(RestExecuter.class.getName());
 
     public static final String STATUS_COMPLETE = "COMPLETE";
@@ -63,11 +58,10 @@ public class RestExecuter extends BasePhenoportalServlet {
      * 
      * @return
      */
-    public static RestExecuter getInstance(String path) {
+    public static RestExecuter getInstance() {
         if (s_restExecuter == null) {
             s_restExecuter = new RestExecuter();
 
-            s_restExecuter.setConnectionInfo(path);
             s_restExecuter.setHostNameVerifier();
             s_restExecuter.setAuth();
             s_restExecuter.trustSelfSignedSSL();
@@ -334,42 +328,6 @@ public class RestExecuter extends BasePhenoportalServlet {
             SSLContext.setDefault(ctx);
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Read in the User/PW for the Rest service
-     */
-    private void setConnectionInfo(String path) {
-
-        FileInputStream in = null;
-        Properties starupProps = new Properties();
-
-        try {
-            in = new FileInputStream(path + "data/Startup.properties");
-            starupProps.load(in);
-
-            s_restUserId = starupProps.getProperty("restUserId");
-            s_restPw = starupProps.getProperty("restPassword");
-            s_restUrl = starupProps.getProperty("restUrl");
-
-        } catch (FileNotFoundException ex) {
-            logger.log(
-                    Level.SEVERE,
-                    "Startup property file not found to read the username and password"
-                            + ex.getMessage(), ex);
-
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE,
-                    "I/O exception while readfing the credentials " + ex.getMessage(), ex);
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, "Exception closing the connection" + ex.getMessage(), ex);
-            }
         }
     }
 
