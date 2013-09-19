@@ -69,7 +69,7 @@ public class PhenotypeReportTabSet extends TabSet {
         addTab(i_fileInfoTab);
         addTab(i_criteriaTab);
         /* TODO: re-enable workflow tab */
-//        addTab(i_workflowTab);
+        // addTab(i_workflowTab);
         addTab(i_summaryTab);
         addTab(i_demographicsTab);
 
@@ -121,11 +121,14 @@ public class PhenotypeReportTabSet extends TabSet {
     }
 
     public void updateResults(Execution execution) {
+        if (execution != null) {
+            i_criteriaTab.setVersionsFromLastExecution(execution);
+        }
         if (execution != null && execution.getDemographics() != null
-                /* && execution.getImage() != null */) {
+        /* && execution.getImage() != null */) {
             generateGraphs(execution.getDemographics());
             /* TODO: re-enable workflow image */
-//            generateWorkflow(execution.getImage());
+            // generateWorkflow(execution.getImage());
 
             disableExecutionResultsTabs(false);
         } else {

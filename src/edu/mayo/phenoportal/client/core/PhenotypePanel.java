@@ -16,7 +16,6 @@ import edu.mayo.phenoportal.client.events.PhenotypeSelectionChangedEventHandler;
 import edu.mayo.phenoportal.client.navigation.NavigationPane;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeServiceAsync;
-import edu.mayo.phenoportal.client.phenotype.report.DataCriteriaListGrid;
 import edu.mayo.phenoportal.client.phenotype.report.ExecuteWindow;
 import edu.mayo.phenoportal.client.phenotype.report.PhenotypeDateRange;
 import edu.mayo.phenoportal.client.phenotype.report.PhenotypeReportTabSet;
@@ -67,7 +66,7 @@ public class PhenotypePanel extends HLayout {
 
         createPhenotypeSelectionChangedEventHandler();
         createLoggedInEventHandler();
-	    createExecutionSetupEventHandler();
+        createExecutionSetupEventHandler();
     }
 
     public void refreshTreeNavigation() {
@@ -110,6 +109,7 @@ public class PhenotypePanel extends HLayout {
                     @Override
                     public void onPhenotypeSelectionChanged(
                             PhenotypeSelectionChangedEvent phenotypeSelectionChangedEvent) {
+
                         updateSelection(phenotypeSelectionChangedEvent.getAlgorithmData());
 
                     }
@@ -133,16 +133,18 @@ public class PhenotypePanel extends HLayout {
         });
     }
 
-	private void createExecutionSetupEventHandler() {
-		Htp.EVENT_BUS.addHandler(PhenotypeExecuteSetupEvent.TYPE, new PhenotypeExecuteSetupEventHandler() {
-			@Override
-			public void onExecuteSetup(PhenotypeExecuteSetupEvent event) {
-				ExecuteWindow executeWindow = new ExecuteWindow(i_algorithmData, i_inputRange.getFromDate(), i_inputRange.getToDate());
-				executeWindow.centerInPage();
-				executeWindow.show();
-				executeWindow.redraw();
-			}
-		});
-	}
+    private void createExecutionSetupEventHandler() {
+        Htp.EVENT_BUS.addHandler(PhenotypeExecuteSetupEvent.TYPE,
+                new PhenotypeExecuteSetupEventHandler() {
+                    @Override
+                    public void onExecuteSetup(PhenotypeExecuteSetupEvent event) {
+                        ExecuteWindow executeWindow = new ExecuteWindow(i_algorithmData,
+                                i_inputRange.getFromDate(), i_inputRange.getToDate());
+                        executeWindow.centerInPage();
+                        executeWindow.show();
+                        executeWindow.redraw();
+                    }
+                });
+    }
 
 }

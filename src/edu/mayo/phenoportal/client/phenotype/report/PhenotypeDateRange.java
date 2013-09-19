@@ -30,6 +30,7 @@ import edu.mayo.phenoportal.client.events.LoggedOutEventHandler;
 import edu.mayo.phenoportal.client.events.PhenotypeExecuteCompletedEvent;
 import edu.mayo.phenoportal.client.events.PhenotypeExecuteCompletedEventHandler;
 import edu.mayo.phenoportal.client.events.PhenotypeExecuteSetupEvent;
+import edu.mayo.phenoportal.client.events.PhenotypeExecuteStartedEvent;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeServiceAsync;
 import edu.mayo.phenoportal.client.utils.MessageWindow;
@@ -51,12 +52,16 @@ public class PhenotypeDateRange extends VLayout {
     private DateItem i_toDate = new DateItem();
     private Label i_selectedPhenotype;
     private AlgorithmData i_algorithmData;
+
+    // Original algorithm data from the server.
+    private AlgorithmData i_algorithmDataOriginal;
+
     private DynamicForm execPanel;
     private StaticTextItem executionDate;
     private StaticTextItem executionTime;
     private StaticTextItem rangeFrom;
     private StaticTextItem rangeTo;
-	private Execution lastExecution;
+    private Execution lastExecution;
     private final Logger logger = Logger.getLogger(PhenotypeDateRange.class.getName());
 
     public PhenotypeDateRange() {
@@ -89,58 +94,75 @@ public class PhenotypeDateRange extends VLayout {
         hLayout.setHeight100();
         hLayout.setAlign(Alignment.RIGHT);
 
-	    execPanel = new DynamicForm();
-	    execPanel.setGroupTitle("Latest Execution");
-	    execPanel.setIsGroup(true);
-	    execPanel.setWidth(350);
-	    execPanel.setHeight100();
-	    execPanel.setAlign(Alignment.RIGHT);
+        execPanel = new DynamicForm();
+        execPanel.setGroupTitle("Latest Execution");
+        execPanel.setIsGroup(true);
+        execPanel.setWidth(350);
+        execPanel.setHeight100();
+        execPanel.setAlign(Alignment.RIGHT);
 
         executionDate = createTextItem("Executed_on", "Executed on");
         executionTime = createTextItem("Elapsed_time", "Elapsed time");
         rangeFrom = createTextItem("Range_from", "Range from");
         rangeTo = createTextItem("Range_to", "Range to");
 
-	    ButtonItem valueSetsBtn = new ButtonItem("valueSetsBtn", "Value Set Details");
-	    valueSetsBtn.setStartRow(false);
-	    valueSetsBtn.setEndRow(false);
-	    valueSetsBtn.setColSpan(2);
-	    valueSetsBtn.setAlign(Alignment.CENTER);
+        ButtonItem execLastExecutionBtn = new ButtonItem("execLastExecutionBtn", "Re-Execute");
+        execLastExecutionBtn.setStartRow(false);
+        execLastExecutionBtn.setEndRow(false);
+        execLastExecutionBtn.setColSpan(1);
+        execLastExecutionBtn.setAlign(Alignment.LEFT);
 
-	    valueSetsBtn.addClickHandler(new ClickHandler() {
-		    @Override
-		    public void onClick(ClickEvent clickEvent) {
-			    displayValueSets();
-		    }
-	    });
+        execLastExecutionBtn.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent clickEvent) {
+                // Execute the algorithm with the last executed info.
+                runLastExecution();
+            }
+        });
 
-	    execPanel.setFields(executionDate, executionTime, rangeFrom, rangeTo, valueSetsBtn);
+        ButtonItem valueSetsBtn = new ButtonItem("valueSetsBtn", "Value Set Details");
+        valueSetsBtn.setStartRow(false);
+        valueSetsBtn.setEndRow(false);
+        valueSetsBtn.setColSpan(1);
+        valueSetsBtn.setAlign(Alignment.RIGHT);
+
+        valueSetsBtn.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent clickEvent) {
+                displayValueSets();
+            }
+        });
+
+        execPanel.setFields(executionDate, executionTime, rangeFrom, rangeTo, valueSetsBtn,
+                execLastExecutionBtn);
         clearLastExecutionDetails();
 
         hLayout.addMember(execPanel);
         return hLayout;
     }
 
-	private void displayValueSets() {
-		if (lastExecution != null) {
-			PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
-			phenotypeService.getExecutionValueSets(lastExecution.getId(), new AsyncCallback<List<ValueSet>>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					SC.warn("Failed to retrieve value sets for the last executed algorithm.");
-				}
+    private void displayValueSets() {
+        if (lastExecution != null) {
+            PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
+            phenotypeService.getExecutionValueSets(lastExecution.getId(),
+                    new AsyncCallback<List<ValueSet>>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+                            SC.warn("Failed to retrieve value sets for the last executed algorithm.");
+                        }
 
-				@Override
-				public void onSuccess(List<ValueSet> result) {
-					LatestExecutionWindow latestExecutionWindow = new LatestExecutionWindow(result);
-					latestExecutionWindow.centerInPage();
-					latestExecutionWindow.show();
-					latestExecutionWindow.redraw();
-				}
-			});
+                        @Override
+                        public void onSuccess(List<ValueSet> result) {
+                            LatestExecutionWindow latestExecutionWindow = new LatestExecutionWindow(
+                                    result);
+                            latestExecutionWindow.centerInPage();
+                            latestExecutionWindow.show();
+                            latestExecutionWindow.redraw();
+                        }
+                    });
 
-		}
-	}
+        }
+    }
 
     /**
      * Create a StaticTextItem with a common style.
@@ -161,6 +183,8 @@ public class PhenotypeDateRange extends VLayout {
     public void updateSelection(AlgorithmData algorithmData) {
 
         i_algorithmData = algorithmData;
+        i_algorithmDataOriginal = copyAlgorithm(i_algorithmData);
+
         String selected = UiHelper.getFormattedLabelText(i_algorithmData.getAlgorithmName());
 
         i_selectedPhenotype.setContents(selected);
@@ -169,6 +193,7 @@ public class PhenotypeDateRange extends VLayout {
 
     private void updateExecutionDetails() {
         if (Htp.getLoggedInUser() != null) {
+
             PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
             phenotypeService.getLatestExecution(i_algorithmData.getAlgorithmName(), i_algorithmData
                     .getAlgorithmVersion(), i_algorithmData.getParentId(), Htp.getLoggedInUser()
@@ -190,8 +215,16 @@ public class PhenotypeDateRange extends VLayout {
     }
 
     public void updateLatestExecutionDetails(Execution execution) {
-	    lastExecution = execution;
+        lastExecution = execution;
         if (execution != null) {
+
+            // TODO - Update the from and to dates from the last execution...
+            // not working.
+
+            // update the to/from date range for execution
+            i_fromDate.setValue(execution.getDateRangeFrom());
+            i_toDate.setValue(execution.getDateRangeTo());
+
             String date = execution.getStartDate();
             String time = execution.getElapsedTime();
             String dateRangeFrom = execution.getDateRangeFrom();
@@ -217,7 +250,7 @@ public class PhenotypeDateRange extends VLayout {
                     rangeTo.show();
                 }
 
-	            execPanel.show();
+                execPanel.show();
             } else {
                 clearLastExecutionDetails();
             }
@@ -226,16 +259,16 @@ public class PhenotypeDateRange extends VLayout {
         }
     }
 
-	public Date getFromDate() {
-		return this.i_fromDate.getValueAsDate();
-	}
+    public Date getFromDate() {
+        return this.i_fromDate.getValueAsDate();
+    }
 
-	public Date getToDate() {
-		return this.i_toDate.getValueAsDate();
-	}
+    public Date getToDate() {
+        return this.i_toDate.getValueAsDate();
+    }
 
     private void clearLastExecutionDetails() {
-	    execPanel.hide();
+        execPanel.hide();
         executionDate.hide();
         executionTime.hide();
         rangeFrom.hide();
@@ -287,7 +320,7 @@ public class PhenotypeDateRange extends VLayout {
                     MessageWindow messageWindow = new MessageWindow(title, message);
                     messageWindow.show();
                 } else {
-	                Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteSetupEvent());
+                    Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteSetupEvent());
                 }
             }
         });
@@ -325,6 +358,7 @@ public class PhenotypeDateRange extends VLayout {
             @Override
             public void onLoggedOut(LoggedOutEvent loggedOutEvent) {
                 i_algorithmData = null;
+                i_algorithmDataOriginal = null;
                 setDateFormDisabled(true);
             }
         });
@@ -347,6 +381,118 @@ public class PhenotypeDateRange extends VLayout {
                 });
     }
 
+    /**
+     * Run the last execution that this user ran
+     */
+    private void runLastExecution() {
+
+        PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
+        phenotypeService.getLatestExecution(i_algorithmDataOriginal.getAlgorithmName(),
+                i_algorithmDataOriginal.getAlgorithmVersion(),
+                i_algorithmDataOriginal.getParentId(), Htp.getLoggedInUser().getUserName(),
+                new AsyncCallback<Execution>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        clearLastExecutionDetails();
+                        logger.log(Level.INFO, "Failed to get the user's latest execution.");
+                    }
+
+                    @Override
+                    public void onSuccess(Execution execution) {
+
+                        getVersionsFromLastExecution(i_algorithmDataOriginal, execution);
+
+                    }
+                });
+
+    }
+
+    /**
+     * Get the values sets from the last execution.
+     * 
+     * @param algorithmData
+     * @param execution
+     */
+    public void getVersionsFromLastExecution(final AlgorithmData algorithmData,
+            final Execution execution) {
+
+        if (execution != null) {
+            PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
+            phenotypeService.getExecutionValueSets(execution.getId(),
+                    new AsyncCallback<List<ValueSet>>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+                            SC.warn("Failed to retrieve value sets for the last executed algorithm.");
+                        }
+
+                        @Override
+                        public void onSuccess(List<ValueSet> valueSets) {
+
+                            // got latest execution and valuesets... now
+                            // re-execute this one.
+
+                            algorithmData.setValueSets(valueSets);
+
+                            String dateRangeFrom = execution.getDateRangeFrom();
+                            String dateRangeTo = execution.getDateRangeTo();
+
+                            Date dateFrom = new Date(dateRangeFrom);
+                            Date dateTo = new Date(dateRangeTo);
+
+                            executeLastExecution(algorithmData, dateFrom, dateTo);
+                        }
+                    });
+
+        }
+
+    }
+
+    /**
+     * Execute the last execution
+     * 
+     * @param algorithmData
+     * @param fromDate
+     * @param toDate
+     */
+    private void executeLastExecution(AlgorithmData algorithmData, Date fromDate, Date toDate) {
+
+        Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteStartedEvent());
+
+        PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
+        phenotypeService.executePhenotype(algorithmData, fromDate, toDate, Htp.getLoggedInUser()
+                .getUserName(), new AsyncCallback<Execution>() {
+
+            @Override
+            public void onSuccess(Execution result) {
+
+                if (result.isError()) {
+                    SC.warn("An error occurred while executing the algorithm.");
+                } else {
+                    String title = "Phenotype Execution Complete";
+                    String message = "The Phenotype execution is complete.  You can view the results in the Summary, Demographics and WorkFlow tabs.";
+                    MessageWindow messageWindow = new MessageWindow(title, message);
+                    messageWindow.show();
+                }
+
+                Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteCompletedEvent(true, result));
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+                logger.log(Level.WARNING, "Phenotype execution has failed.", caught);
+
+                String title = "Phenotype Execution Failed";
+                String message = "The Phenotype execution has failed. If this continues, please contact support.";
+                MessageWindow messageWindow = new MessageWindow(title, message);
+                messageWindow.show();
+
+                Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteCompletedEvent(false));
+            }
+
+        });
+
+    }
+
     private void setEnablementBasedOnUser(User user) {
         // Admin = 1, Execute = 2
         if (user != null && user.getRole() <= 2) {
@@ -362,7 +508,7 @@ public class PhenotypeDateRange extends VLayout {
         i_fromDate.setDisabled(disabled);
         i_toForm.setDisabled(disabled);
         if (disabled)
-	        execPanel.hide();
+            execPanel.hide();
     }
 
     /**
@@ -385,6 +531,21 @@ public class PhenotypeDateRange extends VLayout {
             return time;
         }
         return seconds + " Seconds";
+    }
+
+    private AlgorithmData copyAlgorithm(AlgorithmData algorithmData) {
+        AlgorithmData copy = new AlgorithmData();
+
+        copy.setAlgorithmDescription(algorithmData.getAlgorithmDescription());
+        copy.setAlgorithmName(algorithmData.getAlgorithmName());
+        copy.setAlgorithmVersion(algorithmData.getAlgorithmVersion());
+        copy.setAlgorithmUser(algorithmData.getAlgorithmUser());
+        copy.setId(algorithmData.getId());
+        copy.setCategoryId(algorithmData.getCategoryId());
+        copy.setParentId(algorithmData.getParentId());
+
+        return copy;
+
     }
 
 }
