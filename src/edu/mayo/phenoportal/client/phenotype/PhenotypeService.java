@@ -33,6 +33,9 @@ public interface PhenotypeService extends RemoteService {
     Execution executePhenotype(AlgorithmData algorithmData, Date fromDate, Date toDate,
             String userName) throws IllegalArgumentException;
 
+    Execution executeLastExecution(AlgorithmData algorithmData, String userName)
+            throws IllegalArgumentException;
+
     String getExecutions() throws IllegalArgumentException;
 
     String getUploaders() throws IllegalArgumentException;

@@ -1,23 +1,5 @@
 package edu.mayo.phenoportal.server.phenotype;
 
-import edu.mayo.phenoportal.utils.ServletUtils;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXParseException;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,12 +18,32 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXParseException;
+
+import edu.mayo.phenoportal.utils.ServletUtils;
+
 public class RestExecuter {
 
     private static RestExecuter s_restExecuter;
-	private static String s_restUserId = ServletUtils.getRestUserId();
-	private static String s_restPw = ServletUtils.getRestPassword();
-	private static String s_restUrl = ServletUtils.getRestUrl();
+    private static String s_restUserId = ServletUtils.getRestUserId();
+    private static String s_restPw = ServletUtils.getRestPassword();
+    private static String s_restUrl = ServletUtils.getRestUrl();
     private static Logger logger = Logger.getLogger(RestExecuter.class.getName());
 
     public static final String STATUS_COMPLETE = "COMPLETE";
@@ -82,9 +84,9 @@ public class RestExecuter {
         String boundary = Long.toHexString(System.currentTimeMillis());
         String CRLF = "\r\n"; // Line separator required by multipart/form-data.
 
-        URL url = new URL(s_restUrl + "/executions");
+        URL url = new URL(s_restUrl + "/executor/executions");
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-	    connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+        connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
 
         // infinite timeout on the connection
         connection.setConnectTimeout(0);
@@ -146,7 +148,8 @@ public class RestExecuter {
             location = headerfields.get("Location").get(0);
             location = s_restUrl + "/" + location;
         } catch (Exception e) {
-		    logger.warning("There was an error when attempting to execute the algorithm. Error: " + e.getMessage());
+            logger.warning("There was an error when attempting to execute the algorithm. Error: "
+                    + e.getMessage());
         } finally {
             if (writer != null) {
                 writer.close();
@@ -167,8 +170,8 @@ public class RestExecuter {
     public String pollStatus(String url) throws Exception {
         URL executions = new URL(url);
 
-	    HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
-	    connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+        HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
+        connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
         connection.setRequestProperty("Accept", "application/xml");
         InputStream in = connection.getInputStream();
 
@@ -199,8 +202,8 @@ public class RestExecuter {
         String resultStr = "";
 
         try {
-	        HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
-	        connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+            HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
+            connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
             connection.setRequestProperty("Accept", "application/xml");
             in = connection.getInputStream();
 
@@ -245,8 +248,8 @@ public class RestExecuter {
             throws Exception {
         URL executions = new URL(url);
 
-	    HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
-	    connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+        HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
+        connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
         connection.setRequestProperty("Accept", "image/png");
         InputStream in = connection.getInputStream();
 
@@ -279,12 +282,12 @@ public class RestExecuter {
     /* TODO: Use the actual returned .bpmn file. */
     public static String getBpmn(String url, String storeLocation, String fileName)
             throws Exception {
-//        File incoming = new File(
-//                "/Users/m091355/Dropbox/Mayo/Projects/Sharp/HTP/Drools Response/Disease.bpmn");
-//
-//        fileName = fileName + ".bpmn";
-//        File tempFile = new File(storeLocation + fileName);
-//        FileUtils.copyFile(incoming, tempFile);
+        // File incoming = new File(
+        // "/Users/m091355/Dropbox/Mayo/Projects/Sharp/HTP/Drools Response/Disease.bpmn");
+        //
+        // fileName = fileName + ".bpmn";
+        // File tempFile = new File(storeLocation + fileName);
+        // FileUtils.copyFile(incoming, tempFile);
 
         return null;
     }
@@ -314,13 +317,16 @@ public class RestExecuter {
             SSLContext ctx = SSLContext.getInstance("SSL");
             X509TrustManager tm = new X509TrustManager() {
 
+                @Override
                 public X509Certificate[] getAcceptedIssuers() {
                     return null;
                 }
 
+                @Override
                 public void checkServerTrusted(X509Certificate[] chain, String authType) {
                 }
 
+                @Override
                 public void checkClientTrusted(X509Certificate[] chain, String authType) {
                 }
             };

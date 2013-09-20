@@ -20,16 +20,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import edu.mayo.phenoportal.utils.ServletUtils;
 import mayo.edu.cts2.editor.server.Cts2EditorServiceProperties;
 
 import org.apache.commons.io.FileUtils;
+
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import edu.mayo.phenoportal.client.core.AlgorithmData;
 import edu.mayo.phenoportal.client.phenotype.PhenotypeService;
@@ -55,6 +54,7 @@ import edu.mayo.phenoportal.shared.database.UploadColumns;
 import edu.mayo.phenoportal.shared.database.UserColumns;
 import edu.mayo.phenoportal.shared.database.UserRoleRequestColumns;
 import edu.mayo.phenoportal.utils.SQLStatements;
+import edu.mayo.phenoportal.utils.ServletUtils;
 
 public class PhenotypeServiceImpl extends RemoteServiceServlet implements PhenotypeService {
 
@@ -64,8 +64,8 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
 
     // XML Settings
     public static final String ROOT = "List";
-	private static String i_fileName = "";
-	
+    private static String i_fileName = "";
+
     @Override
     /*
      * Make database connection and queries Mysql to generate the PhenotypeTree
@@ -113,8 +113,7 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
                 }
 
             } catch (Exception ex) {
-                s_logger.log(Level.SEVERE,
-                        "Failed fetching categories from DB" + ex.getMessage());
+                s_logger.log(Level.SEVERE, "Failed fetching categories from DB" + ex.getMessage());
 
             } finally {
                 DBConnection.closeConnection(conn, st, rs);
@@ -205,13 +204,16 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
 
         synchronized (cts2ServerPropertiesLock) {
             if (!cts2RestPropertiesSet) {
-                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(ServletUtils.getCts2RestUrl());
+                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(ServletUtils
+                        .getCts2RestUrl());
                 Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(
-                  ServletUtils.getCts2RestUser(), ServletUtils.getCts2RestPassword());
+                        ServletUtils.getCts2RestUser(), ServletUtils.getCts2RestPassword());
                 Cts2EditorServiceProperties
-                        .setValueSetDefinitionMaintenanceEntitiesUrl(ServletUtils.getCts2EntityRestUrl());
-                Cts2EditorServiceProperties.setValueSetRestPageSize(ServletUtils.getCts2RestPageSize());
-	            cts2RestPropertiesSet = true;
+                        .setValueSetDefinitionMaintenanceEntitiesUrl(ServletUtils
+                                .getCts2EntityRestUrl());
+                Cts2EditorServiceProperties.setValueSetRestPageSize(ServletUtils
+                        .getCts2RestPageSize());
+                cts2RestPropertiesSet = true;
             }
         }
 
@@ -231,13 +233,16 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
 
         synchronized (cts2ServerPropertiesLock) {
             if (!cts2RestPropertiesSet) {
-                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(ServletUtils.getCts2RestUrl());
+                Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceUrl(ServletUtils
+                        .getCts2RestUrl());
                 Cts2EditorServiceProperties.setValueSetDefinitionMaintenanceCredentials(
-                  ServletUtils.getCts2RestUser(), ServletUtils.getCts2RestPassword());
+                        ServletUtils.getCts2RestUser(), ServletUtils.getCts2RestPassword());
                 Cts2EditorServiceProperties
-                        .setValueSetDefinitionMaintenanceEntitiesUrl(ServletUtils.getCts2EntityRestUrl());
-                Cts2EditorServiceProperties.setValueSetRestPageSize(ServletUtils.getCts2RestPageSize());
-	            cts2RestPropertiesSet = true;
+                        .setValueSetDefinitionMaintenanceEntitiesUrl(ServletUtils
+                                .getCts2EntityRestUrl());
+                Cts2EditorServiceProperties.setValueSetRestPageSize(ServletUtils
+                        .getCts2RestPageSize());
+                cts2RestPropertiesSet = true;
             }
         }
 
@@ -290,24 +295,24 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
         return snippet.substring(0, idxEnd);
     }
 
-	private Map<String, String> getOidsWithDescription(String html) {
-		String oidRegex = "\\((\\d+(\\.(?=\\d+))?)+\\)";
-		Map<String, String> oids = new HashMap<String, String>();
-		Pattern linePattern = Pattern.compile("(?<=<li>)([^<]*)(?=</li>)");
-		Matcher lineMatcher = linePattern.matcher(html);
-		while (lineMatcher.find()) {
-			Pattern oidPattern = Pattern.compile(oidRegex);
-			String desc = lineMatcher.group(0).trim();
-			desc = desc.replaceAll("\"", "");
-			Matcher oidMatcher = oidPattern.matcher(desc);
-		    if (oidMatcher.find()) {
-			    String oid = oidMatcher.group(0);
-			    oid = oid.substring(1, oid.length() - 1);
-			    oids.put(oid, desc.replaceAll(oidRegex, "").trim());
-		    }
-		}
-		return oids;
-	}
+    private Map<String, String> getOidsWithDescription(String html) {
+        String oidRegex = "\\((\\d+(\\.(?=\\d+))?)+\\)";
+        Map<String, String> oids = new HashMap<String, String>();
+        Pattern linePattern = Pattern.compile("(?<=<li>)([^<]*)(?=</li>)");
+        Matcher lineMatcher = linePattern.matcher(html);
+        while (lineMatcher.find()) {
+            Pattern oidPattern = Pattern.compile(oidRegex);
+            String desc = lineMatcher.group(0).trim();
+            desc = desc.replaceAll("\"", "");
+            Matcher oidMatcher = oidPattern.matcher(desc);
+            if (oidMatcher.find()) {
+                String oid = oidMatcher.group(0);
+                oid = oid.substring(1, oid.length() - 1);
+                oids.put(oid, desc.replaceAll(oidRegex, "").trim());
+            }
+        }
+        return oids;
+    }
 
     /**
      * Request to execute the phenotype. Will return List<Demographic> object
@@ -321,7 +326,7 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
         String locationUrl;
         String executionStatus = "";
         Execution execution = new Execution();
-	    String xmlPathInfo = getXmlFile(algorithmData.getId());
+        String xmlPathInfo = getXmlFile(algorithmData.getId());
         String xmlPath = ServletUtils.getAlgorithmPath() + '/' + xmlPathInfo;
         File xmlFile = new File(xmlPath);
         String executionDateRangeFrom = DateConverter.getDateString(fromDate);
@@ -337,13 +342,12 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
                     executionDateRangeFrom, executionDateRangeTo);
             execution.setUrl(locationUrl);
 
-//            poll on the status until it is complete
+            // poll on the status until it is complete
             try {
                 while (!executionStatus.equals(RestExecuter.STATUS_COMPLETE)
                         && !executionStatus.equals(RestExecuter.STATUS_FAILED)) {
                     Thread.sleep(500);
-                    executionStatus = RestExecuter.getInstance().pollStatus(
-                            locationUrl);
+                    executionStatus = RestExecuter.getInstance().pollStatus(locationUrl);
                 }
             } catch (InterruptedException ie) {
                 executionStatus = RestExecuter.STATUS_ERROR;
@@ -357,14 +361,14 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
                         algorithmData.getParentId());
                 persistExecution(execution);
             } else if (executionStatus.equals(RestExecuter.STATUS_FAILED)) {
-	            execution.setError(true);
-		        s_logger.log(Level.SEVERE, "Rest execution failed.");
-	        }
+                execution.setError(true);
+                s_logger.log(Level.SEVERE, "Rest execution failed.");
+            }
 
         } catch (Exception e) {
             s_logger.log(Level.SEVERE, "execution failed", e);
             executionStatus = RestExecuter.STATUS_ERROR;
-	        execution.setError(true);
+            execution.setError(true);
         } finally {
             Connection conn = DBConnection.getDBConnection();
             try {
@@ -406,21 +410,45 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
         return execution;
     }
 
-	public void setFileName(String fileName, String version, String category) {
-		this.i_fileName = fileName + "_" + version + "_" + category;
-	}
+    @Override
+    public Execution executeLastExecution(AlgorithmData algorithmData, String userName)
+            throws IllegalArgumentException {
 
-	public String getFileName() {
-		return i_fileName;
-	}
-	
+        Execution lastExecution = getLatestExecution(algorithmData.getAlgorithmName(),
+                algorithmData.getAlgorithmVersion(), algorithmData.getParentId(), userName);
+
+        List<ValueSet> valueSets = getExecutionValueSets(lastExecution.getId());
+
+        // got latest execution and valuesets... now re-execute this one.
+        algorithmData.setValueSets(valueSets);
+
+        String dateRangeFrom = lastExecution.getDateRangeFrom();
+        String dateRangeTo = lastExecution.getDateRangeTo();
+
+        Date dateFrom = new Date(dateRangeFrom);
+        Date dateTo = new Date(dateRangeTo);
+
+        Execution newExecution = executePhenotype(algorithmData, dateFrom, dateTo, userName);
+
+        return newExecution;
+    }
+
+    public void setFileName(String fileName, String version, String category) {
+        this.i_fileName = fileName + "_" + version + "_" + category;
+    }
+
+    public String getFileName() {
+        return i_fileName;
+    }
+
     private void persistExecution(Execution executionResults) throws Exception {
         String locationUrl = executionResults.getUrl();
         executionResults.setId(UUID.randomUUID().toString());
 
         /* Save the execution results to the file system */
         String relativePath = executionResults.getId() + File.separator;
-        String executionResultsPath = ServletUtils.getExecutionResultsPath() + File.separator + relativePath;
+        String executionResultsPath = ServletUtils.getExecutionResultsPath() + File.separator
+                + relativePath;
 
         /* Demographics */
         String returnedXml = RestExecuter.getInstance().getXml(locationUrl + "/xml");
@@ -432,40 +460,42 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
         executionResults.setXmlPath(relativePath + demographicsFileName);
 
         /* Drools workflow Image */
-	    /* TODO: Renable workflow image? */
-//        String returnedImage = RestExecuter.getImage(locationUrl + "/image", basePath + "images/",
-//                getFileName());
-//        String imageFileName = "workflow.png";
-//        File imageFile = new File(executionResultsPath + imageFileName);
-//        FileUtils.copyFile(new File(basePath + "images/" + returnedImage), imageFile);
-//        executionResults.setImage(getImage(relativePath + imageFileName));
+        /* TODO: Renable workflow image? */
+        // String returnedImage = RestExecuter.getImage(locationUrl + "/image",
+        // basePath + "images/",
+        // getFileName());
+        // String imageFileName = "workflow.png";
+        // File imageFile = new File(executionResultsPath + imageFileName);
+        // FileUtils.copyFile(new File(basePath + "images/" + returnedImage),
+        // imageFile);
+        // executionResults.setImage(getImage(relativePath + imageFileName));
     }
 
-//    private Image getImage(String imagePath) throws IOException {
-//        String basePath = getExecutionResultsPath();
-//        File imageFile = new File(basePath + File.separator + imagePath);
-//        Image image = new Image();
-//        image.setImagePath(imagePath);
-//        ImageInputStream in = ImageIO.createImageInputStream(imageFile);
-//        try {
-//            final Iterator<?> readers = ImageIO.getImageReaders(in);
-//            if (readers.hasNext()) {
-//                ImageReader reader = (ImageReader) readers.next();
-//                try {
-//                    reader.setInput(in);
-//                    image.setWidth(reader.getWidth(0));
-//                    image.setHeight(reader.getHeight(0));
-//                } finally {
-//                    reader.dispose();
-//                }
-//            }
-//        } finally {
-//            if (in != null)
-//                in.close();
-//        }
-//
-//        return image;
-//    }
+    // private Image getImage(String imagePath) throws IOException {
+    // String basePath = getExecutionResultsPath();
+    // File imageFile = new File(basePath + File.separator + imagePath);
+    // Image image = new Image();
+    // image.setImagePath(imagePath);
+    // ImageInputStream in = ImageIO.createImageInputStream(imageFile);
+    // try {
+    // final Iterator<?> readers = ImageIO.getImageReaders(in);
+    // if (readers.hasNext()) {
+    // ImageReader reader = (ImageReader) readers.next();
+    // try {
+    // reader.setInput(in);
+    // image.setWidth(reader.getWidth(0));
+    // image.setHeight(reader.getHeight(0));
+    // } finally {
+    // reader.dispose();
+    // }
+    // }
+    // } finally {
+    // if (in != null)
+    // in.close();
+    // }
+    //
+    // return image;
+    // }
 
     public String getCategoryPath(String parentId) {
         Connection conn = DBConnection.getDBConnection();
@@ -879,7 +909,8 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
             String fileTitle = it.next();
             String fileName = fileInfo.get(fileTitle);
 
-            String fileData = readFile(getServletContext().getContextPath() + File.pathSeparator + fileName, errorHtml);
+            String fileData = readFile(getServletContext().getContextPath() + File.pathSeparator
+                    + fileName, errorHtml);
             fileContents.put(fileTitle, fileData);
 
         }
@@ -888,7 +919,7 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
 
     /**
      * Get the zip file path from the db.
-     *
+     * 
      * @param algorithmId
      * @return
      */
@@ -915,28 +946,28 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
         return zipPath;
     }
 
-	private String getXmlFile(int algorithmId) {
-		String xmlPath = null;
+    private String getXmlFile(int algorithmId) {
+        String xmlPath = null;
 
-		Connection conn = DBConnection.getDBConnection();
-		PreparedStatement st = null;
-		ResultSet rs = null;
+        Connection conn = DBConnection.getDBConnection();
+        PreparedStatement st = null;
+        ResultSet rs = null;
 
-		if (conn != null) {
-			try {
-				st = conn.prepareStatement(SQLStatements.selectXmlFileStatement(algorithmId));
-				rs = st.executeQuery();
-				if (rs.next()) {
-					xmlPath = rs.getString(1);
-				}
-			} catch (Exception ex) {
-				s_logger.log(Level.SEVERE, "Failed to fetch xml file" + ex.getMessage(), ex);
-			} finally {
-				DBConnection.closeConnection(conn, st, rs);
-			}
-		}
-		return xmlPath;
-	}
+        if (conn != null) {
+            try {
+                st = conn.prepareStatement(SQLStatements.selectXmlFileStatement(algorithmId));
+                rs = st.executeQuery();
+                if (rs.next()) {
+                    xmlPath = rs.getString(1);
+                }
+            } catch (Exception ex) {
+                s_logger.log(Level.SEVERE, "Failed to fetch xml file" + ex.getMessage(), ex);
+            } finally {
+                DBConnection.closeConnection(conn, st, rs);
+            }
+        }
+        return xmlPath;
+    }
 
     private List<Demographic> getDemographics(String xml) {
         List<Demographic> demographics = new ArrayList<Demographic>();
@@ -969,24 +1000,24 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
         return sb.toString();
     }
 
-	private String readFile(InputStream inStream, String errorString) {
+    private String readFile(InputStream inStream, String errorString) {
 
-		StringBuilder sb = new StringBuilder();
-		try {
-			DataInputStream in = new DataInputStream(inStream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        StringBuilder sb = new StringBuilder();
+        try {
+            DataInputStream in = new DataInputStream(inStream);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
-			String strLine;
-			while ((strLine = br.readLine()) != null) {
-				sb.append(strLine);
-			}
-			in.close();
-		} catch (Exception e) {// Catch exception if any
-			s_logger.log(Level.SEVERE, "Error reading the file:" + e.getMessage());
-			return errorString + "<br/>" + e.getMessage();
-		}
-		return sb.toString();
-	}
+            String strLine;
+            while ((strLine = br.readLine()) != null) {
+                sb.append(strLine);
+            }
+            in.close();
+        } catch (Exception e) {// Catch exception if any
+            s_logger.log(Level.SEVERE, "Error reading the file:" + e.getMessage());
+            return errorString + "<br/>" + e.getMessage();
+        }
+        return sb.toString();
+    }
 
     /**
      * Method to read the logging properties
@@ -994,7 +1025,7 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
 
     @Override
     public void initializeLogging() throws IllegalArgumentException {
-	    ServletUtils.initializeLogging();
+        ServletUtils.initializeLogging();
     }
 
     /**
@@ -1012,7 +1043,6 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
         Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
-
 
         if (conn != null) {
             try {
@@ -1243,8 +1273,7 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
 
             } catch (Exception ex) {
 
-                s_logger.log(Level.SEVERE, "Failed to update Sharp news item" + ex.getMessage(),
-                        ex);
+                s_logger.log(Level.SEVERE, "Failed to update Sharp news item" + ex.getMessage(), ex);
             } finally {
                 DBConnection.closeConnection(conn, st, rs);
             }
@@ -1275,66 +1304,41 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
         return success;
     }
 
-    private static final String DB_STATS = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
-      "<Demographics>\n"+
-      "\t<DemographicType>\n"+
-      "\t\t<type>Initial Patient Population</type>\n"+
-      "\t\t<DemographicCategory>\n"+
-      "\t\t\t<name>gender</name>\n"+
-      "\t\t\t<DemographicStat>\n"+
-      "\t\t\t\t<label>female</label>\n"+
-      "\t\t\t\t<value>18</value>\n"+
-      "\t\t\t</DemographicStat>\n"+
-      "\t\t\t<DemographicStat>\n"+
-      "\t\t\t\t<label>male</label>\n"+
-      "\t\t\t\t<value>18</value>\n"+
-      "\t\t\t</DemographicStat>\n"+
-      "\t\t</DemographicCategory>\n"+
-      "\t\t<DemographicCategory>\n"+
-      "\t\t\t<name>age</name>\n"+
-      "\t\t\t<DemographicStat>\n"+
-      "\t\t\t\t<label>(0,18)</label>\n"+
-      "\t\t\t\t<value>12</value>\n"+
-      "\t\t\t</DemographicStat>\n"+
-      "\t\t\t<DemographicStat>\n"+
-      "\t\t\t\t<label>(19,30)</label>\n"+
-      "\t\t\t\t<value>9</value>\n"+
-      "\t\t\t</DemographicStat>\n"+
-      "\t\t\t<DemographicStat>\n"+
-      "\t\t\t\t<label>(30,60)</label>\n"+
-      "\t\t\t\t<value>8</value>\n"+
-      "\t\t\t</DemographicStat>\n"+
-      "\t\t\t<DemographicStat>\n"+
-      "\t\t\t\t<label>(60,75)</label>\n"+
-      "\t\t\t\t<value>6</value>\n"+
-      "\t\t\t</DemographicStat>\n"+
-      "\t\t\t<DemographicStat>\n"+
-      "\t\t\t\t<label>(75,above)</label>\n"+
-      "\t\t\t\t<value>1</value>\n"+
-      "\t\t\t</DemographicStat>\n"+
-      "\t\t</DemographicCategory>\n"+
-      "\t\t<DemographicCategory>\n"+
-      "\t\t\t<name>race</name>\n"+
-      "\t\t\t<DemographicStat>\n"+
-      "\t\t\t\t<label>American Indian</label>\n"+
-      "\t\t\t\t<value>36</value>\n"+
-      "\t\t\t</DemographicStat>\n"+
-      "\t\t</DemographicCategory>\n"+
-      "\t\t<DemographicCategory>\n"+
-      "\t\t\t<name>ethnicity</name>\n"+
-      "\t\t\t<DemographicStat>\n"+
-      "\t\t\t\t<label>Non Hispanic or Latio</label>\n"+
-      "\t\t\t\t<value>36</value>\n"+
-      "\t\t\t</DemographicStat>\n"+
-      "\t\t</DemographicCategory>\n"+
-      "\t</DemographicType>\n"+
-      "</Demographics>";
+    private static final String DB_STATS = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            + "<Demographics>\n" + "\t<DemographicType>\n"
+            + "\t\t<type>Initial Patient Population</type>\n" + "\t\t<DemographicCategory>\n"
+            + "\t\t\t<name>gender</name>\n" + "\t\t\t<DemographicStat>\n"
+            + "\t\t\t\t<label>female</label>\n" + "\t\t\t\t<value>18</value>\n"
+            + "\t\t\t</DemographicStat>\n" + "\t\t\t<DemographicStat>\n"
+            + "\t\t\t\t<label>male</label>\n" + "\t\t\t\t<value>18</value>\n"
+            + "\t\t\t</DemographicStat>\n" + "\t\t</DemographicCategory>\n"
+            + "\t\t<DemographicCategory>\n" + "\t\t\t<name>age</name>\n"
+            + "\t\t\t<DemographicStat>\n" + "\t\t\t\t<label>(0,18)</label>\n"
+            + "\t\t\t\t<value>12</value>\n" + "\t\t\t</DemographicStat>\n"
+            + "\t\t\t<DemographicStat>\n" + "\t\t\t\t<label>(19,30)</label>\n"
+            + "\t\t\t\t<value>9</value>\n" + "\t\t\t</DemographicStat>\n"
+            + "\t\t\t<DemographicStat>\n" + "\t\t\t\t<label>(30,60)</label>\n"
+            + "\t\t\t\t<value>8</value>\n" + "\t\t\t</DemographicStat>\n"
+            + "\t\t\t<DemographicStat>\n" + "\t\t\t\t<label>(60,75)</label>\n"
+            + "\t\t\t\t<value>6</value>\n" + "\t\t\t</DemographicStat>\n"
+            + "\t\t\t<DemographicStat>\n" + "\t\t\t\t<label>(75,above)</label>\n"
+            + "\t\t\t\t<value>1</value>\n" + "\t\t\t</DemographicStat>\n"
+            + "\t\t</DemographicCategory>\n" + "\t\t<DemographicCategory>\n"
+            + "\t\t\t<name>race</name>\n" + "\t\t\t<DemographicStat>\n"
+            + "\t\t\t\t<label>American Indian</label>\n" + "\t\t\t\t<value>36</value>\n"
+            + "\t\t\t</DemographicStat>\n" + "\t\t</DemographicCategory>\n"
+            + "\t\t<DemographicCategory>\n" + "\t\t\t<name>ethnicity</name>\n"
+            + "\t\t\t<DemographicStat>\n" + "\t\t\t\t<label>Non Hispanic or Latio</label>\n"
+            + "\t\t\t\t<value>36</value>\n" + "\t\t\t</DemographicStat>\n"
+            + "\t\t</DemographicCategory>\n" + "\t</DemographicType>\n" + "</Demographics>";
 
     @Override
     public Execution getDbStats(String type) throws IllegalArgumentException {
         // TODO - This is getting execution results from a file...
         // We need to make a REST call to get the actual data in the future.
-//	    String xml = readFile(PhenotypeServiceImpl.class.getResourceAsStream("diseaseData.xml"), "Error reading DB stats file.");
+        // String xml =
+        // readFile(PhenotypeServiceImpl.class.getResourceAsStream("diseaseData.xml"),
+        // "Error reading DB stats file.");
 
         List<Demographic> demographics = getDemographics(DB_STATS);
         Execution executionResults = new Execution();
@@ -1377,15 +1381,15 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
                 ps.setString(5, vs.comment);
                 ps.execute();
             }
-	        for (ValueSet vs : algorithmData.getSupplementalValueSets()) {
-		        ps = conn.prepareStatement(query);
-		        ps.setString(1, execution.getId());
-		        ps.setString(2, vs.name);
-		        ps.setString(3, vs.description);
-		        ps.setString(4, vs.version);
-		        ps.setString(5, vs.comment);
-		        ps.execute();
-	        }
+            for (ValueSet vs : algorithmData.getSupplementalValueSets()) {
+                ps = conn.prepareStatement(query);
+                ps.setString(1, execution.getId());
+                ps.setString(2, vs.name);
+                ps.setString(3, vs.description);
+                ps.setString(4, vs.version);
+                ps.setString(5, vs.comment);
+                ps.execute();
+            }
 
         } catch (SQLException sqle) {
             System.out.println("Failed to insert ExecutionValueSets. Error: " + sqle.getMessage());
@@ -1398,8 +1402,8 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
     public String getMatEditorUrl(User user) {
         String url;
         if (user != null) {
-            url = ServletUtils.getMatEditorUrl() + "/Login.html?userId=" + user.getUserName() + "&htpId="
-                    + user.getPassword();
+            url = ServletUtils.getMatEditorUrl() + "/Login.html?userId=" + user.getUserName()
+                    + "&htpId=" + user.getPassword();
         } else {
             url = ServletUtils.getMatEditorUrl();
         }
@@ -1444,9 +1448,9 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
                 execution.setBpmnPath(resultSet.getString(ExecutionColumns.BPMN_PATH.colName()));
                 execution.setRulesPath(resultSet.getString(ExecutionColumns.RULES_PATH.colName()));
                 String imagePath = resultSet.getString(ExecutionColumns.IMAGE_PATH.colName());
-	            /* TODO: re-enable workflow image? */
-//                if (imagePath != null && !imagePath.isEmpty())
-//                    execution.setImage(getImage(imagePath));
+                /* TODO: re-enable workflow image? */
+                // if (imagePath != null && !imagePath.isEmpty())
+                // execution.setImage(getImage(imagePath));
 
                 /* Demographics */
                 if (execution.getXmlPath() != null) {
@@ -1475,7 +1479,7 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
             throw new IllegalArgumentException("ExecutionId cannot be null or empty.");
         }
 
-	    List<ValueSet> valueSets = new ArrayList<ValueSet>();
+        List<ValueSet> valueSets = new ArrayList<ValueSet>();
         String query = SQLStatements.getExecutionValueSets();
         Connection connection = DBConnection.getDBConnection();
         PreparedStatement statement = null;
@@ -1486,11 +1490,11 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
             statement.setString(1, executionId);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                valueSets.add(new ValueSet(
-                  resultSet.getString(ExecutionValueSetColumns.VALUE_SET.getColumnName()),
-                  resultSet.getString(ExecutionValueSetColumns.DESCRIPTION.getColumnName()),
-                  resultSet.getString(ExecutionValueSetColumns.VERSION.getColumnName()),
-                  resultSet.getString(ExecutionValueSetColumns.COMMENT.getColumnName())));
+                valueSets.add(new ValueSet(resultSet.getString(ExecutionValueSetColumns.VALUE_SET
+                        .getColumnName()), resultSet.getString(ExecutionValueSetColumns.DESCRIPTION
+                        .getColumnName()), resultSet.getString(ExecutionValueSetColumns.VERSION
+                        .getColumnName()), resultSet.getString(ExecutionValueSetColumns.COMMENT
+                        .getColumnName())));
             }
         } catch (SQLException sqle) {
             s_logger.log(Level.WARNING, "Unable to get the value sets for execution " + executionId

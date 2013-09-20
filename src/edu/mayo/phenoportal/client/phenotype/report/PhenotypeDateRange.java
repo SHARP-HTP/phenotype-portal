@@ -116,7 +116,7 @@ public class PhenotypeDateRange extends VLayout {
             @Override
             public void onClick(ClickEvent clickEvent) {
                 // Execute the algorithm with the last executed info.
-                runLastExecution();
+                executeLastExecution();
             }
         });
 
@@ -222,8 +222,8 @@ public class PhenotypeDateRange extends VLayout {
             // not working.
 
             // update the to/from date range for execution
-            i_fromDate.setValue(execution.getDateRangeFrom());
-            i_toDate.setValue(execution.getDateRangeTo());
+            // i_fromDate.setValue(execution.getDateRangeFrom());
+            // i_toDate.setValue(execution.getDateRangeTo());
 
             String date = execution.getStartDate();
             String time = execution.getElapsedTime();
@@ -382,89 +382,18 @@ public class PhenotypeDateRange extends VLayout {
     }
 
     /**
-     * Run the last execution that this user ran
+     * Run the last execution for this user.
      */
-    private void runLastExecution() {
-
-        PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
-        phenotypeService.getLatestExecution(i_algorithmDataOriginal.getAlgorithmName(),
-                i_algorithmDataOriginal.getAlgorithmVersion(),
-                i_algorithmDataOriginal.getParentId(), Htp.getLoggedInUser().getUserName(),
-                new AsyncCallback<Execution>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                        clearLastExecutionDetails();
-                        logger.log(Level.INFO, "Failed to get the user's latest execution.");
-                    }
-
-                    @Override
-                    public void onSuccess(Execution execution) {
-
-                        getVersionsFromLastExecution(i_algorithmDataOriginal, execution);
-
-                    }
-                });
-
-    }
-
-    /**
-     * Get the values sets from the last execution.
-     * 
-     * @param algorithmData
-     * @param execution
-     */
-    public void getVersionsFromLastExecution(final AlgorithmData algorithmData,
-            final Execution execution) {
-
-        if (execution != null) {
-            PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
-            phenotypeService.getExecutionValueSets(execution.getId(),
-                    new AsyncCallback<List<ValueSet>>() {
-                        @Override
-                        public void onFailure(Throwable caught) {
-                            SC.warn("Failed to retrieve value sets for the last executed algorithm.");
-                        }
-
-                        @Override
-                        public void onSuccess(List<ValueSet> valueSets) {
-
-                            // got latest execution and valuesets... now
-                            // re-execute this one.
-
-                            algorithmData.setValueSets(valueSets);
-
-                            String dateRangeFrom = execution.getDateRangeFrom();
-                            String dateRangeTo = execution.getDateRangeTo();
-
-                            Date dateFrom = new Date(dateRangeFrom);
-                            Date dateTo = new Date(dateRangeTo);
-
-                            executeLastExecution(algorithmData, dateFrom, dateTo);
-                        }
-                    });
-
-        }
-
-    }
-
-    /**
-     * Execute the last execution
-     * 
-     * @param algorithmData
-     * @param fromDate
-     * @param toDate
-     */
-    private void executeLastExecution(AlgorithmData algorithmData, Date fromDate, Date toDate) {
+    private void executeLastExecution() {
 
         Htp.EVENT_BUS.fireEvent(new PhenotypeExecuteStartedEvent());
 
         PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
-        phenotypeService.executePhenotype(algorithmData, fromDate, toDate, Htp.getLoggedInUser()
+        phenotypeService.executeLastExecution(i_algorithmDataOriginal, Htp.getLoggedInUser()
                 .getUserName(), new AsyncCallback<Execution>() {
 
             @Override
             public void onSuccess(Execution result) {
-
                 if (result.isError()) {
                     SC.warn("An error occurred while executing the algorithm.");
                 } else {

@@ -24,6 +24,9 @@ public interface PhenotypeServiceAsync {
     void executePhenotype(AlgorithmData algorithmData, Date fromDate, Date toDate, String userName,
             AsyncCallback<Execution> callback) throws IllegalArgumentException;
 
+    void executeLastExecution(AlgorithmData algorithmData, String userName,
+            AsyncCallback<Execution> callback) throws IllegalArgumentException;
+
     void getExecutions(AsyncCallback<String> callback) throws IllegalArgumentException;
 
     void getUploaders(AsyncCallback<String> callback) throws IllegalArgumentException;
