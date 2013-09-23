@@ -64,6 +64,9 @@ public class PhenotypeDateRange extends VLayout {
     private Execution lastExecution;
     private final Logger logger = Logger.getLogger(PhenotypeDateRange.class.getName());
 
+    private final Date startDate = new Date(1325397600000l); // 2012-01-01
+    private final Date endDate = new Date(1356933600000l);   // 2012-12-31
+
     public PhenotypeDateRange() {
         super();
         init();
@@ -291,6 +294,7 @@ public class PhenotypeDateRange extends VLayout {
 
         i_fromForm = new DynamicForm();
         i_fromDate = new DateItem();
+        i_fromDate.setDefaultValue(startDate);
         i_fromDate.setName("From");
         i_fromForm.setFields(i_fromDate);
         dateLayout.addMember(i_fromForm);
@@ -298,6 +302,7 @@ public class PhenotypeDateRange extends VLayout {
         i_toForm = new DynamicForm();
         i_toDate = new DateItem();
         i_toDate.setName("To");
+        i_toDate.setDefaultValue(endDate);
         i_toForm.setFields(i_toDate);
         dateLayout.addMember(i_toForm);
 
