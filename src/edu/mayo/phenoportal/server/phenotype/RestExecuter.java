@@ -1,5 +1,24 @@
 package edu.mayo.phenoportal.server.phenotype;
 
+import edu.mayo.phenoportal.utils.ServletUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXParseException;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,26 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXParseException;
-
-import edu.mayo.phenoportal.utils.ServletUtils;
 
 public class RestExecuter {
 
@@ -75,10 +74,12 @@ public class RestExecuter {
     /*
      * Execute an algorithm and get the location.
      */
-    public String createExecution(File xmlFile, String startDate, String endDate) throws Exception {
+    public String createExecution(File xmlFile, String startDate, String endDate, Map<String, String> valueSets) throws Exception {
         String charset = "UTF-8";
 
         String location = "";
+        String valueSetJson = mapToJson(valueSets);
+        valueSetJson = valueSetJson == null ? "" : valueSetJson;
 
         // generate some unique value
         String boundary = Long.toHexString(System.currentTimeMillis());
@@ -86,7 +87,7 @@ public class RestExecuter {
 
         URL url = new URL(s_restUrl + "/executor/executions");
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-        connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+	    connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
 
         // infinite timeout on the connection
         connection.setConnectTimeout(0);
@@ -115,6 +116,13 @@ public class RestExecuter {
             writer.append("Content-Type: text/plain; charset=" + charset).append(CRLF);
             writer.append(CRLF);
             writer.append(endDate).append(CRLF).flush();
+
+            // Send valueSetMap.
+            writer.append("--" + boundary).append(CRLF);
+            writer.append("Content-Disposition: form-data; name=\"valueSetDefinitions\"").append(CRLF);
+            writer.append("Content-Type: text/plain; charset=" + charset).append(CRLF);
+            writer.append(CRLF);
+            writer.append(valueSetJson).append(CRLF).flush();
 
             // Send binary file.
             writer.append("--" + boundary).append(CRLF);
@@ -237,61 +245,6 @@ public class RestExecuter {
         return resultStr;
     }
 
-    /**
-     * Get the xml result of the execution.
-     * 
-     * @param url
-     * @return
-     * @throws Exception
-     */
-    public static String getImage(String url, String storeLocation, String fileName)
-            throws Exception {
-        URL executions = new URL(url);
-
-        HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
-        connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
-        connection.setRequestProperty("Accept", "image/png");
-        InputStream in = connection.getInputStream();
-
-        fileName = fileName + ".png";
-        File tempFile = new File(storeLocation + fileName);
-
-        logger.log(Level.INFO, "GetImage path: " + tempFile.getAbsolutePath());
-
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(tempFile));
-        for (int b; (b = in.read()) != -1;) {
-            out.write(b);
-        }
-
-        out.flush();
-        out.close();
-        in.close();
-
-        return fileName;
-    }
-
-    /**
-     * Gets the bpmn result of the execution.
-     * 
-     * @param url
-     * @param storeLocation
-     * @param fileName
-     * @return
-     * @throws Exception
-     */
-    /* TODO: Use the actual returned .bpmn file. */
-    public static String getBpmn(String url, String storeLocation, String fileName)
-            throws Exception {
-        // File incoming = new File(
-        // "/Users/m091355/Dropbox/Mayo/Projects/Sharp/HTP/Drools Response/Disease.bpmn");
-        //
-        // fileName = fileName + ".bpmn";
-        // File tempFile = new File(storeLocation + fileName);
-        // FileUtils.copyFile(incoming, tempFile);
-
-        return null;
-    }
-
     private void setHostNameVerifier() {
         HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
 
@@ -335,6 +288,18 @@ public class RestExecuter {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String mapToJson(Map<String, String> map) {
+        String jsonMap = "";
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            jsonMap = objectMapper.writeValueAsString(map);
+        }
+        catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to serialize value set map to json string.", e);
+        }
+        return jsonMap;
     }
 
 }

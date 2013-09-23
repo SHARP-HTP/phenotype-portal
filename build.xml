@@ -39,6 +39,8 @@
 		<copy todir="${dist.lib}" file="${lib.dir}/httpcore-4.2.2.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/httpmime-4.2.3.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/jaxrs-api-2.3.4.Final.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/jackson-core-asl-1.8.8.jar" />
+		<copy todir="${dist.lib}" file="${lib.dir}/jackson-mapper-asl-1.8.8.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/log4j-1.2.16.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/mailapi.jar" />
 		<copy todir="${dist.lib}" file="${lib.dir}/model-0.8.2.jar" />
@@ -92,7 +94,7 @@
 				<pathelement location="${gwt.sdk}/validation-api-1.0.0.GA.jar" />
 				<pathelement location="${gwt.sdk}/validation-api-1.0.0.GA-sources.jar" />
 			</classpath>
-			<jvmarg value="-Xmx256M" />
+			<jvmarg value="-Xmx512M" />
 			<arg value="-startupUrl" />
 			<arg value="Htp.html" />
 			<arg line="-war" />
@@ -112,6 +114,7 @@
 
 	<target name="clean" description="Cleans this project">
 		<delete dir="${dist.dir}" failonerror="false" />
+		<delete dir="${dist.lib}" failonerror="false" />
 		<delete dir="${compile.dir}" failonerror="false" />
 		<delete dir="${deploy.dir}" failonerror="false" />
 		<delete dir="gwt-unitCache" failonerror="false" />

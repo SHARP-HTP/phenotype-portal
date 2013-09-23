@@ -323,6 +323,16 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
     public Execution executePhenotype(AlgorithmData algorithmData, Date fromDate, Date toDate,
             String userName) throws IllegalArgumentException {
 
+        Map<String, String> valueSets = new HashMap<String, String>();
+        for (ValueSet vs : algorithmData.getValueSets()) {
+            if (!vs.version.equals("1"))
+                valueSets.put(vs.name, vs.version);
+        }
+        for (ValueSet vs : algorithmData.getSupplementalValueSets()) {
+            if (!vs.version.equals("1"))
+                valueSets.put(vs.name, vs.version);
+        }
+
         String locationUrl;
         String executionStatus = "";
         Execution execution = new Execution();
@@ -339,7 +349,7 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
             // execute the algorithm. This will return immediately with an id to
             // the resource that is executing.
             locationUrl = RestExecuter.getInstance().createExecution(xmlFile,
-                    executionDateRangeFrom, executionDateRangeTo);
+                    executionDateRangeFrom, executionDateRangeTo, valueSets);
             execution.setUrl(locationUrl);
 
             // poll on the status until it is complete
@@ -375,8 +385,6 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
                 long endExecution = System.currentTimeMillis();
                 long elapsedTime = endExecution - startExecution;
                 conn.setAutoCommit(false);
-
-                // insertDrools(conn, executionResults, userName, "test");
 
                 Execution exeItem = new Execution();
                 exeItem.setUser(userName);
@@ -458,44 +466,7 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
         List<Demographic> demographics = getDemographics(returnedXml);
         executionResults.setDemographics(demographics);
         executionResults.setXmlPath(relativePath + demographicsFileName);
-
-        /* Drools workflow Image */
-        /* TODO: Renable workflow image? */
-        // String returnedImage = RestExecuter.getImage(locationUrl + "/image",
-        // basePath + "images/",
-        // getFileName());
-        // String imageFileName = "workflow.png";
-        // File imageFile = new File(executionResultsPath + imageFileName);
-        // FileUtils.copyFile(new File(basePath + "images/" + returnedImage),
-        // imageFile);
-        // executionResults.setImage(getImage(relativePath + imageFileName));
     }
-
-    // private Image getImage(String imagePath) throws IOException {
-    // String basePath = getExecutionResultsPath();
-    // File imageFile = new File(basePath + File.separator + imagePath);
-    // Image image = new Image();
-    // image.setImagePath(imagePath);
-    // ImageInputStream in = ImageIO.createImageInputStream(imageFile);
-    // try {
-    // final Iterator<?> readers = ImageIO.getImageReaders(in);
-    // if (readers.hasNext()) {
-    // ImageReader reader = (ImageReader) readers.next();
-    // try {
-    // reader.setInput(in);
-    // image.setWidth(reader.getWidth(0));
-    // image.setHeight(reader.getHeight(0));
-    // } finally {
-    // reader.dispose();
-    // }
-    // }
-    // } finally {
-    // if (in != null)
-    // in.close();
-    // }
-    //
-    // return image;
-    // }
 
     public String getCategoryPath(String parentId) {
         Connection conn = DBConnection.getDBConnection();
@@ -1447,10 +1418,6 @@ public class PhenotypeServiceImpl extends RemoteServiceServlet implements Phenot
                         .colName()));
                 execution.setBpmnPath(resultSet.getString(ExecutionColumns.BPMN_PATH.colName()));
                 execution.setRulesPath(resultSet.getString(ExecutionColumns.RULES_PATH.colName()));
-                String imagePath = resultSet.getString(ExecutionColumns.IMAGE_PATH.colName());
-                /* TODO: re-enable workflow image? */
-                // if (imagePath != null && !imagePath.isEmpty())
-                // execution.setImage(getImage(imagePath));
 
                 /* Demographics */
                 if (execution.getXmlPath() != null) {
