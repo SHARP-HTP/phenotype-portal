@@ -77,10 +77,16 @@ public class SummaryTab extends Tab implements ReportTab {
         i_demographicResult = demographicResult;
         clearTab();
 
-        if (i_demographicResult == null || i_demographicResult.size() == 0) {
+        if (i_demographicResult == null) {
             i_messagePane = new HTMLPane();
             i_messagePane.setWidth100();
             i_messagePane.setContents(MESSAGE_NO_DATA);
+            i_messagePane.redraw();
+            setPane(i_messagePane);
+        } else if (i_demographicResult.size() == 0) {
+            i_messagePane = new HTMLPane();
+            i_messagePane.setWidth100();
+            i_messagePane.setContents("<b>No patients matched the criteria.</b>");
             i_messagePane.redraw();
             setPane(i_messagePane);
         } else {
@@ -138,7 +144,6 @@ public class SummaryTab extends Tab implements ReportTab {
      * This methods will create an option layout to create different options to
      * create graph
      * 
-     * @param demographics
      */
     public void createGraphOptions() {
 
