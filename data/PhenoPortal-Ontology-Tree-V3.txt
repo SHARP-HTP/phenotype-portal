@@ -353,7 +353,6 @@ Section 10.06 Other bacterial diseases
 (h) Streptococcal sore throat
 (i) Tetanus
 (j) Whooping cough
-
 Section 10.7 Other diseases due to viruses and chlamydiae
 (a) Infections mononucleosis
 (b) Mumps
@@ -362,7 +361,6 @@ Section 10.7 Other diseases due to viruses and chlamydiae
 (e) Rabies
 (f) Trachoma
 (g) Viral hepatitis
-
 Section 10.08 Syphilis and other venereal diseases
 (a) Cardiovascular syphilis
 (b) Congenital syphilis
