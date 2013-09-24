@@ -216,13 +216,13 @@ public class CriteriaTab extends Tab implements ReportTab {
         System.out.println("Criteria Tab --- setVersionsFromLastExecution() called.");
         i_lastExecution = execution;
 
-        if (i_lastExecution != null) {
+        if (i_lastExecution != null && i_lastExecution.getId() != null) {
             PhenotypeServiceAsync phenotypeService = GWT.create(PhenotypeService.class);
             phenotypeService.getExecutionValueSets(i_lastExecution.getId(),
                     new AsyncCallback<List<ValueSet>>() {
                         @Override
                         public void onFailure(Throwable caught) {
-                            SC.warn("Failed to retrieve value sets for the last executed algorithm.");
+                            SC.warn("Failed to retrieve value sets for the last executed algorithm. CT");
                         }
 
                         @Override
