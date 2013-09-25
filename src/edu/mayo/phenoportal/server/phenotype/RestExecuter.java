@@ -6,12 +6,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXParseException;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -19,15 +14,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.security.SecureRandom;
@@ -71,6 +59,23 @@ public class RestExecuter {
         return s_restExecuter;
     }
 
+    /**
+     * Create (and configure) a {@link HttpURLConnection} from a {@link URL}.
+     *
+     * @param url the target URL
+     * @return the configured connection
+     * @throws Exception
+     */
+    protected HttpURLConnection getConnection(URL url) throws Exception {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        if(connection instanceof HttpsURLConnection){
+            ((HttpsURLConnection)connection).setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+        }
+
+        return connection;
+    }
+
     /*
      * Execute an algorithm and get the location.
      */
@@ -86,8 +91,7 @@ public class RestExecuter {
         String CRLF = "\r\n"; // Line separator required by multipart/form-data.
 
         URL url = new URL(s_restUrl + "/executor/executions");
-        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-	    connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+        HttpURLConnection connection = this.getConnection(url);
 
         // infinite timeout on the connection
         connection.setConnectTimeout(0);
@@ -178,8 +182,8 @@ public class RestExecuter {
     public String pollStatus(String url) throws Exception {
         URL executions = new URL(url);
 
-        HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
-        connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+        HttpURLConnection connection = this.getConnection(executions);
+
         connection.setRequestProperty("Accept", "application/xml");
         InputStream in = connection.getInputStream();
 
@@ -210,8 +214,8 @@ public class RestExecuter {
         String resultStr = "";
 
         try {
-            HttpsURLConnection connection = (HttpsURLConnection) executions.openConnection();
-            connection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+            HttpURLConnection connection = this.getConnection(executions);
+
             connection.setRequestProperty("Accept", "application/xml");
             in = connection.getInputStream();
 
