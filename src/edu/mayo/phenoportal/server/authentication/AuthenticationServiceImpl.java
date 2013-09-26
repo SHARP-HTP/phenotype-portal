@@ -1,12 +1,5 @@
 package edu.mayo.phenoportal.server.authentication;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -86,8 +79,7 @@ public class AuthenticationServiceImpl extends RemoteServiceServlet implements
     @Override
     public User isValidSession() throws IllegalArgumentException {
         HttpSession httpSession = getThreadLocalRequest().getSession(true);
-        User user = (User) httpSession.getAttribute(USER);
-        return user;
+        return (User) httpSession.getAttribute(USER);
     }
 
     @Override
@@ -97,8 +89,7 @@ public class AuthenticationServiceImpl extends RemoteServiceServlet implements
     }
 
     private String generateHashPw(String pw) {
-        String hashed = BCrypt.hashpw(pw, BCrypt.gensalt());
-        return hashed;
+        return BCrypt.hashpw(pw, BCrypt.gensalt());
     }
 
     /**
@@ -126,19 +117,15 @@ public class AuthenticationServiceImpl extends RemoteServiceServlet implements
 
     @Override
     public Boolean registerUser(User user) throws IllegalArgumentException {
-	    boolean success = registerMatUser(user);
-	    if (success)
-            success = setUser(user);
-        return Boolean.valueOf(success);
+        return setUser(user);
     }
 
     @Override
     public Boolean updateUserPassword(User user) throws IllegalArgumentException {
 
-        Connection conn = null;
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
-        conn = DBConnection.getDBConnection();
 
         boolean success = false;
 
@@ -152,18 +139,18 @@ public class AuthenticationServiceImpl extends RemoteServiceServlet implements
                 st = conn.prepareStatement(SQLStatements.updateUserPasswordStatement(
                         user.getUserName(), pwHashed));
 
-                int result = st.executeUpdate();
+                st.executeUpdate();
                 success = true;
 
             } catch (Exception ex) {
-                s_logger.log(Level.SEVERE, "Failed to update user password" + ex.getStackTrace(),
+                s_logger.log(Level.SEVERE, "Failed to update user password" + ex.getMessage(),
                         ex);
             } finally {
                 DBConnection.closeConnection(conn, st, rs);
             }
         }
 
-        return new Boolean(success);
+        return success;
     }
 
     /**
@@ -176,11 +163,10 @@ public class AuthenticationServiceImpl extends RemoteServiceServlet implements
      * @return
      */
     private User getUser(String name) {
-        Connection conn = null;
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
         User user = null;
-        conn = DBConnection.getDBConnection();
 
         if (conn != null) {
             try {
@@ -204,7 +190,7 @@ public class AuthenticationServiceImpl extends RemoteServiceServlet implements
                 }
             } catch (Exception ex) {
                 s_logger.log(Level.SEVERE,
-                        "Failed to get users for Authenticating" + ex.getStackTrace(), ex);
+                        "Failed to get users for Authenticating" + ex.getMessage(), ex);
             } finally {
                 DBConnection.closeConnection(conn, st, rs);
             }
@@ -219,23 +205,24 @@ public class AuthenticationServiceImpl extends RemoteServiceServlet implements
      * @return
      */
     private boolean setUser(User user) {
-        Connection conn = null;
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
-        conn = DBConnection.getDBConnection();
         boolean isSuccessful = false;
+
+        String pwHashed = generateHashPw(user.getPassword());
 
         if (conn != null) {
             try {
                 long registrationDate = System.currentTimeMillis();
                 user.setRegistrationDate(DateConverter.getTimeString(new Date(registrationDate)));
-                st = conn.prepareStatement(SQLStatements.insertUserStatement(user, user.getPassword()));
+                st = conn.prepareStatement(SQLStatements.insertUserStatement(user, pwHashed));
 
                 st.execute();
                 sendRegistrationEmail(user);
                 isSuccessful = true;
             } catch (Exception ex) {
-                s_logger.log(Level.SEVERE, "Failed to Set users in database" + ex.getStackTrace(),
+                s_logger.log(Level.SEVERE, "Failed to Set users in database" + ex.getMessage(),
                         ex);
                 isSuccessful = false;
 
@@ -255,76 +242,5 @@ public class AuthenticationServiceImpl extends RemoteServiceServlet implements
 
         SmtpClient.sendRegistrationSuccessEmail(host, from, pw, port, messageText, user);
     }
-
-	private boolean registerMatUser(User user) {
-		boolean result = false;
-		String charset = "UTF-8";
-		String url = ServletUtils.getMatEditorUrlInternal() + "/createUser";
-		OutputStream output = null;
-		InputStream response = null;
-
-		try {
-			String hashedpw = generateHashPw(user.getPassword());
-			String query = String.format("userId=%s&firstName=%s&lastName=%s&email=%s&phone=%s&password=%s&htpid=%s",
-			  URLEncoder.encode(user.getUserName(), charset),
-			  URLEncoder.encode(user.getFirstName(), charset),
-			  URLEncoder.encode(user.getLastName(), charset),
-			  URLEncoder.encode(user.getEmail(), charset),
-		      URLEncoder.encode(user.getPhoneNumber(), charset),
-			  URLEncoder.encode(user.getPassword(), charset),
-			  URLEncoder.encode(hashedpw, charset));
-
-			HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-			connection.setConnectTimeout(0);
-			connection.setDoOutput(true);
-			connection.setDoInput(true);
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Accept-Charset", charset);
-			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-			connection.setRequestProperty("charset", charset);
-			connection.setRequestProperty("Content-Length", Integer.toString(query.length()));
-			connection.setUseCaches(false);
-			connection.connect();
-			output = connection.getOutputStream();
-			output.write(query.getBytes(charset));
-			output.flush();
-
-			if (connection.getResponseCode() == 200) {
-				response = connection.getInputStream();
-				System.out.println(response.toString());
-				user.setPassword(hashedpw);
-				result = true;
-			}
-			else {
-				result = false;
-			}
-		}
-		catch (MalformedURLException mue) {
-			s_logger.log(Level.WARNING, "Unable to create MAT user.", mue);
-			result = false;
-		}
-		catch (IOException ioe) {
-			s_logger.log(Level.WARNING, "Unable to create MAT user.", ioe);
-			result = false;
-		}
-		finally {
-			if (output != null) {
-				try {
-					output.close();
-				} catch(Exception e) {
-					s_logger.log(Level.FINE, "Failed to close outputStream.", e);
-				}
-			}
-			if (response != null) {
-				try {
-					response.close();
-				} catch (Exception e) {
-					s_logger.log(Level.FINE, "Failed to close inputStream.", e);
-				}
-			}
-		}
-
-		return result;
-	}
 
 }

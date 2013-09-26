@@ -21,14 +21,13 @@ import edu.mayo.phenoportal.shared.User;
 
 public class TabRegister extends Tab {
 
-    // private static final int WIDTH = 400;
     private static final int HEIGHT = 250;
 
     private static final String TITLE = "Register";
     private static final String ICON = "register.png";
 
     private static final String TITLE_SUCCESS = "Registration Success";
-    private static final String REGISTRATION_MSG_SUCCESS = "Your registration has been submitted.  You will recieve an email when your registration has been accepted and enabled.";
+    private static final String REGISTRATION_MSG_SUCCESS = "Your registration was successful. You can now login using the 'Log In' link.";
 
     private static final String TITLE_ERROR = "Registration Error";
     private static final String REGISTRATION_MSG_ERROR = "The User Id is not unique.  Please enter a different User Id.";
