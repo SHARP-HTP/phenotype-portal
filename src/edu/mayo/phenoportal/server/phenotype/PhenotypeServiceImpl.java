@@ -59,7 +59,7 @@ import edu.mayo.phenoportal.utils.ServletUtils;
 public class PhenotypeServiceImpl extends RemoteServiceServlet implements PhenotypeService {
 
     private static Logger s_logger = Logger.getLogger(PhenotypeServiceImpl.class.getName());
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     private static final String ERROR_HTML = "<b>Could not retrieve the criteria information.</b>";
 
     // XML Settings

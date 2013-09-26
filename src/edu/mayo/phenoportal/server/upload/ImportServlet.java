@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 public class ImportServlet extends HttpServlet implements HttpSessionListener {
 
-	private static final long serialVersionUID = 543451297123974157L;
+	private static final long serialVersionUID = 543451297123974158L;
 	private Logger logger = Logger.getLogger(ImportServlet.class.getName());
 
 	private static Object matImportsLock = new Object();

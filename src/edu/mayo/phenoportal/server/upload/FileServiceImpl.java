@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 public class FileServiceImpl extends RemoteServiceServlet implements FileService {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     static final Logger lgr = Logger.getLogger(FileServiceImpl.class.getName());
 
     @Override

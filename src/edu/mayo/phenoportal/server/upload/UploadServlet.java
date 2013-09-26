@@ -60,7 +60,7 @@ import java.util.zip.ZipInputStream;
 
 public class UploadServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 3457906406134591884L;
+    private static final long serialVersionUID = 3457906406134591886L;
     private static String ALGORITHM_PATH = null;
     private static String MAT_UPLOAD_PATH = "/mat/zips";
     private static Logger logger = Logger.getLogger(UploadServlet.class.getName());
