@@ -1,8 +1,8 @@
 package edu.mayo.phenoportal.shared;
 
-import java.io.Serializable;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class MatImport implements Serializable {
+public class MatImport implements IsSerializable {
 
 	public String id;
 	public String user;

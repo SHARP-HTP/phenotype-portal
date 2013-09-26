@@ -1,12 +1,11 @@
 package edu.mayo.phenoportal.shared;
 
-import java.io.Serializable;
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class DemographicsCategory implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class DemographicsCategory implements IsSerializable {
 
 	private String name;
 	List<DemographicStat> demoStatList = new ArrayList<DemographicStat>();

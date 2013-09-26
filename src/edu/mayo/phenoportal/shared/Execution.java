@@ -1,11 +1,10 @@
 package edu.mayo.phenoportal.shared;
 
-import java.io.Serializable;
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.util.List;
 
-public class Execution implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class Execution implements IsSerializable {
 
 	private String id;
 	private String url;

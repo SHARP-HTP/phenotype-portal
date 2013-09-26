@@ -1,9 +1,10 @@
 package edu.mayo.phenoportal.shared;
 
-import java.io.Serializable;
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.util.Map;
 
-public class ResolvedValueSet implements Serializable {
+public class ResolvedValueSet implements IsSerializable {
 	private String developer;
 	private String oid;
 	private String name;

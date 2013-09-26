@@ -1,9 +1,8 @@
 package edu.mayo.phenoportal.shared;
 
-import java.io.Serializable;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class UserRoleRequest implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class UserRoleRequest implements IsSerializable {
 
     private String id;
     private String userName;

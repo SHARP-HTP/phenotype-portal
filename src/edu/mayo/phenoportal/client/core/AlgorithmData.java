@@ -1,9 +1,8 @@
 package edu.mayo.phenoportal.client.core;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import edu.mayo.phenoportal.shared.ValueSet;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.Map;
  * Class to encapsulate a selected algorithm.
  *
  */
-public class AlgorithmData implements Serializable {
+public class AlgorithmData implements IsSerializable {
 
 	private int id;
 	private String i_categoryId;

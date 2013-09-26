@@ -1,22 +1,17 @@
 package edu.mayo.phenoportal.server.upload;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import edu.mayo.phenoportal.shared.AlgorithmType;
 import org.apache.commons.fileupload.FileItem;
 
-// import org.apache.log4j.Logger;
+public class UploadItems implements IsSerializable {
 
-public class UploadItems implements Serializable {
-    // static final Logger logger =
-    // Logger.getLogger(UploadItems.class.getName());
-
-    private static final long serialVersionUID = -8987031921542979987L;
     private String id;
     private String name;
     private String user;

@@ -1,10 +1,9 @@
 package edu.mayo.phenoportal.client.upload;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import edu.mayo.phenoportal.shared.AlgorithmType;
 
-import java.io.Serializable;
-
-public class ClientUploadItems implements Serializable {
+public class ClientUploadItems implements IsSerializable {
 
 	private int id;
     private String parentId;

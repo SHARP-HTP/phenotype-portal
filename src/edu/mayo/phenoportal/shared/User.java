@@ -1,11 +1,8 @@
 package edu.mayo.phenoportal.shared;
 
-import java.io.Serializable;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class User implements Serializable {
-    // static final Logger logger = Logger.getLogger(User.class.getName());
-
-    private static final long serialVersionUID = 1L;
+public class User implements IsSerializable {
 
     private String fname;
     private String lname;

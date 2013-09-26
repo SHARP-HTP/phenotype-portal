@@ -1,13 +1,11 @@
 package edu.mayo.phenoportal.shared;
 
-import java.io.Serializable;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * Class to encapsulate a news item.
  */
-public class News implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class News implements IsSerializable {
 
     private String i_id;
     private String i_date;

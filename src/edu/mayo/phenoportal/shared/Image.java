@@ -1,10 +1,8 @@
 package edu.mayo.phenoportal.shared;
 
-import java.io.Serializable;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class Image implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class Image implements IsSerializable {
 
 	private String imagePath;
 	private int width;
