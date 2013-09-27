@@ -15,17 +15,16 @@ import java.util.logging.Logger;
 
 public class FileServiceImpl extends RemoteServiceServlet implements FileService {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
     static final Logger lgr = Logger.getLogger(FileServiceImpl.class.getName());
 
     @Override
     public ClientUploadItems retrieveUploadMetadata(int id) {
 
-        Connection conn = null;
+        Connection conn = DBConnection.getDBConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
         ClientUploadItems clientUploadItems = new ClientUploadItems();
-        conn = DBConnection.getDBConnection();
 
         if (conn != null) {
             try {
@@ -58,7 +57,7 @@ public class FileServiceImpl extends RemoteServiceServlet implements FileService
             } catch (Exception ex) {
 
                 lgr.log(Level.SEVERE,
-                        "Failed to retrieve meta data information" + ex.getStackTrace(), ex);
+                        "Failed to retrieve meta data information" + ex.getMessage(), ex);
 
             } finally {
                 DBConnection.closeConnection(conn, st, rs);
