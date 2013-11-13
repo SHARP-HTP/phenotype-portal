@@ -34,7 +34,8 @@ public class UserManual extends VLayout {
         tabGuide.setPane(new GuideHtmlPane());
 
         Tab tabFaq = new Tab("FAQ");
-        tabFaq.setPane(new FaqListGrid());
+        //tabFaq.setPane(new FaqListGrid());
+        tabFaq.setPane(new FaqHtmlPane());
 
         Tab tabContact = new Tab("Contact");
         Canvas tabPane3 = new Canvas();

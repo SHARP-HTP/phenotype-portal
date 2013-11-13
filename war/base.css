@@ -4590,7 +4590,7 @@ a:hover {
   #text-decoration:underline;
 }
 
-#htpLinks
+.htpLinks
 {
   color: red;
   font-family: Arial,Helvetica,sans-serif;
@@ -4599,9 +4599,9 @@ a:hover {
   text-decoration:none;
 }
 
-#htpLinks:hover
+.htpLinks:hover
 {
-  color: red
+  color: red;
   font-family: Arial,Helvetica,sans-serif;
   font-size: 14px;
   font-weight: bold; 

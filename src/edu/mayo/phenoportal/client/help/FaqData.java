@@ -59,8 +59,22 @@ public class FaqData {
                         "There are not any date range restrictions, but please note that a large date range will result a longer query/wait time.. The application will email you if the query takes more than a minute and inform you that the query is running in the background."),
                 new HelpRecord(
                         "How can I contact you for further questions?",
-                        "Please email us on at <a id=\"htpLinks\" href=\"mailto:phenotypeportal@informatics.mayo.edu\">phenotypeportal@informatics.mayo.edu</a>")
-
+                        "Please email us on at <a class=\"htpLinks\" href=\"mailto:phenotypeportal@informatics.mayo.edu\">phenotypeportal@informatics.mayo.edu</a>"),
+                new HelpRecord(
+                        "Is there additional documentation?",
+                        "Please visit the <a class=\"htpLinks\" href=\"http://docs.phenotypeportal.org\">QDM Phenotyping Documentation</a>"),
+                new HelpRecord(
+                        "Is there an API demonstration?",
+                        "Please visit the <a class=\"htpLinks\" href=\"http://api.phenotypeportal.org\">QDM Phenotyping API Demonstration</a>"),
+                new HelpRecord(
+                        "Is there a downloadable virtual machine image?",
+                        "Please visit the <a class=\"htpLinks\" href=\"http://static.phenotypeportal.org/downloads/vm/sharp-htp.ova\">sharp-htp virtual machine image</a>"),
+                new HelpRecord(
+                        "Is there a Cypress execution report for MU Stage 2 CQMs?",
+                        "Please visit the <a class=\"htpLinks\" href=\"http://api.phenotypeportal.org/executor/cypress/report\">Cypress execution report for MU Stage 2 CQMs</a>"),
+                new HelpRecord(
+                        "Is source code available for download?",
+                        "Please visit the <a class=\"htpLinks\" href=\"https://github.com/SHARP-HTP/qdm-phenotyping\">QDM Phenotyping GitHub</a>")
         };
 
     }

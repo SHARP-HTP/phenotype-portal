@@ -142,7 +142,7 @@ public class FileInfoTab extends Tab implements ReportTab {
                         StaticTextItem associatedNameItem = createItem("PheKB/NQF Name",
                                 uploadItems.getAssocName());
 
-                        final String link = "<a id=\"htpLinks\" href=\""
+                        final String link = "<a class=\"htpLinks\" href=\""
                                 + uploadItems.getAssocLink() + "\" target=\"_blank\">"
                                 + uploadItems.getAssocLink() + "</a>";
 
