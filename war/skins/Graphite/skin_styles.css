@@ -2463,6 +2463,14 @@ a:hover {
   font-weight: bold; 
   text-decoration:none;
 }
+.htpLinks:link
+{
+    color: #2013d4;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration:none;
+}
 .htpLinks:hover
 {
   color: #2013d4;
@@ -2470,6 +2478,14 @@ a:hover {
   font-size: 14px;
   font-weight: bold; 
   text-decoration:underline;
+}
+.htpLinks:visited
+{
+    color: #2cabe2;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration:none;
 }
 .htpClickable {
   color: #B0ABDB;
