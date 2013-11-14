@@ -7,6 +7,8 @@ Phenotyping is the process of identifying a cohort of patients based on certain 
 
 Traditionally, a patient's medical information is stored inconsistently and in multiple locations, both electronically and non-electronically. The Phenotype Portal will work towards creating a unified framework for normalizing and standardizing clinical data, which will allow for the exchange of patient information among care providers, government agencies, insurers and other stake holders. 
 
+For technical information about this project including source code downloads and installation instructions, please visit the <a class="htpLinks" href="http://docs.phenotypeportal.org">QDM Phenotyping Documentation</a> page.
+
 # PhenotypePortal Installation Guide #
 
 ## Requirements ##
